@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>360eDash — Dashboard</title>
+
+<!-- =========================================================
+     Auth Guard — HARUS paling atas & TIDAK pakai "defer".
+     Dijalankan sebelum apa pun lain di-load, supaya kalau user
+     belum login, dia langsung dilempar ke halaman login tanpa
+     sempat melihat isi dashboard (menghindari "flash" konten). -->
+<script>
+  (function () {
+    var isLoggedIn = sessionStorage.getItem("edash-user");
+    if (!isLoggedIn) {
+      // Ticket deep-link (?ticket=<id>, lihat js/ticketing.js & tombol
+      // "Copy Link" di modal detail ticket): kalau user belum login,
+      // simpan dulu ke sessionStorage SEBELUM dilempar ke halaman
+      // marketing, supaya tidak hilang. login.js membacanya lagi
+      // lewat "edash-pending-deeplink" dan mengarahkan balik ke sini
+      // (lengkap dengan ?ticket=...) begitu login berhasil.
+      var ticketParam = new URLSearchParams(window.location.search).get("ticket");
+      if (ticketParam) {
+        sessionStorage.setItem("edash-pending-deeplink", "index.html?ticket=" + encodeURIComponent(ticketParam));
+      }
+      window.location.replace("main-page/index.html");
+    }
+  })();
+</script>
+
+<!-- Google Fonts: Poppins -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome 6 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<!-- MapLibre GL JS (peta open-source, dipakai untuk Project Overview & Project
+     Selector) — basemap "street" dari OpenFreeMap (vector tiles, gratis tanpa
+     API key/limit) dan basemap "satellite" dari Esri World Imagery -->
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+
+<!-- Global design tokens + shared atoms (button, pill, skeleton, toast) -->
+<link rel="stylesheet" href="css/global.css">
+
+<!-- Master components (modular, reusable) -->
+<link rel="stylesheet" href="master/sidebar/sidebar.css">
+<link rel="stylesheet" href="master/header/header.css">
+<link rel="stylesheet" href="master/logout-modal/logout-modal.css">
+
+<!-- Page-specific styles -->
+<link rel="stylesheet" href="css/login.css">
+<link rel="stylesheet" href="css/project-overview.css">
+<link rel="stylesheet" href="css/project-detail.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/project-selector.css">
+<link rel="stylesheet" href="css/system-information.css">
+<link rel="stylesheet" href="css/battery-station.css">
+<link rel="stylesheet" href="css/catalog.css">
+<link rel="stylesheet" href="css/project-monitoring.css">
+<link rel="stylesheet" href="css/task-maintenance.css">
+<link rel="stylesheet" href="css/task-management.css">
+<link rel="stylesheet" href="css/setting.css">
+<link rel="stylesheet" href="css/alert.css">
+<link rel="stylesheet" href="css/activity-log.css">
+<link rel="stylesheet" href="css/add-project.css">
+<link rel="stylesheet" href="css/admin-calculator.css">
+<link rel="stylesheet" href="css/admin-view.css">
+<link rel="stylesheet" href="css/operator/operator-dashboard.css">
+<link rel="stylesheet" href="css/ticketing.css">
+<link rel="stylesheet" href="css/dark-mode-v8.css?v=20260825b">
+
+<style>
+  :root {
+    --page-bg: #f4f7f7;
+
+    /* Tracks .edash-content's own padding at each breakpoint below, so
+       any page that needs to break out of that padding (e.g. Project
+       Selector's fullscreen map) can use `inset: calc(-1 * var(...))`
+       instead of a hardcoded value that drifts out of sync with the
+       responsive padding and clips content under the header. */
+    --edash-content-pad: 24px;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--page-bg);
+    color: #25343F;
+  }
+
+  html[data-theme="dark"] body {
+    background: #101b1f;
+    color: #e7eff0;
+  }
+
+  html[data-theme="dark"] .edash-content {
+    background: #101b1f;
+  }
+
+  html[data-theme="dark"] * {
+    scrollbar-color: #315158 transparent;
+  }
+
+  html[data-theme="dark"] *::-webkit-scrollbar-thumb {
+    background-color: #315158;
+  }
+
+  html[data-theme="dark"] *::-webkit-scrollbar-thumb:hover {
+    background-color: #21a7ae;
+  }
+
+  /* ---------- App shell ----------
+     Hanya .edash-content yang scroll. Sidebar & header punya tinggi
+     tetap (100vh) sehingga header TIDAK PERNAH ikut ter-scroll,
+     tidak akan "tenggelam" walau isi halaman panjang. */
+
+  .edash-layout {
+    display: flex;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    max-width: 100vw;
+  }
+
+  .edash-main {
+    flex: 1;
+    min-width: 0;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .edash-content {
+    position: relative;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--edash-content-pad);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #sidebar-root:empty,
+  #header-root:empty {
+    display: none;
+  }
+
+  /* ---------- Responsive content padding ----------
+     Keeps the same layout concept, just tightens the outer gutter
+     as the viewport shrinks so cards/tables have more usable width. */
+
+  @media (max-width: 1024px) {
+    .edash-content {
+      padding: 20px;
+    }
+
+    :root {
+      --edash-content-pad: 20px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .edash-content {
+      padding: 16px;
+    }
+
+    :root {
+      --edash-content-pad: 16px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .edash-content {
+      padding: 12px;
+    }
+
+    :root {
+      --edash-content-pad: 12px;
+    }
+  }
+
+  /* Fullscreen pages (e.g. Project Selector map) opt out of the
+     dvh fallback issue by keeping fixed 100vh already handled above. */
+
+  /* ---------- Global thin scrollbar ----------
+     Applies to any scrollable region in the app (content area,
+     modals, tables, etc.) so scrollbars look consistent everywhere
+     instead of the bulky OS default. */
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #cfe4e4 transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #cfe4e4;
+    border-radius: 999px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: #0f6a71;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="edash-layout">
+
+  <!-- Sidebar mount point -->
+  <div id="sidebar-root"></div>
+
+  <!-- Backdrop shown behind the sidebar on mobile/tablet when it's
+       open as an off-canvas panel (see master/sidebar/sidebar.css) -->
+  <div class="edash-sidebar-backdrop" id="edashSidebarBackdrop"></div>
+
+  <div class="edash-main">
+
+    <!-- Header mount point (tidak ikut scroll) -->
+    <div id="header-root"></div>
+
+    <main class="edash-content">
+
+      <!-- Halaman aktif dimuat ke sini oleh main.js -->
+      <div id="page-root"></div>
+
+    </main>
+  </div>
+
+</div>
+
+<!-- Logout confirmation modal mount point (overlay, sits outside
+     .edash-layout so it's never clipped by any page's overflow) -->
+<div id="logout-modal-root"></div>
+
+
+<!-- =========================================================
+     THIRD-PARTY LIBRARIES
+     ========================================================= -->
+
+<script
+  src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"
+  defer>
+</script>
+
+<script
+  src="vendor/chartjs/chart.umd.min.js"
+  defer>
+</script>
+
+<script
+  src="vendor/papaparse/papaparse.min.js"
+  defer>
+</script>
+
+<script
+  src="vendor/jspdf/jspdf.umd.min.js"
+  defer>
+</script>
+
+<script
+  src="vendor/jspdf/jspdf.plugin.autotable.min.js"
+  defer>
+</script>
+
+<script
+  src="vendor/xlsx/xlsx.full.min.js"
+  defer>
+</script>
+
+
+<!-- =========================================================
+     CORE / CONFIGURATION
+     ========================================================= -->
+
+<script src="js/api-config.js"></script>
+<script src="js/stale-cache.js"></script>
+<script src="js/loading-bar.js"></script>
+<script src="js/project-context.js"></script>
+<script src="js/activity-log-client.js"></script>
+<script src="js/marketing-pixel-client.js"></script>
+
+
+<!-- =========================================================
+     PROJECT / DASHBOARD
+     ========================================================= -->
+
+<script src="js/project-overview.js" defer></script>
+<script src="js/project-detail.js" defer></script>
+<script src="js/dashboard.js?v=20260907" defer></script>
+<script src="js/project-selector.js" defer></script>
+<script src="js/login.js" defer></script>
+
+
+<!-- =========================================================
+     CATALOG
+     ========================================================= -->
+
+<script src="js/company-catalog.js" defer></script>
+<script src="js/catalog.js" defer></script>
+
+
+<!-- =========================================================
+     SYSTEM INFORMATION
+     ========================================================= -->
+
+<script src="js/system-information.js" defer></script>
+
+
+<!-- =========================================================
+     BATTERY STATION
+     
+     Urutan penting:
+     1. battery-repository        (metadata — localStorage, belum VPS)
+     2. battery-vps-discovery     (Project -> System -> Device, VPS real)
+     3. battery-telemetry-adapter (telemetry/latest & /history, VPS real)
+     4. battery-station           (UI controller)
+     ========================================================= -->
+
+<script src="js/battery-repository.js" defer></script>
+<script src="js/battery-vps-discovery.js" defer></script>
+<script src="js/battery-telemetry-adapter.js" defer></script>
+<script src="js/battery-station.js" defer></script>
+
+
+<!-- =========================================================
+     PROJECT MONITORING
+     ========================================================= -->
+
+<script src="js/project-monitoring.js" defer></script>
+
+
+<!-- =========================================================
+     TASK / MANAGEMENT
+     ========================================================= -->
+
+<script src="js/task-maintenance.js" defer></script>
+<script src="js/task-management.js" defer></script>
+
+
+<!-- =========================================================
+     SETTINGS
+     ========================================================= -->
+
+<script src="js/setting.js" defer></script>
+
+
+<!-- =========================================================
+     PROJECT / ADMIN
+     ========================================================= -->
+
+<script src="js/add-project.js" defer></script>
+<script src="js/admin-calculator.js" defer></script>
+<script src="js/admin-view.js" defer></script>
+
+
+<!-- =========================================================
+     ACTIVITY / OPERATOR / ANALYTICS
+     ========================================================= -->
+
+<script src="js/activity-log.js" defer></script>
+<script src="js/operator/operator-dashboard.js" defer></script>
+<script src="js/marketing-analytics.js" defer></script>
+
+
+<!-- =========================================================
+     TICKETING
+     ========================================================= -->
+
+<script src="js/ticketing.js" defer></script>
+
+
+<!-- =========================================================
+     MASTER COMPONENTS
+     ========================================================= -->
+
+<script src="master/logout-modal/logout-modal.js" defer></script>
+<script src="master/header/header.js" defer></script>
+
+
+<!-- =========================================================
+     MAIN PAGE ROUTER / LOADER
+     ========================================================= -->
+
+<script src="js/main.js" defer></script>
+
+
+<!-- =========================================================
+     ALERT
+     ========================================================= -->
+
+<script src="js/alert.js" defer></script>
+
+</body>
+</html>

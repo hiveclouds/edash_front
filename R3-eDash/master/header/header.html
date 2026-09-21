@@ -1,0 +1,131 @@
+<!-- ============================================================
+  Master Header Component — 360eDash
+============================================================= -->
+<header class="edash-header">
+
+  <!-- Left: mobile sidebar toggle (visible only on small screens, see
+       header.css @media) + reserved area for page title / breadcrumb -->
+  <div class="hd-left">
+    <button class="hd-menu-toggle" id="hdMenuToggle" type="button" aria-label="Open menu" aria-controls="edashSidebar" aria-expanded="false">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
+
+  <!-- Right: theme switch + language switch + notifications + profile -->
+  <div class="hd-right">
+
+    <!-- Light/Dark mode toggle. Baca/tulis localStorage "edash-theme" yang
+         sama persis dipakai applySavedTheme()/themeSwitcher() di main.js
+         dan toggle Appearance di Settings -- dua-duanya saling sinkron
+         karena sumber kebenarannya cuma satu: atribut data-theme di <html>. -->
+    <button class="hd-theme-toggle" id="hdThemeToggle" type="button" role="switch" aria-checked="false" aria-label="Toggle light/dark mode">
+      <span class="hd-theme-star hd-theme-star--1"></span>
+      <span class="hd-theme-star hd-theme-star--2"></span>
+      <span class="hd-theme-star hd-theme-star--3"></span>
+      <span class="hd-theme-cloud"><i class="fa-solid fa-cloud"></i></span>
+      <span class="hd-theme-thumb">
+        <i class="fa-solid fa-sun hd-theme-icon hd-theme-icon--sun"></i>
+        <i class="fa-solid fa-moon hd-theme-icon hd-theme-icon--moon"></i>
+      </span>
+    </button>
+
+    <button class="hd-lang" id="hdLangToggle" type="button" aria-label="Switch language">
+      <i class="fa-solid fa-globe"></i>
+      <span class="hd-lang-current" id="hdLangCurrent">EN</span>
+    </button>
+    <div id="google_translate_element" class="hd-lang-widget"></div>
+
+    <div class="hd-notif-wrap">
+
+      <button class="hd-notif" id="hdNotif" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="hdNotifPanel" aria-label="Notifications">
+        <i class="fa-regular fa-bell"></i>
+        <span class="hd-notif-badge" id="hdNotifBadge" hidden>0</span>
+      </button>
+
+      <div class="hd-notif-panel" id="hdNotifPanel" role="dialog" aria-label="Notifications" aria-hidden="true">
+
+        <div class="hd-notif-panel-head">
+          <span class="hd-notif-panel-title" data-i18n="header.notif.title">Notifications</span>
+          <button class="hd-notif-markall" id="hdNotifMarkAll" type="button">
+            <i class="fa-solid fa-check-double"></i>
+            <span data-i18n="header.notif.markAll">Mark All Read</span>
+          </button>
+        </div>
+
+        <div class="hd-notif-list" id="hdNotifList">
+          <!-- Item notifikasi dirender oleh master/header/header.js -->
+        </div>
+
+        <div class="hd-notif-empty" id="hdNotifEmpty" hidden>
+          <i class="fa-regular fa-bell-slash"></i>
+          <span data-i18n="header.notif.empty">No notifications yet</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="hd-profile-wrap" id="hdProfileWrap">
+      <button class="hd-profile" id="hdProfile" type="button" aria-haspopup="true" aria-expanded="false">
+        <span class="hd-avatar" id="hdAvatarInitials">AD</span>
+        <span class="hd-profile-info">
+          <span class="hd-profile-name" id="hdProfileName">admin.user</span>
+          <span class="hd-profile-role" id="hdProfileRole">Admin</span>
+        </span>
+        <i class="fa-solid fa-chevron-down hd-caret"></i>
+      </button>
+
+      <div class="hd-profile-menu" id="hdProfileMenu">
+
+        <div class="hd-profile-menu-banner">
+          <span class="hd-profile-menu-avatar" id="hdMenuAvatarInitials">AD</span>
+          <div class="hd-profile-menu-id">
+            <span class="hd-profile-menu-name" id="hdMenuName">admin.user</span>
+            <span class="hd-profile-menu-email" id="hdMenuEmail">admin@360edash.com</span>
+          </div>
+        </div>
+
+        <div class="hd-profile-menu-body">
+
+          <div class="hd-profile-menu-row">
+            <i class="fa-solid fa-user-shield hd-profile-menu-icon"></i>
+            <div class="hd-profile-menu-text">
+              <span class="hd-profile-menu-label">Role</span>
+              <span class="hd-profile-menu-value" id="hdMenuRole">Admin</span>
+            </div>
+          </div>
+
+          <div class="hd-profile-menu-divider"></div>
+
+          <div class="hd-profile-menu-row">
+            <i class="fa-regular fa-clock hd-profile-menu-icon"></i>
+            <div class="hd-profile-menu-text">
+              <span class="hd-profile-menu-label">Login Terakhir</span>
+              <span class="hd-profile-menu-value" id="hdLastActive">—</span>
+            </div>
+          </div>
+
+          <div class="hd-profile-menu-divider"></div>
+
+          <div class="hd-profile-menu-row">
+            <i class="fa-solid fa-shield-halved hd-profile-menu-icon"></i>
+            <div class="hd-profile-menu-text">
+              <span class="hd-profile-menu-label">Status</span>
+              <span class="hd-status-badge"><i class="fa-solid fa-circle"></i> Active</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="hd-profile-menu-foot">
+          <button type="button" class="hd-profile-menu-logout" id="hdMenuLogoutBtn">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</header>

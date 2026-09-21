@@ -1,0 +1,162 @@
+/* ============================================================
+   Master Logout Modal Component — 360eDash
+   Design tokens match master/sidebar, master/header (Poppins,
+   teal primary, danger red, 12–16px card radius).
+============================================================= */
+
+.lg-overlay {
+  --lg-primary: #0f6a71;
+  --lg-primary-dark: #0b4f54;
+  --lg-danger: #d64545;
+  --lg-danger-dark: #b93a3a;
+  --lg-danger-soft: #fbe8e8;
+  --lg-ink: #25343f;
+  --lg-muted: #7c8b8d;
+  --lg-border: #e7edee;
+  --lg-surface: #ffffff;
+
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+
+  background: rgba(18, 30, 34, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+}
+
+.lg-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s ease, visibility 0s linear 0s;
+}
+
+.lg-overlay * {
+  box-sizing: border-box;
+}
+
+/* ---------- Modal card ---------- */
+.lg-modal {
+  width: 100%;
+  max-width: 420px;
+  background: var(--lg-surface);
+  border-radius: 18px;
+  padding: 28px 28px 24px;
+  box-shadow: 0 24px 60px rgba(15, 106, 113, 0.28);
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+
+  transform: translateY(10px) scale(0.96);
+  opacity: 0;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+}
+
+.lg-overlay.is-open .lg-modal {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* ---------- Icon ---------- */
+.lg-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: var(--lg-danger-soft);
+  color: var(--lg-danger);
+  font-size: 22px;
+}
+
+/* ---------- Text ---------- */
+.lg-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--lg-ink);
+  margin-bottom: 8px;
+}
+
+.lg-desc {
+  font-size: 13.5px;
+  color: var(--lg-muted);
+  line-height: 1.55;
+  max-width: 320px;
+  margin: 0 auto 24px;
+}
+
+/* ---------- Actions ---------- */
+.lg-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lg-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 11px 16px;
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.lg-btn:active {
+  transform: scale(0.97);
+}
+
+.lg-btn-secondary {
+  background: var(--lg-surface);
+  color: var(--lg-ink);
+  border-color: var(--lg-border);
+}
+.lg-btn-secondary:hover {
+  background: #f4f7f7;
+  border-color: #d9e2e3;
+}
+
+.lg-btn-danger {
+  background: var(--lg-danger);
+  color: #fff;
+}
+.lg-btn-danger:hover {
+  background: var(--lg-danger-dark);
+}
+
+/* Keyboard focus (not just mouse hover) gets a visible ring,
+   important since the modal traps focus for keyboard users. */
+.lg-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(15, 106, 113, 0.25);
+}
+.lg-btn-danger:focus-visible {
+  box-shadow: 0 0 0 3px rgba(214, 69, 69, 0.25);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 480px) {
+  .lg-modal {
+    padding: 24px 20px 20px;
+  }
+  .lg-actions {
+    flex-direction: column-reverse;
+  }
+  .lg-btn {
+    width: 100%;
+  }
+}

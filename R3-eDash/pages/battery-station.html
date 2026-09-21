@@ -1,0 +1,271 @@
+<!-- ============================================================
+     Sub-tab: Battery Station — dimuat oleh js/project-monitoring.js
+     ke dalam panel "battery" pada halaman Project Monitoring.
+
+     Redesain ini mengikuti design token guide.html DAN pola nyata
+     yang sudah dipakai halaman lain (System Information / Task
+     Maintenance): page-head, stats-row kartu ikon, card radius
+     14px, chart 2 kolom — supaya terasa satu produk yang sama,
+     bukan halaman yang didesain sendiri-sendiri. Tombol & pill umum
+     memakai class global (.btn/.pill dari css/global.css).
+
+     3 lapis informasi tetap eksplisit dan tidak ditumpuk jadi satu
+     tembok kartu:
+       LEVEL 1  .bs-stats-row   — fleet/station health sekilas
+       LEVEL 2  .bs-grid        — inventaris baterai terdaftar
+       LEVEL 3  #bsDetailView   — detail satu baterai, view sendiri
+                                  (list <-> detail, bukan ditumpuk
+                                  di bawah grid)
+
+     Data-model dari STEP 1/2/2.5 tidak berubah:
+       1. REGISTERED BATTERIES — identitas/metadata milik user
+          (Name/Brand/Model/Serial Number), disimpan lewat
+          js/battery-repository.js ke PostgreSQL (tabel
+          `batteries` via /api/v1/batteries — pola sama dengan
+          /pv-modules), bukan localStorage/JSON/hardcode lagi.
+       2. BATTERY TELEMETRY — pembacaan operasional (status/SoC/SoH/
+          voltage/current/power/energi), diambil lewat
+          js/battery-telemetry-adapter.js dari VPS Core API real
+          (GET /devices/:id/telemetry/latest & /telemetry/history).
+          Pill #bsSourcePill di header di-update secara dinamis oleh
+          js/battery-station.js (renderSourcePill()) sesuai status
+          real: "Live VPS Data" / "VPS Connection Error" / dst —
+          BUKAN teks statis lagi.
+
+     Semua id diberi prefix "bs" dan class spesifik battery diberi
+     prefix "bs-" supaya tidak bentrok dengan halaman lain (tab
+     sistem di sini lazy-load, bukan hapus-pasang).
+
+     Rendering TIDAK PERNAH membaca field mentah B_V1/B_C1/B_P1/
+     B_ST1/B_left_cap1/B_HLT_EXP1 secara langsung — semua nilai
+     datang lewat model battery gabungan (metadata + telemetry) yang
+     dibangun js/battery-station.js dari kedua modul Step 1 di atas.
+============================================================= -->
+<div class="bs-page" id="bsRoot">
+
+  <!-- ============================================================
+       VIEW 1 — Battery Station Overview (Level 1 + Level 2)
+  ============================================================= -->
+  <div class="bs-view is-active" id="bsListView">
+
+    <div class="bs-page-head">
+      <div>
+      </div>
+      <div class="bs-page-head-right"></div>
+    </div>
+
+    <!-- ============ LEVEL 1 — Fleet Health Overview ============ -->
+    <div class="bs-stats-row" id="bsStatsRow" data-skeleton-target aria-label="Battery fleet overview"></div>
+    <p class="bs-stats-note" id="bsOverviewNote"></p>
+
+    <!-- ============ LEVEL 2 — Battery Inventory ============ -->
+    <div class="bs-section-toolbar">
+      <div class="bs-section-toolbar-text">
+        <h2 id="bsRegTitle">Registered Batteries</h2>
+      </div>
+      <div class="bs-list-toolbar">
+        <span class="pill pill-info bs-source-pill" id="bsSourcePill" title="Memuat status sumber data...">
+          <i class="fa-solid fa-plug-circle-exclamation"></i> <span id="bsSourcePillText">Loading\u2026</span>
+        </span>
+        <span class="bs-count-pill" id="bsInventoryCount">0 batteries</span>
+        <div class="bs-filter-group">
+          <select class="bs-filter-select" id="bsStatusFilter" aria-label="Filter status">
+            <option value="all">Semua status</option>
+            <option value="charging">Charging</option>
+            <option value="discharging">Discharging</option>
+            <option value="idle">Static</option>
+            <option value="no-telemetry">Tanpa telemetry</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="bs-grid" id="bsBatteryGrid" data-skeleton-target></div>
+
+    <div class="bs-empty" id="bsEmptyState" style="display:none;">
+      <img src="assets/images/swap.png" alt="">
+      <h3 id="bsEmptyTitle">Belum ada baterai terdaftar</h3>
+      <p id="bsEmptyDesc">Daftarkan baterai untuk mulai memantau.</p>
+    </div>
+
+  </div>
+
+  <!-- ============================================================
+       VIEW 2 — Battery Detail (Level 3, mode terpisah)
+  ============================================================= -->
+  <div class="bs-view" id="bsDetailView">
+
+    <div class="bs-detail-head">
+      <button class="bs-back-btn" id="bsBackBtn" type="button" aria-label="Back to Batteries" title="Back to Batteries">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <div class="bs-detail-title-wrap">
+        <div class="bs-detail-title-row">
+          <h2 id="bsProjectTitle">Battery</h2>
+          <span class="bs-badge bs-badge-lg" id="bsDetailBadge">&ndash;</span>
+        </div>
+        <span class="bs-detail-sub" id="bsDetailMeta">&nbsp;</span>
+      </div>
+      <div class="bs-detail-head-right">
+        <span class="bs-caption" id="bsLastUpdated">Loading&hellip;</span>
+        <button class="btn btn-secondary" id="bsRefreshDetailBtn" type="button">
+          <i class="fa-solid fa-rotate-right"></i> <span id="bsRefreshDetailBtnText">Refresh</span>
+        </button>
+        <button class="bs-icon-btn" id="bsDetailEditBtn" type="button" title="Edit Battery" aria-label="Edit Battery"><i class="fa-solid fa-pen"></i></button>
+      </div>
+    </div>
+
+    <div class="bs-nodata-note" id="bsNoDataNote" style="display:none;"></div>
+
+    <!-- ============ Current State (kiri, lebar) + Today's Energy
+         (kanan, sempit) dalam satu baris — hemat ruang vertikal. ============ -->
+    <div class="bs-detail-top-grid">
+      <div class="bs-card" id="bsHeroCard" data-skeleton-target>
+        <div class="bs-card-head">
+          <div class="bs-card-head-text"><span class="bs-live-dot" id="bsOperLiveDot"></span><h3 id="bsOperTitle">Current Battery State</h3></div>
+          <span class="bs-caption" id="bsOperSourceLabel">Logger data</span>
+        </div>
+        <div class="bs-state-top" id="bsStateTop"></div>
+        <div class="bs-state-tech" id="bsStateTech"></div>
+      </div>
+
+      <div class="bs-card" data-skeleton-target>
+        <div class="bs-card-head">
+          <div class="bs-card-head-text"><h3 id="bsEnergyTitle">Today's Energy</h3></div>
+        </div>
+        <div id="bsEnergySections"></div>
+      </div>
+    </div>
+
+    <!-- ============ Performance History — grafik tren + kontrol range ============ -->
+    <div class="bs-card" data-skeleton-target>
+      <div class="bs-card-head">
+        <div class="bs-card-head-text"><h3 id="bsPerfTitle">Performance History</h3></div>
+        <div class="bs-tabs" id="bsTrendTabs"></div>
+      </div>
+
+      <div class="bs-range-controls" id="bsRangeControls">
+        <div class="bs-range-bar">
+          <div class="bs-range-dates">
+            <input type="datetime-local" class="bs-range-date-input" id="bsRangeFrom" aria-label="Dari tanggal">
+            <span class="bs-range-sep">&ndash;</span>
+            <input type="datetime-local" class="bs-range-date-input" id="bsRangeTo" aria-label="Sampai tanggal">
+            <button type="button" class="bs-range-apply" id="bsRangeApplyBtn">Terapkan</button>
+            <button type="button" class="bs-range-reset" id="bsRangeResetBtn" hidden>Reset</button>
+          </div>
+        </div>
+        <div class="bs-range-slider" id="bsRangeSliderWrap">
+          <div class="bs-range-slider-track"></div>
+          <div class="bs-range-slider-fill" id="bsRangeSliderFill"></div>
+          <input type="range" id="bsRangeSliderMin" min="0" max="100" value="0">
+          <input type="range" id="bsRangeSliderMax" min="0" max="100" value="100">
+        </div>
+        <div class="bs-range-caption">
+          <span id="bsRangeCaptionStart">&ndash;</span>
+          <span id="bsRangeCaptionEnd">&ndash;</span>
+        </div>
+      </div>
+
+      <div class="bs-chart-grid" id="bsChartGrid"></div>
+    </div>
+
+    <!-- Status Transition card dihilangkan sesuai permintaan (minor UI cleanup). -->
+    <div class="bs-card" data-skeleton-target style="display:none;">
+      <div class="bs-card-head">
+        <div class="bs-card-head-text"><h3 id="bsLogsTitle">Status Transition</h3></div>
+        <span class="bs-card-count" id="bsLogCount">0</span>
+      </div>
+      <div class="bs-status-ribbon" id="bsStatusRibbon"></div>
+      <div class="bs-status-ribbon-foot">
+        <div class="bs-status-legend" id="bsStatusLegend">
+          <button type="button" class="bs-status-legend-item" data-status="charging"><span class="bs-status-legend-dot tone-charging"></span>Charging</button>
+          <button type="button" class="bs-status-legend-item" data-status="discharging"><span class="bs-status-legend-dot tone-discharging"></span>Discharging</button>
+          <button type="button" class="bs-status-legend-item" data-status="idle"><span class="bs-status-legend-dot tone-idle"></span>Static</button>
+        </div>
+        <span class="bs-status-ribbon-range" id="bsStatusRibbonRange"></span>
+      </div>
+      <div class="bs-log-filter-bar" id="bsLogFilterBar" style="display:none;">
+        <span id="bsLogFilterLabel"></span>
+        <button type="button" id="bsLogFilterClearBtn">Tampilkan semua status</button>
+      </div>
+      <div class="bs-timeline" id="bsLogList"></div>
+      <button type="button" class="bs-timeline-more" id="bsLogMoreBtn" style="display:none;"></button>
+    </div>
+
+  </div>
+
+  <!-- ============================================================
+       MODAL — Edit Battery (metadata saja, bukan telemetry). Selalu
+       mengedit baris `batteries` yang sudah ada (BR_updateBattery) —
+       tidak ada lagi fitur "Add Battery"/create di halaman ini (lihat
+       PHASE 4 note di js/battery-repository.js & js/battery-station.js).
+       Tidak ada Delete di halaman ini.
+  ============================================================= -->
+  <div class="bs-modal-overlay" id="bsFormModalOverlay">
+    <div class="bs-modal" role="dialog" aria-modal="true" aria-labelledby="bsFormModalTitle">
+      <h2 id="bsFormModalTitle"><i class="fa-solid fa-pen"></i> Edit Battery</h2>
+      <p class="bs-modal-desc" id="bsFormModalDesc">Update this battery's identity. Telemetry (status, SoC, voltage, etc.) is never edited here &mdash; it always comes from the assigned device.</p>
+
+      <form id="bsBatteryForm">
+        <p class="bs-form-group-label">Battery Identity</p>
+        <div class="bs-form-field">
+          <label class="bs-form-label" for="bsFieldName">Battery Name <span class="bs-req">*</span></label>
+          <input class="bs-form-input" id="bsFieldName" type="text" maxlength="80" placeholder="mis. Main Battery Bank" autocomplete="off">
+          <span class="bs-form-error" id="bsErrName" style="display:none;"></span>
+        </div>
+        <div class="bs-form-field">
+          <label class="bs-form-label" for="bsFieldBrand">Battery Brand</label>
+          <input class="bs-form-input" id="bsFieldBrand" type="text" placeholder="mis. INVT Battery" autocomplete="off">
+          <span class="bs-form-hint">Opsional.</span>
+          <span class="bs-form-error" id="bsErrBrand" style="display:none;"></span>
+        </div>
+        <div class="bs-form-field">
+          <label class="bs-form-label" for="bsFieldModel">Battery Model</label>
+          <input class="bs-form-input" id="bsFieldModel" type="text" placeholder="mis. GS-5000" autocomplete="off">
+          <span class="bs-form-hint">Opsional.</span>
+          <span class="bs-form-error" id="bsErrModel" style="display:none;"></span>
+        </div>
+        <div class="bs-form-field">
+          <label class="bs-form-label" for="bsFieldSerial">Battery Serial Number</label>
+          <input class="bs-form-input" id="bsFieldSerial" type="text" placeholder="mis. SN-00123" autocomplete="off">
+          <span class="bs-form-hint">Opsional &mdash; kalau diisi, harus unik (serial number baterai, bukan serial inverter/logger).</span>
+          <span class="bs-form-error" id="bsErrSerial" style="display:none;"></span>
+        </div>
+
+        <div class="bs-modal-actions">
+          <button type="button" class="bs-modal-btn-cancel" id="bsFormCancelBtn">Cancel</button>
+          <button type="submit" class="bs-btn-add" id="bsFormSubmitBtn"><i class="fa-solid fa-check"></i> <span id="bsFormSubmitBtnText">Save Changes</span></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL — Chart zoom (klik salah satu grafik untuk lihat detail)
+  ============================================================= -->
+  <div class="bs-modal-overlay" id="bsChartModalOverlay">
+    <div class="bs-modal bs-chart-modal" role="dialog" aria-modal="true" aria-labelledby="bsChartModalTitle">
+      <div class="bs-chart-modal-head">
+        <div>
+          <h2 id="bsChartModalTitle"><i class="fa-solid fa-chart-line"></i> Chart</h2>
+          <span class="bs-caption" id="bsChartModalRange">&ndash;</span>
+        </div>
+        <button type="button" class="bs-icon-btn" id="bsChartModalCloseBtn" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="bs-chart-modal-canvas-wrap"><canvas id="bsChartModalCanvas"></canvas></div>
+      <div class="bs-chart-modal-stats">
+        <div><span class="bs-chart-modal-stat-label">Min</span><span class="bs-chart-modal-stat-value" id="bsChartModalMin">&ndash;</span></div>
+        <div><span class="bs-chart-modal-stat-label">Max</span><span class="bs-chart-modal-stat-value" id="bsChartModalMax">&ndash;</span></div>
+        <div><span class="bs-chart-modal-stat-label">Rata-rata</span><span class="bs-chart-modal-stat-value" id="bsChartModalAvg">&ndash;</span></div>
+        <div><span class="bs-chart-modal-stat-label">Terakhir</span><span class="bs-chart-modal-stat-value" id="bsChartModalLast">&ndash;</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Toast (save/edit/deactivate feedback) ============ -->
+  <div class="bs-toast" id="bsToast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="bsToastMsg">Saved.</span>
+  </div>
+
+</div>

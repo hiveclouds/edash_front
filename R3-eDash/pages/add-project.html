@@ -1,0 +1,251 @@
+<!-- ============================================================
+     Page: Add New Project — 360eDash
+     Catatan penting: file ini di-load sebagai FRAGMENT lewat
+     loadPage() di js/main.js, lalu di-inject ke dalam #page-root
+     yang sudah berada di dalam shell utama (index.html) — yaitu
+     .edash-layout > .edash-main > .edash-content.
+     Karena itu file ini TIDAK BOLEH punya <!DOCTYPE>, <html>,
+     <head>, <body>, ataupun wrapper .edash-layout/#sidebar-root/
+     #header-root/.edash-content sendiri. Kalau ditambahkan lagi,
+     itu akan membuat wrapper tsb NESTED di dalam punya index.html
+     yang asli → hasilnya 2 scrollbar bertumpuk.
+     CSS & font/link yang dibutuhkan (add-project.css, sidebar.css,
+     header.css, Poppins, Font Awesome) semuanya sudah di-load
+     sekali di index.html, jadi tidak perlu diulang di sini.
+     Bandingkan pola ini dengan pages/alert.html atau
+     pages/admin-calculator.html yang sudah benar.
+============================================================= -->
+      <div class="ap-wrap">
+
+        <div class="ap-head">
+          <h1>Add New System</h1>
+          <p>Isi detail proyek dan spesifikasi sistem di bawah ini.</p>
+        </div>
+
+        <form class="ap-form" id="apForm">
+
+          <!-- LEFT COLUMN: Project details -->
+          <div class="ap-col-left">
+            <section class="ap-card">
+              <div class="ap-card-head">
+                <h3>Project Details</h3>
+              </div>
+              <div class="ap-field">
+                <label for="apProjectName">Project Name</label>
+                <input type="text" id="apProjectName" placeholder="Enter Project Name" value="Kebun Surya Teluknaga 01" required>
+              </div>
+
+              <div class="ap-field">
+                <label for="apProjectLocation">Project Location</label>
+                <input type="text" id="apProjectLocation" placeholder="Enter the city name" value="Teluknaga, Banten" required>
+              </div>
+
+              <div class="ap-field">
+                <label for="apCategory">Category</label>
+                <select id="apCategory" required>
+                  <option value="">Choose category..</option>
+                  <option value="bss">Solaris BSS</option>
+                  <option value="rooftop" selected>Rooftop Solar</option>
+                  <option value="fish-farm">Solar Fish Farm</option>
+                </select>
+              </div>
+
+              <div class="ap-field">
+                <label for="apTimeZone">Time Zone</label>
+                <select id="apTimeZone">
+                  <option>Choose timezone..</option>
+                  <option selected>GMT+7 — WIB (Jakarta)</option>
+                  <option>GMT+8 — WITA (Makassar)</option>
+                  <option>GMT+9 — WIT (Jayapura)</option>
+                </select>
+              </div>
+
+              <div class="ap-grid-2">
+                <div class="ap-field">
+                  <label for="apLat">Latitude</label>
+                  <input type="text" id="apLat" placeholder="Enter Latitude" value="-6.0725">
+                </div>
+                <div class="ap-field">
+                  <label for="apLng">Longitude</label>
+                  <input type="text" id="apLng" placeholder="Enter Longitude" value="106.6349">
+                </div>
+              </div>
+
+              <div class="ap-field">
+                <label for="apPartner">Project Partner</label>
+                <input type="text" id="apPartner" placeholder="Enter Partner Name" value="PT Surya Nusantara">
+              </div>
+
+              <div class="ap-field">
+                <label for="apPartnerType">Partner Type</label>
+                <select id="apPartnerType">
+                  <option>Individual</option>
+                  <option selected>Company</option>
+                  <option>Government</option>
+                </select>
+              </div>
+
+              <div class="ap-field">
+                <label for="apProjectSystem">Project System</label>
+                <select id="apProjectSystem">
+                  <option selected>Melssa Microgrid</option>
+                  <option>On-Grid</option>
+                  <option>Off-Grid</option>
+                  <option>Hybrid</option>
+                </select>
+              </div>
+
+              <div class="ap-field">
+                <label for="apProjectSchema">Project Schema</label>
+                <select id="apProjectSchema">
+                  <option selected>Direct Purchase</option>
+                  <option>Lease to Own</option>
+                  <option>Power Purchase Agreement</option>
+                </select>
+              </div>
+
+              <div class="ap-field">
+                <label for="apProjectType">Project Type</label>
+                <select id="apProjectType">
+                  <option selected>Default</option>
+                  <option>Residential</option>
+                  <option>Commercial</option>
+                  <option>Industrial</option>
+                </select>
+              </div>
+            </section>
+          </div>
+
+          <!-- RIGHT COLUMN: Inverter Tab Section + actions -->
+          <div class="ap-col-right">
+            <div class="ap-card ap-inverter-wrapper">
+              
+              <!-- Tab Header Area: Tabs on left, "+ Add New Inverter" on right -->
+              <div class="ap-tab-header">
+                <div class="ap-tabs-nav" id="apInverterTabs">
+                  <button type="button" class="ap-tab-btn active" data-tab="1">
+                    <span>Inverter #1</span>
+                  </button>
+                </div>
+                <button type="button" class="ap-add-inverter-btn" id="apAddInverterBtn">
+                  <i class="fa-solid fa-plus"></i> Add New Inverter
+                </button>
+              </div>
+
+              <!-- Tab Contents Container (Single viewable at a time) -->
+              <div class="ap-tab-contents" id="apInverterContents">
+                <!-- Content Inverter #1 -->
+                <div class="ap-tab-pane active" id="inverterPane-1" data-inverter="1">
+                  <div class="ap-pane-header">
+                    <h4>Inverter #1 Details</h4>
+                  </div>
+
+                  <div class="ap-grid-2">
+                    <div class="ap-field">
+                      <label>Inverter Brand</label>
+                      <input type="text" class="inv-brand" placeholder="e.g. Sungrow, SMA.." value="Sungrow">
+                    </div>
+                    <div class="ap-field">
+                      <label>Max Output (kW)</label>
+                      <input type="text" class="inv-output" placeholder="e.g. 50" value="50">
+                    </div>
+                  </div>
+
+                  <div class="ap-field">
+                    <label>Communicational Protocol</label>
+                    <select class="inv-protocol">
+                      <option>Select Protocol Communicational Type</option>
+                      <option selected>Modbus TCP</option>
+                      <option>Modbus RTU</option>
+                      <option>RS-485</option>
+                    </select>
+                  </div>
+
+                  <div class="ap-field">
+                    <label>Inverter Manual (PDF)</label>
+                    <div class="ap-file-row">
+                      <label class="ap-file-btn">
+                        Pilih File
+                        <input type="file" accept="application/pdf" hidden>
+                      </label>
+                      <span class="ap-file-name">Tidak ada file yang dipilih</span>
+                    </div>
+                  </div>
+
+                  <p class="ap-subtitle">Solar Panel Properties</p>
+
+                  <div class="ap-grid-2">
+                    <div class="ap-field">
+                      <label>Model</label>
+                      <input type="text" class="pv-model" placeholder="Panel Model" value="JA Solar JAM72S30">
+                    </div>
+                    <div class="ap-field">
+                      <label>PV Installed (kW)</label>
+                      <input type="text" class="pv-installed" placeholder="e.g. 100" value="120">
+                    </div>
+                  </div>
+
+                  <div class="ap-grid-2">
+                    <div class="ap-field">
+                      <label>Panel Size (W)</label>
+                      <input type="text" class="pv-size" placeholder="e.g. 450" value="545">
+                    </div>
+                    <div class="ap-field">
+                      <label>Cell Type</label>
+                      <select class="pv-cell">
+                        <option>Select Cell Type</option>
+                        <option selected>Monocrystalline</option>
+                        <option>Polycrystalline</option>
+                        <option>Thin Film</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="ap-actions">
+              <button type="submit" class="ap-btn ap-btn-primary">
+                <i class="fa-solid fa-square-plus"></i> Add New Project
+              </button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+<!-- Modal Pop-Up Confirmation -->
+<div class="ap-modal-overlay" id="apModalOverlay">
+  <div class="ap-modal">
+    <div class="ap-modal-icon">
+      <i class="fa-solid fa-circle-check"></i>
+    </div>
+    <h2>Project Added Successfully!</h2>
+    <p>Data proyek baru dan konfigurasi inverter telah berhasil disimpan ke dalam sistem.</p>
+    
+    <div class="ap-modal-summary" id="apModalSummary">
+      <!-- Dynamic summary content -->
+    </div>
+
+    <div class="ap-modal-actions">
+      <button type="button" class="ap-btn ap-btn-primary" id="apCloseModalBtn">OK, Lihat di Project Selector</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Pop-Up Confirmation: Remove Inverter -->
+<div class="ap-modal-overlay" id="apRemoveInverterOverlay">
+  <div class="ap-modal">
+    <div class="ap-modal-icon ap-modal-icon-danger">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    <h2 id="apRemoveInverterTitle">Hapus Inverter?</h2>
+    <p id="apRemoveInverterText">Data yang sudah diisi pada inverter ini akan hilang dan tidak bisa dikembalikan.</p>
+
+    <div class="ap-modal-actions ap-modal-actions-row">
+      <button type="button" class="ap-btn ap-btn-secondary" id="apCancelRemoveInverterBtn">Batal</button>
+      <button type="button" class="ap-btn ap-btn-danger" id="apConfirmRemoveInverterBtn">Ya, Hapus</button>
+    </div>
+  </div>
+</div>

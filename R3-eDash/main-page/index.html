@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- link previews -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="360 Energy">
+    <meta property="og:description" content="Empowering equitable development through accessible renewable Energy">
+    <meta property="og:image" content="https://360energy.io/360energylogo.webp">
+    <meta property="og:url" content="https://360energy.io">
+
+    <!--  Twitter preview -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="360 Energy">
+    <meta name="twitter:description" content="Empowering equitable development through accessible renewable Energy">
+    <meta name="twitter:image" content="https://360energy.io/360energylogo.webp">
+
+    <link rel="icon" type="image/webp" href="360energylogo.webp" />
+    <title>360energy</title>
+    <script src="https://cdn.tailwindcss.com    "></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css    ">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css    " xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        :root {
+            --bg-teal-900: #0b3b3a;
+            --green-700: #0f4f46;
+            --card-dark: rgba(7, 28, 28, 0.75);
+            --gold-400: #f6a33c;
+            --gold-500: #f29117;
+            --cta-orange: #eb7c1a;
+            --white: #ffffff;
+            --font-sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        }
+
+        body {
+            padding-top: env(safe-area-inset-top);
+            margin: 0;
+            background: none;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('DESKTOP2.png') center / cover no-repeat;
+            z-index: -1;
+        }
+
+        .lang-btn {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .lang-btn.active-lang {
+            transform: scale(1.15);
+            border-radius: 9999px;
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .btn--menu {
+            background: rgba(15, 79, 70, 0.5);
+            border: 1px solid var(--gold-400);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .btn--menu span {
+            white-space: normal;
+            line-height: 1.2;
+        }
+        .btn--cta {
+            background-color: var(--cta-orange);
+            box-shadow: 0 6px 20px rgba(235, 124, 26, 0.4);
+        }
+
+        .glass-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes scrollFeedback {
+        0% { transform: scale(1); opacity: 1; }
+        25% { transform: scale(0.95); opacity: 0.8; }
+        50% { transform: scale(1.05); opacity: 1; }
+        75% { transform: scale(0.98); opacity: 0.9; }
+        100% { transform: scale(1); opacity: 1; }
+        }
+
+        .scroll-feedback {
+        animation: scrollFeedback 0.6s ease-in-out;
+        }
+
+    </style>
+</head>
+<body id="main-body">
+
+<nav class="sticky top-0 z-50 w-full bg-transparent">
+  <div class="relative h-16 px-6 pl-28 sm:pl-6 flex items-center justify-center">
+    <button id="sticky-scroll-btn"
+        class="absolute left-4 top-1/2 -translate-y-1/2
+                sm:static sm:translate-y-0 sm:mx-auto
+                flex items-center gap-2 px-3 py-1.5 rounded-full
+                text-[10px] sm:text-xs uppercase tracking-wider text-white
+                opacity-80 hover:opacity-100 transition duration-200
+                focus:outline-none active:outline-none active:ring-0 focus:ring-0
+                select-none">
+        <i class="fa-solid fa-chevron-down text-sm"></i>
+        <span data-lang-key="scroll" class="font-bold text-white inline">
+            Scroll untuk Info Lebih Lanjut
+        </span>
+        <i class="fa-solid fa-chevron-down text-sm"></i>
+    </button>
+
+    <div class="absolute right-4 top-1/2 -translate-y-1/2 flex space-x-2">
+      <button id="lang-en" class="lang-btn p-1.5 rounded-full">
+        <img src="UK flag.png" class="w-6 h-6" alt="UK">
+      </button>
+      <button id="lang-id" class="lang-btn p-1.5 rounded-full">
+        <img src="IND flag.png" class="w-6 h-6" alt="IND">
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="lg:flex">
+
+     <section class="hero-section relative h-[calc(100vh-4rem)] w-full flex flex-col lg:w-2/5 lg:h-screen lg:sticky lg:top-0">
+        <div class="w-full max-w-md mx-auto h-full flex flex-col justify-center p-6 text-white">
+
+          <main class="flex flex-col items-center text-center w-full -mt-6 sm:-mt-4">
+            <div class="flex items-center gap-3">
+                <img src="LOGO.png" alt="360 Logo">
+            </div>
+
+            <div class="flex flex-col items-center space-y-3 w-full">
+              <a href="../pages/solar-calculator.html" class="btn--menu w-full h-[56px] rounded-full flex items-center p-2 pr-4 transition-transform duration-200 hover:scale-[1.03] active:scale-100">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-[--gold-500]"><i class="fa-solid fa-solar-panel text-xl text-white"></i></div>
+                <span data-lang-key="calculate" class="flex-grow text-center text-sm font-medium leading-tight break-words" style="font-size: 1 rem;">Calculate My Solar Savings</span>
+              </a>
+              <a href="https://wa.me/6287775760575    " class="btn--menu w-full h-[56px] rounded-full flex items-center p-2 pr-4 transition-transform duration-200 hover:scale-[1.03] active:scale-100">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-green-500"><i class="fa-brands fa-whatsapp text-xl text-white"></i></div>
+                <span data-lang-key="care" class="flex-grow text-center text-sm font-medium">Customer Care</span>
+              </a>
+              <a href="#" id="download-profile" class="btn--menu w-full h-[56px] rounded-full flex items-center p-2 pr-4 transition-transform duration-200 hover:scale-[1.03] active:scale-100">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-[--gold-500]"><i class="fa-solid fa-building-columns text-lg text-white"></i></div>
+                <span data-lang-key="profile" class="flex-grow text-center text-sm font-medium">Company Profile</span>
+              </a>
+            </div>
+
+            <div class="flex flex-col items-center mt-6 w-full">
+              <a href="../pages/login.html" class="btn--cta w-full h-[56px] rounded-full flex items-center justify-center transition-transform duration-200 hover:scale-[1.03] active:scale-100">
+                <span data-lang-key="cta" class="font-bold text-white">Login to Dashboard</span>
+              </a>
+            </div>
+          </main>
+
+          <div class="flex-shrink-0 flex flex-col items-center gap-4 pt-4 pb-6 mt-6">
+              <div class="flex items-center justify-center space-x-4">
+                  <a href="https://www.linkedin.com/company/360-energy-io/    " aria-label="LinkedIn Profile" class="glass-card w-12 h-12 flex items-center justify-center rounded-lg transition-transform duration-200 hover:scale-110">
+                      <i class="fa-brands fa-linkedin-in text-2xl text-white"></i>
+                  </a>
+                  <a href="https://www.instagram.com/360e.io    " aria-label="Instagram Profile" class="glass-card w-12 h-12 flex items-center justify-center rounded-lg transition-transform duration-200 hover:scale-110">
+                      <i class="fa-brands fa-instagram text-2xl text-white"></i>
+                  </a>
+              </div>
+          </div>
+      </div>
+    </section>
+
+    <div class="content-background-wrapper flex flex-col items-center pt-16 lg:pt-24 space-y-16 lg:space-y-24 lg:w-3/5">
+
+      <section id="zero-cost-section" class="w-full max-w-md lg:max-w-2xl mx-auto px-6">
+          <img data-lang-key="contentImageOne" data-lang-type="src" src="" alt="Zero Cost Information" class="w-full">
+      </section>
+
+      <section id="install-plts-section" class="w-full max-w-md lg:max-w-2xl mx-auto px-6">
+          <img data-lang-key="contentImageTwo" data-lang-type="src" src="" alt="PLTS Installation Information" class="w-full">
+      </section>
+
+      <section id="financing-section" class="w-full max-w-md lg:max-w-2xl mx-auto px-6">
+          <img data-lang-key="contentImageThree" data-lang-type="src" src="" alt="Financing Scheme Information" class="w-full">
+      </section>
+
+      <section id="installation-section" class="w-full max-w-md lg:max-w-2xl mx-auto px-6">
+          <img data-lang-key="contentImageFour" data-lang-type="src" src="" class="w-full">
+      </section>
+
+      <section id="installation-section-2" class="w-full max-w-md lg:max-w-2xl mx-auto px-6">
+          <img data-lang-key="contentImageFive" data-lang-type="src" src="" class="w-full">
+      </section>
+
+      <section id="installation-section-3" class="w-full max-w-md lg:max-w-2xl mx-auto px-6">
+          <img data-lang-key="contentImageSix" data-lang-type="src" src="" class="w-full">
+      </section>
+
+      <section id="installation-section-4" class="w-full max-w-md lg:max-w-2xl mx-auto px-6">
+            <img data-lang-key="contentImageSeven" data-lang-type="src" src="" class="w-full">
+      </section>
+
+      <section id="simulation-section-8" class="w-full max-w-md lg:max-w-2xl mx-auto px-6">
+            <img data-lang-key="contentImageEight" data-lang-type="src" src="" alt="Simulation Information 1" class="w-full">
+      </section>
+
+      <section id="simulation-section-9" class="w-full max-w-md lg:max-w-2xl mx-auto px-6">
+            <img data-lang-key="contentImageNine" data-lang-type="src" src="" alt="Simulation Information 2" class="w-full">
+      </section>
+
+    </div>
+
+</div>
+
+<footer class="w-full py-5 px-6 border-t border-white/10 text-center" style="background: rgba(7, 28, 28, 0.85);">
+  <p class="text-xs text-white/80 break-words">
+    © 2026 360energy (PT. Pionir Energi Hijau) — 360eDash Smart Solar Planner
+    · <a href="../pages/privacy-policy.html" class="underline text-white hover:text-[--gold-400] transition-colors duration-150">Privacy Policy</a>
+  </p>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+const translations = {
+    en: {
+        company: "PT Green Energy Pioneer",
+        calculate: "Calculate My Solar Savings",
+        care: "Customer Care",
+        profile: "Company Profile",
+        cta: "Login To Dashboard",
+        scroll: "Scroll to Learn More",
+        contentImageOne: "Slide 1 ENG.webp",
+        contentImageTwo: "Slide 2 ENG.webp",
+        contentImageThree: "Slide 3 ENG.webp",
+        contentImageFour: "ENG PASANG 1.webp",
+        contentImageFive: "ENG PASANG 2.webp",
+        contentImageSix: "ENG PASANG 3.webp",
+        contentImageSeven: "ENG PASANG 4.webp",
+        contentImageEight: "ENG SIMULATION 1.webp",
+        contentImageNine: "ENG SIMULATION 2.webp"
+    },
+    id: {
+        company: "PT Pionir Energi Hijau",
+        calculate: "Hitung Pengurangan Tagihan Listrik Anda",
+        care: "Layanan Pelanggan",
+        profile: "Profil Perusahaan",
+        cta: "Masuk Ke Dashboard",
+        scroll: "Scroll untuk Info Lebih Lanjut",
+        contentImageOne: "Slide 1 IND.webp",
+        contentImageTwo: "Slide 2 IND.webp",
+        contentImageThree: "Slide 3 IND.webp",
+        contentImageFour: "PASANG 1 IND.webp",
+        contentImageFive: "PASANG 2 IND.webp",
+        contentImageSix: "PASANG 3 IND.webp",
+        contentImageSeven: "PASANG 4 IND.webp",
+        contentImageEight: "IND SIMULATION 1.webp",
+        contentImageNine: "IND SIMULATION 2.webp"
+    }
+};
+
+    const langEnBtn = document.getElementById('lang-en');
+    const langIdBtn = document.getElementById('lang-id');
+    const langBtns = [langEnBtn, langIdBtn];
+    const translatableElements = document.querySelectorAll('[data-lang-key]');
+
+    const setLanguage = (lang) => {
+        if (!['en', 'id'].includes(lang)) return;
+
+        translatableElements.forEach(el => {
+            const key = el.getAttribute('data-lang-key');
+            const type = el.getAttribute('data-lang-type');
+
+            if (key && translations[lang][key]) {
+                if (type === 'src') {
+                    el.src = translations[lang][key];
+                } else {
+                    el.textContent = translations[lang][key];
+                }
+            }
+        });
+
+        langBtns.forEach(btn => btn.classList.remove('active-lang'));
+        if (lang === 'en') {
+            langEnBtn.classList.add('active-lang');
+            document.documentElement.lang = 'en';
+        } else {
+            langIdBtn.classList.add('active-lang');
+            document.documentElement.lang = 'id';
+        }
+
+        localStorage.setItem('preferredLanguage', lang);
+    };
+
+    langEnBtn.addEventListener('click', () => setLanguage('en'));
+    langIdBtn.addEventListener('click', () => setLanguage('id'));
+
+    const savedLang = localStorage.getItem('preferredLanguage');
+    setLanguage(savedLang || 'id');
+
+    document.getElementById('download-profile').addEventListener('click', (e) => {
+        e.preventDefault();
+        const link = document.createElement('a');
+        link.href = '360energy Company Profile.pdf';
+        link.download = '360energy Company Profile.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+
+    const scrollTargets = [
+        '#main-body',
+        '#zero-cost-section',
+        '#install-plts-section',
+        '#financing-section',
+        '#installation-section',
+        '#installation-section-2',
+        '#installation-section-3',
+        '#installation-section-4',
+        '#simulation-section-8',
+        '#simulation-section-9'
+    ];
+    let currentIndex = 0;
+    const scrollBtn = document.getElementById('sticky-scroll-btn');
+
+    scrollBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        currentIndex = (currentIndex + 1) % scrollTargets.length;
+        const targetId = scrollTargets[currentIndex];
+        const targetElement = document.querySelector(targetId);
+
+        if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth' });
+
+        scrollBtn.style.transition = 'opacity 0.3s ease';
+        scrollBtn.style.opacity = '0.5';
+
+        setTimeout(() => {
+            scrollBtn.style.opacity = '1';
+        }, 600);
+
+        scrollBtn.classList.add('scroll-feedback');
+        setTimeout(() => scrollBtn.classList.remove('scroll-feedback'), 600);
+        }
+
+    });
+});
+</script>
+
+</body>
+</html>
+

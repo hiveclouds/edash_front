@@ -1,0 +1,108 @@
+<!-- ============================================================
+  Master Sidebar Component — 360eDash
+============================================================= -->
+<aside class="edash-sidebar" id="edashSidebar">
+
+  <!-- Branding (sticky, stays visible while nav scrolls) -->
+  <div class="sb-brand">
+    <div class="sb-brand-id">
+      <img class="sb-brand-logo" src="assets/images/logo.png" alt="360eDash">
+    </div>
+    <button class="sb-toggle" id="sbToggle" type="button" aria-label="Toggle sidebar">
+      <i class="fa-solid fa-bars-staggered"></i>
+    </button>
+  </div>
+
+  <!-- Scrollable body: greeting, quick actions, nav groups (except footer) -->
+  <div class="sb-scroll">
+
+    <!-- Greeting -->
+    <div class="sb-greeting">
+      <span class="sb-greeting-label" data-i18n="sidebar.greeting.label">Halo,</span>
+      <span class="sb-greeting-name">John!</span>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="sb-quick-actions">
+      <button class="sb-btn sb-btn-primary is-active" type="button" id="sbDashboardBtn">
+        <i class="fa-solid fa-house"></i>
+        <span data-i18n="sidebar.dashboard">Dashboard</span>
+      </button>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <!-- Navigation -->
+    <nav class="sb-nav">
+
+      <div class="sb-nav-group">
+        <p class="sb-nav-title" data-i18n="sidebar.nav.monitoring">Monitoring</p>
+        <a class="sb-nav-item" href="#" data-page="pages/project-selector.html">
+          <span class="sb-nav-icon"><i class="fa-solid fa-map-location-dot"></i></span>
+          <span class="sb-nav-label" data-i18n="sidebar.nav.projectSelector">Project Selector</span>
+        </a>
+        <a class="sb-nav-item" href="#" data-page="pages/project-monitoring.html">
+          <span class="sb-nav-icon"><i class="fa-solid fa-table-cells-large"></i></span>
+          <span class="sb-nav-label" data-i18n="sidebar.nav.projectMonitoring">Project Monitoring</span>
+        </a>
+        <a class="sb-nav-item" href="#" data-page="pages/alert.html">
+          <span class="sb-nav-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+          <span class="sb-nav-label" data-i18n="sidebar.nav.alerts">Alerts</span>
+        </a>
+        <a class="sb-nav-item" href="#" data-page="pages/task-maintenance.html">
+          <span class="sb-nav-icon"><i class="fa-solid fa-list-check"></i></span>
+          <span class="sb-nav-label" data-i18n="sidebar.nav.taskMaintenance">Task Maintenance</span>
+        </a>
+      </div>
+
+      <div class="sb-nav-group">
+        <p class="sb-nav-title" data-i18n="sidebar.nav.tools">Tools</p>
+        <a class="sb-nav-item" href="#" data-page="pages/admin-calculator.html">
+          <span class="sb-nav-icon"><i class="fa-solid fa-calculator"></i></span>
+          <span class="sb-nav-label" data-i18n="sidebar.nav.adminCalc">Admin Calculator</span>
+        </a>
+        <a class="sb-nav-item" href="#" data-page="pages/catalog.html">
+          <span class="sb-nav-icon"><i class="fa-solid fa-book"></i></span>
+          <span class="sb-nav-label" data-i18n="sidebar.nav.catalog">Catalog</span>
+        </a>
+        <a class="sb-nav-item" href="#" data-page="pages/add-project.html">
+          <span class="sb-nav-icon"><i class="fa-solid fa-circle-plus"></i></span>
+          <span class="sb-nav-label" data-i18n="sidebar.nav.addProject">Add New Project</span>
+        </a>
+      </div>
+
+      <div class="sb-nav-group">
+        <p class="sb-nav-title" data-i18n="sidebar.nav.administration">Administration</p>
+        <a class="sb-nav-item" href="#" data-page="pages/admin-view.html">
+          <span class="sb-nav-icon"><i class="fa-solid fa-user-shield"></i></span>
+          <span class="sb-nav-label" data-i18n="sidebar.nav.adminView">Admin View</span>
+        </a>
+        <a class="sb-nav-item" href="#" data-page="pages/activity-log.html">
+          <span class="sb-nav-icon"><i class="fa-solid fa-clock-rotate-left"></i></span>
+          <span class="sb-nav-label" data-i18n="sidebar.nav.activityLog">Activity Log</span>
+        </a>
+        <a class="sb-nav-item" href="#" data-page="pages/ticketing.html">
+          <span class="sb-nav-icon"><i class="fa-solid fa-bug"></i></span>
+          <span class="sb-nav-label" data-i18n="sidebar.nav.ticketing">Ticketing</span>
+        </a>
+      </div>
+    </nav>
+
+  </div>
+
+  <!-- Others: pinned outside the scroll area, always visible at the
+       bottom of the sidebar regardless of how many nav items are
+       above it (fewer for Operator, more for Admin 360). -->
+  <div class="sb-nav-group sb-nav-group-footer">
+    <p class="sb-nav-title" data-i18n="sidebar.nav.others">Others</p>
+    <a class="sb-nav-item" href="#" data-page="pages/setting.html">
+      <span class="sb-nav-icon"><i class="fa-solid fa-gear"></i></span>
+      <span class="sb-nav-label" data-i18n="sidebar.nav.setting">Setting</span>
+    </a>
+    <a class="sb-nav-item sb-nav-item-danger" href="#" id="sbLogoutBtn">
+      <span class="sb-nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span>
+      <span class="sb-nav-label" data-i18n="sidebar.nav.logout">Logout</span>
+    </a>
+  </div>
+
+</aside>

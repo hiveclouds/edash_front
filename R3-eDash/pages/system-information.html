@@ -1,0 +1,300 @@
+<div class="si" id="siRoot">
+
+  <!-- ============================================================
+       VIEW 1 — System Information (list)
+  ============================================================= -->
+  <div class="si-view is-active" id="siListView">
+
+    <div class="si-stats-row" id="siStatsRow"></div>
+
+    <div class="si-list-toolbar">
+      <div class="si-filter-group">
+        <span class="si-filter-label">Filter</span>
+        <select class="si-filter-select" id="siStatusFilter">
+          <option value="all">Semua</option>
+          <option value="connected">Connected</option>
+          <option value="pending">Pending</option>
+          <option value="offline">Offline</option>
+        </select>
+      </div>
+      <!-- Tombol "Add System" DIHAPUS -- halaman ini sekarang murni
+           read-only cerminan device dari Core API (lihat catatan CRUD
+           di js/system-information.js), jadi tidak ada lagi cara nambah
+           system manual dari sini. -->
+    </div>
+
+    <div class="si-grid" id="siSystemGrid"></div>
+
+    <div class="si-empty" id="siEmptyState" style="display:none;">
+      <i class="fa-solid fa-solar-panel"></i>
+      <h3 id="siEmptyTitle">Belum ada system</h3>
+      <p id="siEmptyDesc">Belum ada system PLTS yang terhubung untuk proyek ini.</p>
+    </div>
+
+    <div class="si-pagination" id="siPagination"></div>
+
+  </div>
+
+  <!-- ============================================================
+       VIEW 2 — Detail System
+  ============================================================= -->
+  <div class="si-view" id="siDetailView">
+
+    <div class="si-detail-head">
+      <button class="si-back-btn" id="siBackBtn" type="button" aria-label="Kembali">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <div class="si-detail-title-wrap">
+        <div class="si-detail-title-row">
+          <h2 id="siDetailName">—</h2>
+          <span class="si-badge" id="siDetailStatusBadge">—</span>
+          <!-- Tombol edit nama/brand DIHAPUS bersama fitur Edit lainnya. -->
+        </div>
+        <span class="si-detail-sub" id="siDetailSub">—</span>
+      </div>
+    </div>
+
+    <!-- Semua kartu (System/Inverter/PV Overview, Device/Voltage/Current,
+         Power/Temperature/Health/Alarm, Production/PV Strings/Grid&Load)
+         digabung jadi SATU grid supaya bisa di-drag-drop bebas dari atas
+         ke bawah tanpa terpotong per section (section terpisah bikin sisa
+         kartu numpuk sendirian kalau jumlahnya tidak habis dibagi 3). -->
+    <div class="si-cards-grid" id="siCardsRow"></div>
+
+    <!-- ============================================================
+         Need Maintenance CTA
+         Future & Historical Maintenance sekarang ada di tab
+         "Task Management" (tab ke-4 Project Monitoring). Tombol ini
+         mengarahkan user ke sana, dengan unit ini sudah terpilih.
+    ============================================================= -->
+    <div class="si-section">
+      <div class="si-need-maint-banner">
+        <div class="si-need-maint-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        <div class="si-need-maint-text">
+          <h3 data-i18n="maintenance.need.title">Unit ini butuh maintenance?</h3>
+          <p data-i18n="maintenance.need.desc">Ajukan jadwal pemeliharaan atau lihat riwayat maintenance unit ini di halaman Task Management.</p>
+        </div>
+        <button class="si-btn si-btn-primary" id="siNeedMaintenanceBtn" type="button">
+          <i class="fa-solid fa-list-check"></i>
+          <span data-i18n="maintenance.need.button">Ajukan Task Maintenance</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Future & Historical Maintenance ----------------------------
+         Markup asli dipertahankan (tersembunyi) agar seluruh logic di
+         js/system-information.js tetap berjalan tanpa error, namun
+         secara visual tidak lagi ditampilkan di sini — sudah pindah
+         ke tab "Task Management".
+    ============================================================= -->
+    <div class="si-legacy-hidden">
+
+      <div class="si-section">
+        <div class="si-section-head">
+          <h2>Future Maintenance<span class="si-section-count" id="siFutureCount"></span></h2>
+          <button class="si-btn si-btn-secondary si-btn-sm" id="siAddScheduleBtn" type="button">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Schedule</span>
+          </button>
+        </div>
+        <div class="si-maint-list" id="siFutureList"></div>
+      </div>
+
+      <div class="si-section">
+        <div class="si-section-head">
+          <h2>Historical Maintenance<span class="si-section-count" id="siHistoryCount"></span></h2>
+        </div>
+        <div class="si-timeline" id="siHistoryList"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ============================================================
+     MODAL — Add / Edit Schedule (Future Maintenance, reused)
+============================================================= -->
+<div class="si-modal-overlay" id="siScheduleOverlay">
+  <div class="si-modal si-modal-sm">
+    <div class="si-modal-head">
+      <div>
+        <h2 id="siScheduleModalTitle">Add Schedule</h2>
+        <p>Tambahkan jadwal pemeliharaan mendatang untuk system ini.</p>
+      </div>
+      <button class="si-modal-close" id="siScheduleCloseBtn" type="button" aria-label="Tutup">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="si-modal-body">
+      <form id="siScheduleForm">
+        <div class="si-form-grid si-form-grid-1">
+          <div class="si-field">
+            <label>Maintenance Title</label>
+            <input type="text" name="title" placeholder="Contoh: Panel cleaning">
+          </div>
+          <div class="si-field">
+            <label>Description</label>
+            <textarea name="description" placeholder="Jelaskan detail pekerjaan..."></textarea>
+          </div>
+        </div>
+        <div class="si-form-grid" style="margin-top:14px;">
+          <div class="si-field">
+            <label>Scheduled Date<span class="si-req">*</span></label>
+            <input type="date" name="scheduledDate">
+            <span class="si-field-error">Scheduled Date wajib diisi.</span>
+          </div>
+          <div class="si-field">
+            <label>Priority</label>
+            <input type="hidden" name="priority" value="medium">
+            <div class="si-priority-select">
+              <button type="button" class="si-priority-opt si-priority-opt-low" data-value="low">Low</button>
+              <button type="button" class="si-priority-opt si-priority-opt-medium is-selected" data-value="medium">Medium</button>
+              <button type="button" class="si-priority-opt si-priority-opt-high" data-value="high">High</button>
+            </div>
+          </div>
+          <div class="si-field si-span-2">
+            <label>Assign Technician</label>
+            <select name="technician">
+              <option value="">Pilih teknisi</option>
+              <option>Dedi Kurniawan</option>
+              <option>Andi Wijaya</option>
+              <option>Budi Santoso</option>
+              <option>Citra Lestari</option>
+              <option value="other">Lainnya...</option>
+            </select>
+            <input type="text" name="technicianCustom" placeholder="Nama teknisi lain" class="si-conditional-field">
+          </div>
+          <div class="si-field si-span-2">
+            <label>Notes</label>
+            <textarea name="notes" placeholder="Catatan tambahan (opsional)"></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="si-modal-foot">
+      <button class="si-btn si-btn-ghost" id="siScheduleCancelBtn" type="button">Cancel</button>
+      <div class="si-modal-foot-right">
+        <button class="si-btn si-btn-primary" id="siScheduleSaveBtn" type="button">
+          <i class="fa-solid fa-floppy-disk"></i> Save Schedule
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Future Maintenance Detail
+============================================================= -->
+<div class="si-modal-overlay" id="siFutureDetailOverlay">
+  <div class="si-modal si-modal-sm">
+    <div class="si-modal-head">
+      <div>
+        <h2>Maintenance Detail</h2>
+        <p>Informasi lengkap jadwal pemeliharaan.</p>
+      </div>
+      <button class="si-modal-close" id="siFutureDetailCloseBtn" type="button" aria-label="Tutup">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="si-modal-body">
+      <div class="si-detail-modal-top">
+        <div class="si-maint-icon si-maint-icon-lg"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        <div style="min-width:0;">
+          <h3 id="siFutureDetailTitle" class="si-detail-modal-title">—</h3>
+          <div id="siFutureDetailTags" class="si-maint-tags"></div>
+        </div>
+      </div>
+      <dl class="si-dl si-detail-modal-dl" id="siFutureDetailDl"></dl>
+      <div class="si-detail-modal-block" id="siFutureDetailDescWrap">
+        <b>Description</b>
+        <p id="siFutureDetailDesc">—</p>
+      </div>
+      <div class="si-detail-modal-block" id="siFutureDetailNotesWrap">
+        <b>Notes</b>
+        <p id="siFutureDetailNotes">—</p>
+      </div>
+    </div>
+    <div class="si-modal-foot">
+      <button class="si-btn si-btn-danger-ghost" id="siFutureDetailDeleteBtn" type="button">
+        <i class="fa-solid fa-trash"></i> Delete
+      </button>
+      <div class="si-modal-foot-right">
+        <button class="si-btn si-btn-secondary" id="siFutureDetailCloseBtn2" type="button">Close</button>
+        <button class="si-btn si-btn-primary" id="siFutureDetailEditBtn" type="button">
+          <i class="fa-solid fa-pen"></i> Edit Schedule
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Historical Maintenance Detail
+============================================================= -->
+<div class="si-modal-overlay" id="siHistoryDetailOverlay">
+  <div class="si-modal si-modal-sm">
+    <div class="si-modal-head">
+      <div>
+        <h2>Maintenance Log Detail</h2>
+        <p>Riwayat lengkap pekerjaan pemeliharaan yang telah diselesaikan.</p>
+      </div>
+      <button class="si-modal-close" id="siHistoryDetailCloseBtn" type="button" aria-label="Tutup">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="si-modal-body">
+      <div class="si-detail-modal-top">
+        <div class="si-maint-icon si-maint-icon-lg si-maint-icon-done"><i class="fa-solid fa-check"></i></div>
+        <div style="min-width:0;">
+          <h3 id="siHistoryDetailTitle" class="si-detail-modal-title">—</h3>
+          <div id="siHistoryDetailTags" class="si-maint-tags"></div>
+        </div>
+      </div>
+      <dl class="si-dl si-detail-modal-dl" id="siHistoryDetailDl"></dl>
+      <div class="si-detail-modal-block">
+        <b>Problem</b>
+        <p id="siHistoryDetailProblem">—</p>
+      </div>
+      <div class="si-detail-modal-block">
+        <b>Action Taken</b>
+        <p id="siHistoryDetailAction">—</p>
+      </div>
+      <div class="si-detail-modal-block" id="siHistoryDetailNotesWrap">
+        <b>Notes</b>
+        <p id="siHistoryDetailNotes">—</p>
+      </div>
+    </div>
+    <div class="si-modal-foot">
+      <div></div>
+      <div class="si-modal-foot-right">
+        <button class="si-btn si-btn-secondary" id="siHistoryDetailCloseBtn2" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Zoom Card (klik card mana pun -> tampil lebih besar)
+============================================================= -->
+<div class="si-modal-overlay" id="siZoomOverlay">
+  <div class="si-modal si-modal-lg si-zoom-modal">
+    <div class="si-modal-head">
+      <div>
+        <div class="si-card-eyebrow" id="siZoomEyebrow">—</div>
+        <h2 id="siZoomTitle">—</h2>
+      </div>
+      <button class="si-modal-close" id="siZoomCloseBtn" type="button" aria-label="Tutup">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="si-modal-body si-zoom-body" id="siZoomBody"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="si-toast" id="siToast">
+  <i class="fa-solid fa-circle-check"></i>
+  <span id="siToastMsg">Saved.</span>
+</div>

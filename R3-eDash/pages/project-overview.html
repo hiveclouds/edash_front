@@ -1,0 +1,96 @@
+<div class="page-container project-overview-page">
+
+  <section class="project-info card">
+    <div class="project-info-head">
+      <div class="project-selector">
+        <label for="projectSelect">Select Project</label>
+        <select id="projectSelect" aria-label="Select Project">
+          <option value="tawabi">PLTS Tawabi</option>
+        </select>
+      </div>
+      <div class="project-detail">
+        <h1 id="projectName">PLTS Tawabi</h1>
+        <div class="project-meta" id="projectMeta"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="top-grid">
+    <div class="card chart-card large-card">
+      <div class="card-header">
+        <div>
+          <h3>Energy Production vs Consumption</h3>
+          <span class="card-subtitle">Last 7 days</span>
+        </div>
+        <button type="button" class="secondary-btn" id="energyRangeBtn">7 Days</button>
+      </div>
+      <div class="chart-area" id="energyChart" aria-label="Energy production and consumption chart"></div>
+    </div>
+
+    <div class="side-column">
+      <div class="card weather-card">
+        <div class="card-header"><h3>Current Weather</h3><span class="status-dot">Live</span></div>
+        <div class="weather-temp" id="weatherTemp">34.4°C</div>
+        <div class="weather-desc" id="weatherDesc">Overcast Clouds</div>
+        <div class="weather-info" id="weatherInfo">Humidity: 46%</div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Weekly Analysis</h3></div>
+        <div class="analysis-row"><span>Average production</span><strong id="weeklyProduction">—</strong></div>
+        <div class="analysis-row"><span>Performance</span><strong id="weeklyPerformance">—</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="second-grid">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h3>Energy Production</h3>
+          <span class="card-subtitle">PV output by array</span>
+        </div>
+      </div>
+      <div class="chart-area compact" id="productionChart" aria-label="PV production chart"></div>
+    </div>
+    <div class="card spending-card">
+      <h3>Energy Spending</h3>
+      <div class="big-number" id="energySpending">Rp19.000</div>
+      <span>This Month</span>
+    </div>
+  </section>
+
+  <section class="kpi-grid">
+    <div class="card kpi-card"><h4>Monthly Emission Saving</h4><div class="kpi-value" id="emissionSaving">0.0124</div><span>Ton CO₂</span></div>
+    <div class="card kpi-card"><h4>Equivalent Trees</h4><div class="kpi-value" id="equivalentTrees">2</div><span>Trees</span></div>
+    <div class="card kpi-card"><h4>Tree Planting Cost</h4><div class="kpi-value" id="treeCost">Rp13.436</div><span>Equivalent</span></div>
+  </section>
+
+  <section class="performance-section">
+    <div class="section-heading">
+      <div>
+        <h2>Performance Analytics</h2>
+        <p>Key operating performance of the selected PV system.</p>
+      </div>
+      <span class="live-badge"><i></i> Live data</span>
+    </div>
+
+    <div class="performance-grid" id="performanceGrid">
+      <article class="card performance-card" data-performance="batteryVoltage"></article>
+      <article class="card performance-card" data-performance="pvVoltage"></article>
+      <article class="card performance-card" data-performance="radiatorTemp"></article>
+      <article class="card performance-card" data-performance="batteryCurrent"></article>
+      <article class="card performance-card" data-performance="batteryPower"></article>
+      <article class="card performance-card" data-performance="leakCurrent"></article>
+    </div>
+  </section>
+
+  <section class="bottom-grid">
+    <div class="card"><h3>Battery Swapping Station</h3><p id="batteryStatus">No available batteries.</p></div>
+    <div class="card"><h3>History Swaps</h3><p id="swapHistory">No recent swaps available.</p></div>
+    <div class="card">
+      <h3>Notifications</h3>
+      <ul class="notification-list" id="notificationList"></ul>
+    </div>
+  </section>
+
+</div>

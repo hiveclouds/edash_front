@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>360eDash — Solar Calculator</title>
+
+<!-- Google Fonts: Poppins -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Font Awesome 6 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<!-- Design tokens + shared atoms (button, pill) -->
+<link rel="stylesheet" href="../css/global.css">
+
+<!-- Solar Calculator page style -->
+<link rel="stylesheet" href="../css/solar-calculator.css">
+
+<script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '2542449989534359');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=2542449989534359&ev=PageView&noscript=1"
+  /></noscript>
+<!-- End Meta Pixel -->
+ 
+</head>
+<body>
+
+<div class="calc-page">
+
+  <!-- ============ Top bar ============ -->
+  <header class="calc-topbar">
+    <div class="calc-topbar__inner">
+      <img class="calc-topbar__logo" src="../assets/logo2.png" alt="360energy">
+    </div>
+  </header>
+
+  <!-- Everything below the header scrolls in its own region, so the
+       header itself never scrolls or gets swept by the page scrollbar -->
+  <div class="calc-scroll-area" id="calcScrollArea">
+
+  <!-- ============ Page title ============ -->
+  <section class="calc-hero-lite">
+    <div class="calc-hero-lite__inner">
+      <div class="calc-hero-lite__text">
+        <h1 class="calc-hero-lite__title">Smart Solar Planner</h1>
+        <p class="calc-hero-lite__desc">Calculate your facility's rooftop solar potential in seconds.</p>
+      </div>
+
+      <div class="calc-hero-lite__actions">
+        <button type="button" class="calc-admin-btn" id="calcAdminSettingsBtn" aria-label="Settings" aria-haspopup="dialog" aria-expanded="false" aria-controls="calcAdminSettingsModal">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+        <button type="button" class="calc-lang-btn" id="calcLangToggle" aria-label="Switch language">
+          <i class="fa-solid fa-globe"></i>
+          <span id="calcLangCurrent">EN</span>
+        </button>
+        <a href="../main-page/index.html" class="calc-home-btn">
+          <i class="fa-solid fa-house"></i>
+          <span>Home</span>
+        </a>
+        <a href="login.html" class="calc-signin-btn">
+          <i class="fa-solid fa-right-to-bracket"></i>
+          <span>Sign In</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Calculator ============ -->
+  <main class="calc-shell" id="calculator">
+
+    <!-- Left: input form -->
+    <section class="calc-form-panel">
+      <div class="calc-card calc-card--form">
+        <div class="calc-card__head">
+          <span class="calc-card__icon"><i class="fa-solid fa-solar-panel"></i></span>
+          <div>
+            <h2>Enter Your Project Details</h2>
+            <p>Initial estimate — for an official quote, our team will conduct a further site survey.</p>
+          </div>
+        </div>
+
+        <form id="solarCalcForm" class="calc-form" novalidate>
+
+          <div class="form-group">
+            <label for="countrySelect">Country</label>
+            <div class="input-control input-control--select">
+              <i class="fa-solid fa-earth-asia input-control__icon"></i>
+              <select id="countrySelect" required>
+                <option value="ID" selected>Indonesia</option>
+                <option value="US">United States</option>
+                <option value="OTHER">Other</option>
+              </select>
+              <i class="fa-solid fa-chevron-down input-control__caret"></i>
+            </div>
+          </div>
+
+          <div class="form-group" id="otherCountryGroup" hidden>
+            <label for="countryOtherInput">Country Name</label>
+            <div class="input-control">
+              <i class="fa-solid fa-earth-americas input-control__icon"></i>
+              <input type="text" id="countryOtherInput" placeholder="Type your country name">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="provinceSelect" id="provinceLabel">Facility Province</label>
+            <!-- Dropdown mode: used for Indonesia (provinces) and United States (states) -->
+            <div class="input-control input-control--select" id="provinceSelectWrap">
+              <i class="fa-solid fa-map-location-dot input-control__icon"></i>
+              <select id="provinceSelect" required></select>
+              <i class="fa-solid fa-chevron-down input-control__caret"></i>
+            </div>
+            <!-- Manual mode: used for "Other" countries -->
+            <div class="input-control" id="provinceInputWrap" hidden>
+              <i class="fa-solid fa-map-location-dot input-control__icon"></i>
+              <input type="text" id="provinceInput" placeholder="Type your province / state">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cityInput" id="cityLabel">City / Regency</label>
+            <!-- Dropdown mode: used for Indonesia (city/regency) and United States (city), auto-filled based on the selected province/state -->
+            <div class="input-control input-control--select" id="cityInputWrap">
+              <i class="fa-solid fa-location-dot input-control__icon"></i>
+              <select id="cityInput" required></select>
+              <i class="fa-solid fa-chevron-down input-control__caret"></i>
+            </div>
+            <!-- Manual mode: used for "Other" countries -->
+            <div class="input-control" id="cityInputTextWrap" hidden>
+              <i class="fa-solid fa-location-dot input-control__icon"></i>
+              <input type="text" id="cityInputText" placeholder="Type your city">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="facilitySelect" class="calc-input-label">Facility Type <button type="button" class="calc-input-info-btn" data-info="Each facility type has different operating hours and electricity usage patterns. This helps estimate how your electricity demand is distributed throughout the day." aria-label="More information about Facility Type">i</button></label>
+            <div class="input-control input-control--select">
+              <i class="fa-solid fa-building input-control__icon"></i>
+              <select id="facilitySelect" required>
+                <option value="restaurant" selected>Restaurant</option>
+                <option value="office">Office</option>
+                <option value="mall">Mall / Retail</option>
+                <option value="hospital">Hospital</option>
+                <option value="industrial_247">Factory 24/7</option>
+                <option value="industrial_1shift">Factory 1 Shift</option>
+                <option value="residential">Residential Complex</option>
+                <option value="streetlights">Street Lighting</option>
+                <option value="other">Other</option>
+              </select>
+              <i class="fa-solid fa-chevron-down input-control__caret"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="kvaInput" class="calc-input-label">Installed PLN Power Capacity (kVA) <button type="button" class="calc-input-info-btn" data-info="The electrical capacity registered with PLN for your facility. This is used as a reference for system sizing and is not your actual electricity consumption." aria-label="More information about Installed PLN Power Capacity">i</button></label>
+            <div class="input-control">
+              <i class="fa-solid fa-bolt input-control__icon"></i>
+              <input type="number" id="kvaInput" min="1" step="1" placeholder="e.g. 66" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="tariffSelect" class="calc-input-label">PLN Tariff Category <button type="button" class="calc-input-info-btn" data-info="The tariff category on your PLN account determines the electricity rate used to estimate your current and future electricity costs." aria-label="More information about PLN Tariff Category">i</button></label>
+            <div class="input-control input-control--select">
+              <i class="fa-solid fa-file-invoice-dollar input-control__icon"></i>
+              <select id="tariffSelect" required>
+                <option value="415">Rumah tangga 450 VA</option>
+                <option value="605">Rumah tangga 900 VA (Subsidi)</option>
+                <option value="1352">Rumah tangga 900 VA (RTM)</option>
+                <option value="1444.70">Rumah tangga 1.300-2.200 VA</option>
+                <option value="1699.53">Rumah tangga 3.500 VA+</option>
+                <option value="1352">R-1/TR 900 VA</option>
+                <option value="1444.70">R-1/TR 1.300 VA</option>
+                <option value="1444.70">R-1/TR 2.200 VA</option>
+                <option value="1699.53">R-2/TR 3.500-5.500 VA</option>
+                <option value="1699.53">R-3/TR 6.600 VA+</option>
+                <option value="1444.70" selected>B-2/TR 6.600 VA-200 kVA</option>
+                <option value="1699.53">P-1/TR 6.600 VA-200 kVA</option>
+                <option value="1699.53">P-3/TR 200 kVA+</option>
+                <option value="custom">Custom</option>
+              </select>
+              <i class="fa-solid fa-chevron-down input-control__caret"></i>
+            </div>
+          </div>
+
+          <div class="form-group" id="customTariffGroup" hidden>
+            <label for="customTariffInput">Custom PLN Tariff (Rp/kWh)</label>
+            <div class="input-control">
+              <i class="fa-solid fa-pen input-control__icon"></i>
+              <input type="number" id="customTariffInput" min="0" step="0.01" placeholder="e.g. 1444.70">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="energyInputMethod" class="calc-input-label">Isi data tagihan listrik bulanan Anda <button type="button" class="calc-input-info-btn" data-info="Choose how you want to provide your electricity usage: either your typical monthly PLN bill, or your average daily energy consumption in kWh." aria-label="More information about Fill in your monthly electricity bill">i</button></label>
+            <div class="input-control input-control--select">
+              <i class="fa-solid fa-file-invoice input-control__icon"></i>
+              <select id="energyInputMethod">
+                <option value="kwh">Daily Energy (kWh)</option>
+                <option value="bill" selected>Monthly Bill (IDR)</option>
+              </select>
+              <i class="fa-solid fa-chevron-down input-control__caret"></i>
+            </div>
+          </div>
+
+          <div class="form-group" id="kwhInputGroup" hidden>
+            <label for="totalEnergyInput" class="calc-input-label">Total Daily Energy Use (kWh)</label>
+            <div class="input-control">
+              <i class="fa-solid fa-bolt input-control__icon"></i>
+              <input type="number" id="totalEnergyInput" min="0" step="0.1" placeholder="e.g. 383">
+            </div>
+          </div>
+
+          <div class="form-group" id="billInputGroup">
+            <label for="billInput" class="calc-input-label">Total Monthly Electricity Bill (Rp) <button type="button" class="calc-input-info-btn" data-info="Enter your typical monthly PLN electricity bill before installing solar. If it varies month to month, use a representative average." aria-label="More information about Total Monthly Electricity Bill">i</button></label>
+            <div class="input-control">
+              <i class="fa-solid fa-receipt input-control__icon"></i>
+              <input type="text" inputmode="numeric" id="billInput" placeholder="e.g. 16.800.000" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="limitByArea" class="calc-input-label" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="checkbox" id="limitByArea" style="width:16px; height:16px; margin:0;">
+              Limit by Roof Area
+            </label>
+          </div>
+
+          <div class="form-group" id="roofAreaInputsContainer" hidden>
+            <label for="totalRoofArea" class="calc-input-label">Total Roof Area (m²)</label>
+            <div class="input-control">
+              <i class="fa-solid fa-ruler-combined input-control__icon"></i>
+              <input type="number" id="totalRoofArea" min="0" step="1" placeholder="e.g. 500">
+            </div>
+          </div>
+
+          <div class="form-group" id="usableRoofPercentGroup" hidden>
+            <label for="usableRoofPercent" class="calc-input-label">Usable Roof Area (%)</label>
+            <div class="calc-slider-control">
+              <input type="range" id="usableRoofPercent" class="calc-slider-control__range" min="0" max="100" step="1" value="80">
+              <input type="number" class="calc-slider-control__value" id="usableRoofPercentValue" min="0" max="100" step="1" value="80" inputmode="numeric">
+            </div>
+          </div>
+
+          <!-- Pricing/BOT admin fields (profit margin, cost per kWp, BOT
+               tariff discount + thresholds, max payback) moved into the
+               Admin: Pricing Controls modal — opened via the gear button
+               in the top-right actions bar. Same input IDs are reused
+               there, so computeEstimate()/getFormValues() keep reading
+               them with no other JS changes needed. -->
+
+          <span class="form-error form-error--general" id="calcFormError"></span>
+
+          <button type="submit" class="btn-calc" id="calcSubmitBtn">
+            <span>Calculate Estimate</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Right: results -->
+    <section class="calc-results-panel" id="resultsPanel">
+      <div class="calc-card calc-card--results">
+
+        <div class="calc-empty-state" id="emptyState">
+          <i class="fa-regular fa-sun"></i>
+          <h3>Your estimate will appear here</h3>
+          <p>Fill in the form and click "Calculate Estimate" to see your facility's solar system potential.</p>
+        </div>
+
+        <div class="calc-output" id="calcOutput" hidden>
+
+          <p class="calc-summary-banner" id="summaryBanner"></p>
+
+          <div class="calc-highlight-grid calc-highlight-grid--2">
+            <div class="calc-stat-card calc-stat-card--success">
+              <span class="calc-stat-card__label">Estimated Monthly Savings</span>
+              <span class="calc-stat-card__value" id="statMonthlySavings">Rp --</span>
+              <span class="calc-stat-card__sub" id="statBillCompare"></span>
+            </div>
+            <div class="calc-stat-card calc-stat-card--accent calc-stat-card--icon">
+              <span class="calc-stat-card__icon calc-stat-card__icon--accent"><i class="fa-solid fa-solar-panel"></i></span>
+              <span class="calc-stat-card__label">Solar System Size</span>
+              <span class="calc-stat-card__value" id="statSystemSize">-- kWp</span>
+              <span class="calc-stat-card__sub" id="statPanelCountShort"></span>
+            </div>
+          </div>
+
+          <!-- Simple, punchy sales teaser — replaces the old tariff/pitch/chart
+               trio in the free preview. Full detail now lives behind the
+               email gate below, which also doubles as a stronger hook. -->
+          <div class="calc-cta-banner">
+            <span class="calc-cta-banner__icon"><i class="fa-solid fa-piggy-bank"></i></span>
+            <div class="calc-cta-banner__text">
+              <h3>Save up to <span id="pitchSavingsPctTeaser">--%</span> on your electricity costs over 20 years</h3>
+              <p>Unlock your full report for production charts, investment breakdown, payback period, and environmental impact.</p>
+            </div>
+          </div>
+
+          <div class="calc-detail-wrap">
+            <h3 class="calc-detail-heading"><i class="fa-solid fa-chart-line"></i> Full Breakdown &amp; Investment Projection</h3>
+
+            <div class="calc-detail-body" id="detailGrid">
+
+              <!-- Tab nav: splits the breakdown into Summary / Financial / Technical
+                   so the free preview doesn't dump every stat on the user at once.
+                   JS (initDetailTabs) toggles .is-active + re-fires the chart
+                   renderers for the tab being shown, since charts measure their
+                   container size at render time and can't do that while hidden. -->
+              <div class="calc-tabs" id="detailTabs" role="tablist">
+                <button type="button" class="calc-tab is-active" id="calcTabBtnSummary" role="tab" aria-selected="true" aria-controls="calcTabSummary" data-tab="summary">Summary</button>
+                <button type="button" class="calc-tab" id="calcTabBtnFinancial" role="tab" aria-selected="false" aria-controls="calcTabFinancial" data-tab="financial">Financial</button>
+                <button type="button" class="calc-tab" id="calcTabBtnTechnical" role="tab" aria-selected="false" aria-controls="calcTabTechnical" data-tab="technical">Technical</button>
+              </div>
+
+              <!-- ============ Ringkasan (Summary) ============ -->
+              <div class="calc-tab-panel is-active" id="calcTabSummary" role="tabpanel" aria-labelledby="calcTabBtnSummary" data-tab-panel="summary">
+
+                <!-- Full stat recap (System Size + Coverage — moved from free preview)
+                     — kept as the free preview: always visible, never blurred,
+                     even while .calc-detail-wrap is locked. -->
+                <div class="calc-tab-preview">
+                  <div class="calc-highlight-grid calc-highlight-grid--2 calc-highlight-grid--recap">
+                    <div class="calc-stat-card calc-stat-card--accent">
+                      <span class="calc-stat-card__label">Payback Period (Planner NCF)</span>
+                      <span class="calc-stat-card__value" id="statPaybackTeaser">-- years</span>
+                      <span class="calc-stat-card__sub">your estimated investment payback</span>
+                    </div>
+                    <div class="calc-stat-card calc-stat-card--teal calc-stat-card--icon">
+                      <span class="calc-stat-card__icon calc-stat-card__icon--teal"><i class="fa-solid fa-leaf"></i></span>
+                      <span class="calc-stat-card__label">Solar Energy Coverage</span>
+                      <span class="calc-stat-card__value" id="statCoverage">-- %</span>
+                      <span class="calc-stat-card__sub">of total daily electricity consumption</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Everything below the preview stays blurred + non-interactive
+                     while locked. #lockOverlay gets moved in here (as a sibling
+                     of .calc-tab-locked__content) by initDetailTabs()/the lock
+                     logic in solar-calculator.js whenever this tab is active. -->
+                <div class="calc-tab-locked">
+                  <div class="calc-tab-locked__content">
+
+                    <!-- Sales pitch: conventional (PLN-only) vs. solar, 20-year outlook (moved from free preview) -->
+                    <div class="calc-savings-hero">
+                      <p class="calc-savings-hero__eyebrow">If you go solar, over 20 years you'll save</p>
+                      <p class="calc-savings-hero__amount" id="pitchSavingsAmount">Rp --</p>
+                      <p class="calc-savings-hero__sub">that's <b id="pitchSavingsPct">--%</b> off your total bill vs. staying 100% on PLN</p>
+
+                      <div class="calc-savings-hero__grid">
+                        <div class="calc-savings-hero__item">
+                          <i class="fa-solid fa-file-invoice-dollar calc-savings-hero__icon"></i>
+                          <span class="calc-savings-hero__text">Monthly bill <b id="heroMonthlyBillOld">Rp --</b> <i class="fa-solid fa-arrow-right"></i> <b class="calc-savings-hero__accent" id="heroMonthlyBillNew">Rp --</b></span>
+                        </div>
+                        <div class="calc-savings-hero__item">
+                          <i class="fa-solid fa-solar-panel calc-savings-hero__icon"></i>
+                          <span class="calc-savings-hero__text">System size <b id="heroSystemSize">-- kWp</b> <span class="calc-savings-hero__muted">± <span id="heroPanelCount">--</span> solar panels</span></span>
+                        </div>
+                        <div class="calc-savings-hero__item">
+                          <i class="fa-solid fa-bolt calc-savings-hero__icon"></i>
+                          <span class="calc-savings-hero__text">Tariff <b id="heroTariffOld">Rp --/kWh</b> <i class="fa-solid fa-arrow-right"></i> <b class="calc-savings-hero__accent" id="heroTariffNew">Rp --/kWh</b></span>
+                        </div>
+                        <div class="calc-savings-hero__item">
+                          <i class="fa-solid fa-leaf calc-savings-hero__icon"></i>
+                          <span class="calc-savings-hero__text">Offset <b id="pitchCo2">-- tCO2e</b> <span class="calc-savings-hero__muted">— like planting <b id="pitchTrees">--</b> mangrove</span></span>
+                        </div>
+                      </div>
+
+                      <div class="calc-savings-hero__bars">
+                        <div class="calc-savings-bar-row">
+                          <span class="calc-savings-bar-row__label">Stay on PLN</span>
+                          <span class="calc-savings-bar-row__track"><span class="calc-savings-bar-row__fill calc-savings-bar-row__fill--pln" id="heroBarPln"></span></span>
+                          <span class="calc-savings-bar-row__value" id="pitchConventionalCost">Rp --</span>
+                        </div>
+                        <div class="calc-savings-bar-row">
+                          <span class="calc-savings-bar-row__label">Go solar</span>
+                          <span class="calc-savings-bar-row__track"><span class="calc-savings-bar-row__fill calc-savings-bar-row__fill--solar" id="heroBarSolar"></span></span>
+                          <span class="calc-savings-bar-row__value" id="pitchSolarCost">Rp --</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Production vs. consumption chart (moved from free preview) -->
+                    <div class="calc-chart-card">
+                      <div class="calc-chart-card__head">
+                        <h3><i class="fa-solid fa-chart-area"></i> Estimated Daily Production vs. Consumption</h3>
+                        <div class="calc-chart-card__controls">
+                          <label class="calc-battery-toggle" for="batteryScenarioToggle">
+                            <span class="calc-battery-toggle__label"><i class="fa-solid fa-battery-half"></i> Battery Storage</span>
+                            <input type="checkbox" id="batteryScenarioToggle" role="switch" aria-label="Enable battery storage scenario" checked>
+                            <span class="calc-battery-toggle__track" aria-hidden="true"><span class="calc-battery-toggle__thumb"></span></span>
+                          </label>
+                          <div class="calc-chart-legend" id="productionChartLegend">
+                            <span class="calc-chart-legend__item"><i class="calc-chart-dot calc-chart-dot--consumption"></i> Consumption</span>
+                            <span class="calc-chart-legend__item"><i class="calc-chart-dot calc-chart-dot--solar"></i> Solar Production</span>
+                            <span class="calc-chart-legend__item" id="chartOverlayLegend"><i class="calc-chart-dot calc-chart-dot--overlay"></i> Self-consumed</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="calc-chart-box" id="productionChart"></div>
+                    </div>
+
+                    <!-- Environmental / CSR -->
+                    <h4 class="calc-detail-subhead">Environmental Impact &amp; CSR Equivalent (20 Years)</h4>
+                    <div class="calc-detail-grid calc-detail-grid--4">
+                      <div class="calc-detail-card calc-detail-card--medallion">
+                        <span class="calc-icon-badge calc-icon-badge--emerald"><i class="fa-solid fa-cloud"></i></span>
+                        <div class="calc-detail-card__body"><span class="calc-detail-card__label">Total Emission Reduction</span><span class="calc-detail-card__value" id="envTotalEmissions">-- tCO2e</span></div>
+                      </div>
+                      <div class="calc-detail-card calc-detail-card--medallion">
+                        <span class="calc-icon-badge calc-icon-badge--green"><i class="fa-solid fa-chart-line"></i></span>
+                        <div class="calc-detail-card__body"><span class="calc-detail-card__label">Average Annual Reduction</span><span class="calc-detail-card__value" id="envAvgEmissions">-- tCO2e</span></div>
+                      </div>
+                      <div class="calc-detail-card calc-detail-card--medallion">
+                        <span class="calc-icon-badge calc-icon-badge--lime"><i class="fa-solid fa-water"></i></span>
+                        <div class="calc-detail-card__body"><span class="calc-detail-card__label">Mangrove Forest Equivalent</span><span class="calc-detail-card__value" id="envMangroveHa">-- ha</span></div>
+                      </div>
+                      <div class="calc-detail-card calc-detail-card--medallion">
+                        <span class="calc-icon-badge calc-icon-badge--cyan"><i class="fa-solid fa-tree"></i></span>
+                        <div class="calc-detail-card__body"><span class="calc-detail-card__label">Equivalent Trees</span><span class="calc-detail-card__value" id="envMangroveTrees">-- trees</span></div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- ============ Finansial (Financial) ============ -->
+              <div class="calc-tab-panel" id="calcTabFinancial" role="tabpanel" aria-labelledby="calcTabBtnFinancial" data-tab-panel="financial" hidden>
+
+                <!-- PLN vs. Solar Leasing tariff (moved from free preview) — free preview -->
+                <div class="calc-tab-preview">
+                  <div class="calc-tariff-compare">
+                    <div class="calc-tariff-box calc-tariff-box--old">
+                      <span class="calc-tariff-box__label">PLN Tariff</span>
+                      <span class="calc-tariff-box__value" id="statPlnTariff">Rp --/kWh</span>
+                    </div>
+                    <i class="fa-solid fa-arrow-right calc-tariff-arrow"></i>
+                    <div class="calc-tariff-box calc-tariff-box--new">
+                      <span class="calc-tariff-box__label">Solar Leasing Tariff (BOT)</span>
+                      <span class="calc-tariff-box__value" id="statSolarTariff">Rp --/kWh</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="calc-tab-locked">
+                  <div class="calc-tab-locked__content">
+
+                    <!-- Financing model switcher -->
+                    <h4 class="calc-detail-subhead">Choose How You'd Like to Go Solar</h4>
+                    <div class="calc-finance-switch" id="financeSwitch" role="tablist" aria-label="Financing model">
+                      <button type="button" class="calc-finance-switch__btn is-active" id="financeTabBtnLeasing" role="tab" aria-selected="true" aria-controls="financeTabLeasing" data-finance-tab="leasing">
+                        <span class="calc-finance-switch__icon"><i class="fa-solid fa-handshake"></i></span>
+                        <span class="calc-finance-switch__text"><b>Solar Leasing</b><span>No upfront cost</span></span>
+                      </button>
+                      <button type="button" class="calc-finance-switch__btn" id="financeTabBtnDirect" role="tab" aria-selected="false" aria-controls="financeTabDirect" data-finance-tab="direct">
+                        <span class="calc-finance-switch__icon"><i class="fa-solid fa-hand-holding-dollar"></i></span>
+                        <span class="calc-finance-switch__text"><b>Direct Purchase</b><span>You own the system</span></span>
+                      </button>
+                    </div>
+
+                    <!-- Solar Leasing (ZeroCapEx / BOT) panel -->
+                    <div class="calc-finance-panel is-active" id="financeTabLeasing" data-finance-panel="leasing">
+                      <p class="calc-finance-panel__desc">Pay a lower monthly rate than PLN with <b>zero upfront investment</b> — 360energy owns, installs, and maintains the system for you.</p>
+                      <p class="calc-fit-note" id="botIneligibleNote" hidden><i class="fa-solid fa-circle-info"></i> <span id="botIneligibleNoteText"></span></p>
+                      <div class="calc-finance-hero" id="leasingHero">
+                        <div class="calc-finance-hero__top">
+                          <span class="calc-finance-hero__old" id="leaseOldBill">Rp --</span>
+                          <span class="calc-finance-hero__pct" id="leaseSavePct">save --%</span>
+                        </div>
+                        <span class="calc-finance-hero__new" id="botNewBill">Rp --</span>
+                        <span class="calc-finance-hero__label">new monthly bill</span>
+                        <span class="calc-finance-hero__savings" id="botMonthlySavings">save Rp --/mo</span>
+                        <div class="calc-finance-hero__divider"></div>
+                        <div class="calc-finance-hero__row">
+                          <span>Total Project Savings (20yr)</span>
+                          <b id="botTotalSavings">Rp --</b>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Direct Purchase (Outright / Beli Putus) panel -->
+                    <div class="calc-finance-panel" id="financeTabDirect" data-finance-panel="direct" hidden>
+                      <p class="calc-finance-panel__desc">Pay for the system upfront and <b>own it outright</b> — the biggest long-term savings, with your investment paid back in just a few years.</p>
+                      <p class="calc-fit-note" id="dpPaybackTooLongNote" hidden><i class="fa-solid fa-circle-info"></i> <span id="dpPaybackTooLongNoteText"></span></p>
+                      <div class="calc-finance-hero" id="directHero">
+                        <div class="calc-finance-hero__top">
+                          <span class="calc-finance-hero__old" id="dpOldBill">Rp --</span>
+                          <span class="calc-finance-hero__pct" id="dpSavePct">save --%</span>
+                        </div>
+                        <span class="calc-finance-hero__new" id="dpNewBill">Rp --</span>
+                        <span class="calc-finance-hero__label">new monthly bill</span>
+                        <span class="calc-finance-hero__savings" id="dpMonthlySavings">save Rp --/mo</span>
+                      </div>
+
+                      <div class="calc-payback-card" id="directPaybackCard">
+                        <div class="calc-payback-card__row">
+                          <span>Estimated system investment</span>
+                          <b id="statInvestment">Rp --</b>
+                        </div>
+                        <div class="calc-payback-bar">
+                          <span class="calc-payback-bar__marker" id="paybackMarker"><span id="statPayback">-- yrs</span></span>
+                          <span class="calc-payback-bar__track">
+                            <span class="calc-payback-bar__fill calc-payback-bar__fill--paid" id="paybackFillPaid"></span>
+                            <span class="calc-payback-bar__fill calc-payback-bar__fill--free" id="paybackFillFree"></span>
+                          </span>
+                        </div>
+                        <div class="calc-payback-bar__axis"><span>Year 0</span><span>Year 20</span></div>
+                        <div class="calc-payback-legend">
+                          <span class="calc-chart-legend__item"><i class="calc-chart-dot calc-payback-dot--paid"></i> Paying off investment</span>
+                          <span class="calc-chart-legend__item"><i class="calc-chart-dot calc-payback-dot--free"></i> Pure savings, no more payments</span>
+                        </div>
+                        <div class="calc-payback-card__divider"></div>
+                        <div class="calc-payback-card__row">
+                          <span>NPV (Planner NCF, 8%)</span>
+                          <b id="statNpv">Rp --</b>
+                        </div>
+                        <div class="calc-payback-card__row">
+                          <span>IRR (Planner NCF)</span>
+                          <b id="statIrr">--%</b>
+                        </div>
+                        <div class="calc-payback-card__divider"></div>
+                        <div class="calc-payback-card__row">
+                          <span>Planner NCF Payback</span>
+                          <b id="plannerNcfPayback">-- yrs</b>
+                        </div>
+                        <div class="calc-payback-card__row">
+                          <span>Planner Discounted Payback</span>
+                          <b id="plannerDiscountedPayback">-- yrs</b>
+                        </div>
+                        <div class="calc-payback-card__row">
+                          <span>Planner NPV</span>
+                          <b id="plannerNpv">Rp --</b>
+                        </div>
+                        <div class="calc-payback-card__row">
+                          <span>Planner IRR (NCF)</span>
+                          <b id="plannerIrr">--%</b>
+                        </div>
+                        <div class="calc-payback-card__row">
+                          <span>Direct Purchase Payback</span>
+                          <b id="directPurchasePayback">-- yrs</b>
+                        </div>
+                        <div class="calc-payback-card__divider"></div>
+                        <div class="calc-payback-card__total">
+                          <span>Total savings over 20 years</span>
+                          <b id="statLifetimeSavings">Rp --</b>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Annual bills chart -->
+                    <div class="calc-chart-card calc-bills-card">
+                      <div class="calc-chart-card__head">
+                        <h3><i class="fa-solid fa-file-invoice-dollar"></i> Electricity Bill: Now vs. Solar</h3>
+                      </div>
+                      <p class="calc-bills-card__desc">Your electricity bill goes up every year as PLN tariffs increase. Here's how your annual bill compares at a few points in time, with and without solar.</p>
+                      <p class="calc-bills-card__savings" id="billsSavingsHeadline">Save Rp -- in Year 1 &rarr; save Rp --/year by Year 20</p>
+                      <div class="calc-chart-legend calc-bills-card__legend">
+                        <span class="calc-chart-legend__item"><i class="calc-chart-dot calc-chart-dot--consumption"></i> Stay on PLN</span>
+                        <span class="calc-chart-legend__item"><i class="calc-chart-dot calc-chart-dot--solar"></i> With Solar</span>
+                      </div>
+                      <div class="calc-chart-box calc-chart-box--tall" id="annualBillsChart"></div>
+                    </div>
+
+                    <!-- Year-by-year table -->
+                    <div class="calc-table-head">
+                      <h4 class="calc-detail-subhead calc-detail-subhead--flush">Outright Purchase: Annual Financial Breakdown</h4>
+                      <button type="button" class="calc-table-toggle" id="toggleYearlyTable">Expand Table <i class="fa-solid fa-chevron-down"></i></button>
+                    </div>
+                    <div class="calc-table-wrap" id="yearlyTableWrap" hidden>
+                      <table class="calc-table">
+                        <thead>
+                          <tr><th>Year</th><th>Savings (Rp)</th><th>OpEx (Rp)</th><th>NCF (Rp)</th><th>Cum. NCF (Rp)</th></tr>
+                        </thead>
+                        <tbody id="yearlyTableBody"></tbody>
+                      </table>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- ============ Teknis (Technical) ============ -->
+              <div class="calc-tab-panel" id="calcTabTechnical" role="tabpanel" aria-labelledby="calcTabBtnTechnical" data-tab-panel="technical" hidden>
+
+                <!-- Consumption chart — free preview -->
+                <div class="calc-tab-preview">
+                  <div class="calc-chart-card">
+                    <div class="calc-chart-card__head"><h3><i class="fa-solid fa-gauge-high"></i> Consumption</h3></div>
+                    <div class="calc-mini-chart-box" id="consumptionLoadChart" role="img" aria-label="Comparison of base load, additional peak load, and installed PLN capacity"></div>
+                  </div>
+                </div>
+
+                <div class="calc-tab-locked">
+                  <div class="calc-tab-locked__content">
+
+                <div class="calc-chart-card">
+                  <div class="calc-chart-card__head"><h3><i class="fa-solid fa-file-invoice"></i> Load &amp; Billing Snapshot</h3></div>
+                  <div class="calc-detail-grid calc-detail-grid--4">
+                    <div class="calc-detail-card calc-detail-card--medallion"><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-gauge"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label">Base Load</span><span class="calc-detail-card__value" id="cBaseLoad">-- kW</span></div></div>
+                    <div class="calc-detail-card calc-detail-card--medallion"><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-bolt"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label">Additional Peak Load</span><span class="calc-detail-card__value" id="cPeakLoad">-- kW</span></div></div>
+                    <div class="calc-detail-card calc-detail-card--medallion"><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-plug"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label">Installed PLN Capacity</span><span class="calc-detail-card__value" id="cMaxLoad">-- kVA</span></div></div>
+                    <div class="calc-detail-card calc-detail-card--medallion"><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-clock"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label">Prep / Idle Load</span><span class="calc-detail-card__value" id="cPrepIdleLoad">-- / -- kW</span></div></div>
+                    <div class="calc-detail-card calc-detail-card--medallion"><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-coins"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label">Daily Cost (Pre-Solar)</span><span class="calc-detail-card__value" id="cDailyCostPrePv">Rp --</span></div></div>
+                    <div class="calc-detail-card calc-detail-card--medallion"><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-file-invoice-dollar"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label">Monthly Bill (Pre-Solar)</span><span class="calc-detail-card__value" id="cMonthlyBillPrePv">Rp --</span></div></div>
+                  </div>
+                </div>
+
+                <!-- Solar PV System -->
+                <div class="calc-chart-card">
+                  <div class="calc-chart-card__head"><h3><i class="fa-solid fa-solar-panel"></i> Solar PV System</h3></div>
+                  <div class="calc-detail-grid calc-detail-grid--4">
+                    <div class="calc-detail-card calc-detail-card--medallion"><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-border-all"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label">Number of Panels</span><span class="calc-detail-card__value" id="sIdealPanels">--</span></div></div>
+                    <div class="calc-detail-card calc-detail-card--medallion"><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-solar-panel"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label">System Size</span><span class="calc-detail-card__value" id="sSystemSize">-- kWp</span></div></div>
+                    <div class="calc-detail-card calc-detail-card--medallion"><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-ruler-combined"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label">Total Panel Area</span><span class="calc-detail-card__value" id="sTotalArea">-- m²</span></div></div>
+                    <div class="calc-detail-card calc-detail-card--medallion"><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-gauge-high"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label">Max Output Power</span><span class="calc-detail-card__value" id="sMaxOutput">-- kW</span></div></div>
+                  </div>
+                </div>
+
+                <!-- Energy Mix -->
+                <div class="calc-chart-card">
+                  <div class="calc-chart-card__head"><h3><i class="fa-solid fa-chart-pie"></i> Estimated Energy Performance (Year 1)</h3></div>
+                  <div class="calc-donut-wrap">
+                    <div class="calc-mini-chart-box calc-mini-chart-box--donut" id="energyMixDonut" role="img" aria-label="Daily energy mix breakdown"></div>
+                    <div class="calc-donut-legend" id="energyMixDonutLegend"></div>
+                  </div>
+                  <div class="calc-detail-grid calc-detail-grid--4">
+                    <div class="calc-detail-card calc-detail-card--medallion"><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-house-chimney"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label" id="eSolarConsumedLabel">Daily Solar Consumption</span><span class="calc-detail-card__value" id="eSolarConsumed">-- kWh</span></div></div>
+                    <div class="calc-detail-card calc-detail-card--medallion"><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-plug-circle-bolt"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label">Daily Grid Import</span><span class="calc-detail-card__value" id="eGridImport">-- kWh</span></div></div>
+                    <div class="calc-detail-card calc-detail-card--medallion"><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-arrow-trend-up"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label" id="eExcessSurplusLabel">Daily Excess Surplus</span><span class="calc-detail-card__value" id="eExcessSurplus">-- kWh</span></div></div>
+                    <div class="calc-detail-card calc-detail-card--medallion" id="eBatteryStoredCard" hidden><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-car-battery"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label">Energy Stored in Battery</span><span class="calc-detail-card__value" id="eBatteryStored">-- kWh</span></div></div>
+                    <div class="calc-detail-card calc-detail-card--medallion"><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-sun"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label">Total Daily Production</span><span class="calc-detail-card__value" id="eTotalProduction">-- kWh</span></div></div>
+                    <div class="calc-detail-card calc-detail-card--medallion"><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-chart-line"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label">Daily Specific Yield</span><span class="calc-detail-card__value" id="eSpecificYield">-- kWh/kWp</span></div></div>
+                    <div class="calc-detail-card calc-detail-card--medallion"><span class="calc-icon-badge calc-icon-badge--sky"><i class="fa-solid fa-chart-pie"></i></span><div class="calc-detail-card__body"><span class="calc-detail-card__label">Daily Solar Mix</span><span class="calc-detail-card__value" id="eSolarMix">-- %</span></div></div>
+                  </div>
+                </div>
+
+                <!-- Battery Storage Scenario -->
+                <section class="calc-battery-scenario" id="batteryScenarioInfo" hidden aria-label="Battery Storage Scenario">
+                  <div class="calc-battery-scenario__head">
+                    <div class="calc-battery-scenario__title">
+                      <i class="fa-solid fa-battery-half" aria-hidden="true"></i>
+                      <h4>Battery Storage Scenario <span>(Estimate)</span></h4>
+                    </div>
+                  </div>
+                  <div class="calc-battery-scenario__grid">
+                    <article class="calc-battery-scenario-card calc-battery-scenario-card--solar">
+                      <div class="calc-battery-scenario-card__top">
+                        <div class="calc-battery-scenario-card__icon"><i class="fa-solid fa-bolt" aria-hidden="true"></i></div>
+                        <button type="button" class="calc-battery-info-btn" data-battery-info="excess" data-info="Estimated solar energy available after the facility's direct daytime consumption is met. This is the energy that can be routed to battery storage in this scenario." aria-label="More information about Available Solar Surplus">i</button>
+                      </div>
+                      <div class="calc-battery-scenario-card__label">Available Solar Surplus</div>
+                      <div class="calc-battery-scenario-card__value" id="bscExcess">-- <small>kWh/day</small></div>
+                    </article>
+
+                    <article class="calc-battery-scenario-card calc-battery-scenario-card--capacity">
+                      <div class="calc-battery-scenario-card__top">
+                        <div class="calc-battery-scenario-card__icon"><i class="fa-solid fa-battery-full" aria-hidden="true"></i></div>
+                        <button type="button" class="calc-battery-info-btn" data-battery-info="capacity" data-info="Estimated battery capacity sized to the modeled solar surplus. The calculator rounds the requirement up to multiples of the catalog battery unit (61.44 kWh) so the scenario shown can accommodate the full modeled surplus without an unrealistic fixed capacity cap." aria-label="More information about Estimated Battery Capacity">i</button>
+                      </div>
+                      <div class="calc-battery-scenario-card__label">Estimated Battery Capacity</div>
+                      <div class="calc-battery-scenario-card__value" id="bscCapacity">-- <small>kWh</small></div>
+                    </article>
+
+                    <article class="calc-battery-scenario-card calc-battery-scenario-card--stored">
+                      <div class="calc-battery-scenario-card__top">
+                        <div class="calc-battery-scenario-card__icon"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></div>
+                        <button type="button" class="calc-battery-info-btn" data-battery-info="stored" data-info="Estimated solar energy stored in the battery when solar production exceeds direct consumption." aria-label="More information about Stored Energy">i</button>
+                      </div>
+                      <div class="calc-battery-scenario-card__label">Stored Energy</div>
+                      <div class="calc-battery-scenario-card__value" id="bscStored">-- <small>kWh/day</small></div>
+                    </article>
+
+                    <article class="calc-battery-scenario-card calc-battery-scenario-card--discharged">
+                      <div class="calc-battery-scenario-card__top">
+                        <div class="calc-battery-scenario-card__icon"><i class="fa-solid fa-battery-quarter" aria-hidden="true"></i></div>
+                        <button type="button" class="calc-battery-info-btn" data-battery-info="discharged" data-info="Estimated energy discharged from the battery later to help meet consumption when solar production is unavailable or insufficient." aria-label="More information about Discharged Energy">i</button>
+                      </div>
+                      <div class="calc-battery-scenario-card__label">Discharged Energy</div>
+                      <div class="calc-battery-scenario-card__value" id="bscDischarged">-- <small>kWh/day</small></div>
+                    </article>
+
+                    <article class="calc-battery-scenario-card calc-battery-scenario-card--efficiency">
+                      <div class="calc-battery-scenario-card__top">
+                        <div class="calc-battery-scenario-card__icon"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i></div>
+                        <button type="button" class="calc-battery-info-btn" data-battery-info="efficiency" data-info="Public calculator assumption for battery round-trip efficiency. The catalog does not list a specific battery efficiency figure, so this estimate uses 92%; actual performance depends on the battery, inverter, operating conditions, and chosen system design." aria-label="More information about Battery Round-trip Efficiency">i</button>
+                      </div>
+                      <div class="calc-battery-scenario-card__label">Battery Round-trip Efficiency</div>
+                      <div class="calc-battery-scenario-card__value" id="bscEfficiency">92<small>%</small></div>
+                    </article>
+                  </div>
+                </section>
+
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="calc-lock-overlay" id="lockOverlay">
+              <div class="calc-lock-box">
+                <span class="calc-lock-box__icon"><i class="fa-solid fa-lock"></i></span>
+                <h4>Unlock the full breakdown &amp; report</h4>
+                <p>Enter your email to view investment details, payback period, and download the estimate report as a PDF.</p>
+
+                <form id="emailGateForm" class="calc-lock-form" novalidate>
+                  <div class="input-control">
+                    <i class="fa-regular fa-user input-control__icon"></i>
+                    <input type="text" id="leadNameInput" placeholder="Full name" required>
+                  </div>
+                  <div class="input-control input-control--select">
+                    <i class="fa-regular fa-building input-control__icon"></i>
+                    <select id="leadTypeInput" required>
+                      <option value="" disabled selected>Type</option>
+                      <option value="personal">Personal</option>
+                      <option value="company">Company</option>
+                      <option value="government">Government</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down input-control__caret"></i>
+                  </div>
+                  <div class="input-control">
+                    <i class="fa-regular fa-envelope input-control__icon"></i>
+                    <input type="email" id="emailGateInput" placeholder="name@company.com" required>
+                  </div>
+                  <div class="input-control">
+                    <i class="fa-solid fa-phone input-control__icon"></i>
+                    <input type="tel" id="leadPhoneInput" placeholder="Phone number" required>
+                  </div>
+                  <div class="input-control">
+                    <i class="fa-solid fa-location-dot input-control__icon"></i>
+                    <input type="text" id="leadAddressInput" placeholder="Address" required>
+                  </div>
+                  <span class="form-error" id="emailGateError"></span>
+                  <button type="submit" class="btn-login" id="emailGateSubmit">
+                    <span class="btn-login__label">Unlock Details &amp; Report</span>
+                  </button>
+                </form>
+
+                <p class="calc-lock-box__footnote">All your information is only used to provide your solar estimate and quotation.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="calc-unlocked-actions" id="unlockedActions" hidden>
+            <button type="button" class="btn btn-secondary" id="downloadPdfBtn">
+              <i class="fa-solid fa-file-arrow-down"></i> Download Report (PDF)
+            </button>
+            <a href="https://wa.me/6287775760575?text=Hi%20360energy%2C%20I%20just%20checked%20my%20Smart%20Solar%20Planner%20estimate%20and%20would%20like%20to%20proceed%20to%20an%20official%20quote." class="btn-calc calc-cta-login" target="_blank" rel="noopener noreferrer">
+              <span>Continue to Official Quote</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+
+          <p class="calc-disclaimer"><i class="fa-solid fa-circle-info"></i> This estimate is indicative, based on standard assumptions (regional solar irradiance potential, typical load profiles, and prevailing market prices). Final figures will be adjusted after a technical survey by the 360energy team.</p>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="calc-footer">
+    <p>© 2026 360energy (PT. Pionir Energi Hijau) — 360eDash Smart Solar Planner · <a href="privacy-policy.html" class="calc-footer__link">Privacy Policy</a></p>
+  </footer>
+
+  </div>
+
+</div>
+
+<!-- ============ Admin: Pricing Controls modal ============ -->
+<!-- Opened via the gear button in the top-right actions bar. Holds the
+     Direct Purchase / BOT pricing inputs that used to sit inline in the
+     public form — same input IDs, so computeEstimate() / getFormValues()
+     keep reading them unchanged, they've just moved out of the public
+     form and behind this admin panel. -->
+<div class="calc-admin-modal" id="calcAdminSettingsModal" hidden>
+  <div class="calc-admin-modal__backdrop" id="calcAdminSettingsBackdrop"></div>
+  <div class="calc-admin-modal__panel" role="dialog" aria-modal="true" aria-labelledby="calcAdminSettingsTitle">
+    <div class="calc-admin-modal__head">
+      <span class="calc-admin-modal__icon"><i class="fa-solid fa-gear"></i></span>
+      <div>
+        <h2 id="calcAdminSettingsTitle">Settings</h2>
+        <p>Sign in to view and adjust settings for this calculator.</p>
+      </div>
+      <button type="button" class="calc-admin-modal__close" id="calcAdminSettingsClose" aria-label="Close">&times;</button>
+    </div>
+
+    <div class="calc-admin-modal__body">
+
+      <!-- Login gate — shown first; the pricing form only appears after
+           a successful sign-in. Client-side only (this page has no
+           backend/auth yet), just enough to keep casual visitors out. -->
+      <div class="calc-admin-login" id="calcAdminLoginView">
+        <form id="calcAdminLoginForm" class="calc-form" novalidate>
+
+          <div class="form-group">
+            <label for="calcAdminUsername" class="calc-input-label">Username</label>
+            <div class="input-control">
+              <i class="fa-solid fa-user input-control__icon"></i>
+              <input type="text" id="calcAdminUsername" autocomplete="username" placeholder="Username" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="calcAdminPassword" class="calc-input-label">Password</label>
+            <div class="input-control">
+              <i class="fa-solid fa-lock input-control__icon"></i>
+              <input type="password" id="calcAdminPassword" autocomplete="current-password" placeholder="Password" required>
+            </div>
+          </div>
+
+          <span class="form-error form-error--general" id="calcAdminLoginError"></span>
+
+          <button type="submit" class="btn-calc" id="calcAdminLoginSubmit">
+            <span>Sign In</span>
+            <i class="fa-solid fa-right-to-bracket"></i>
+          </button>
+        </form>
+      </div>
+
+      <div id="calcAdminPricingView" hidden>
+        <form id="adminPricingForm" class="calc-form" novalidate>
+
+        <!-- Sumber Harga: Katalog Live -->
+        <!-- Reads the Katalog page's "Harga Terbaru (Live)" prices (same
+             browser localStorage) to auto-compute Cost per kWp + the
+             SLO/NIDI permit cost as a full Bill of Materials. See
+             computeCatalogBom() / initCatalogPricingControls() in
+             js/solar-calculator.js. -->
+        <div class="calc-catalog-pricing" id="calcCatalogPricingBox">
+          <label class="calc-battery-toggle calc-catalog-pricing__toggle" for="useCatalogPricingToggle">
+            <span class="calc-battery-toggle__label"><i class="fa-solid fa-tags"></i> Gunakan Harga Live dari Katalog</span>
+            <input type="checkbox" id="useCatalogPricingToggle" role="switch" aria-label="Gunakan harga live dari katalog untuk estimasi biaya" checked>
+            <span class="calc-battery-toggle__track" aria-hidden="true"><span class="calc-battery-toggle__thumb"></span></span>
+          </label>
+          <p class="calc-catalog-pricing__desc">Cost per kWp &amp; biaya SLO/NIDI dihitung otomatis dari harga <strong>Terbaru (Live)</strong> di halaman Katalog — item termurah per kategori dipilih otomatis, dikalikan kebutuhan (jumlah panel/unit) sesuai ukuran sistem hasil hitung.</p>
+          <div class="calc-catalog-pricing__status" id="calcCatalogPricingStatus"></div>
+          <button type="button" class="calc-catalog-pricing__reset" id="calcCatalogPricingResetBtn" hidden>
+            <i class="fa-solid fa-rotate-left"></i> Reset ke Harga Katalog
+          </button>
+        </div>
+
+        <div class="form-group">
+          <label for="profitMarginInput" class="calc-input-label">Direct Purchase Profit Margin (%) <button type="button" class="calc-input-info-btn" data-info="The profit margin added on top of the system cost to derive the Direct Purchase price offered to the end user." aria-label="More information about Direct Purchase Profit Margin">i</button></label>
+          <div class="input-control">
+            <i class="fa-solid fa-percent input-control__icon"></i>
+            <input type="number" id="profitMarginInput" min="0" max="99" step="1" value="35">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="costPerKwpInput" class="calc-input-label">Cost per kWp (Rp) <button type="button" class="calc-input-info-btn" data-info="Turnkey EPC cost per kWp used to estimate the Direct Purchase system investment (before profit margin and PPN). Auto-filled from live Catalog prices when 'Gunakan Harga Live dari Katalog' is on — edit it directly to override for this session." aria-label="More information about Cost per kWp">i</button></label>
+          <div class="input-control">
+            <i class="fa-solid fa-coins input-control__icon"></i>
+            <input type="text" inputmode="numeric" id="costPerKwpInput" placeholder="e.g. 12.000" value="10.806.717">
+          </div>
+          <p class="calc-catalog-pricing__hint" id="costPerKwpCatalogHint"></p>
+        </div>
+
+        <div class="form-group">
+          <label for="solarDiscountInput" class="calc-input-label">BOT Tariff Efficiency Savings (%) <button type="button" class="calc-input-info-btn" data-info="The discount applied to the escalated PLN tariff each year to arrive at the ZeroCapEx Solar Leasing (BOT) tariff." aria-label="More information about BOT Tariff Efficiency Savings">i</button></label>
+          <div class="calc-slider-control">
+            <input type="range" id="solarDiscountInput" class="calc-slider-control__range" min="0" max="100" step="1" value="10">
+            <input type="number" class="calc-slider-control__value" id="solarDiscountInputValue" min="0" max="100" step="1" value="10" inputmode="numeric">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="botThresholdJabodetabekInput" class="calc-input-label">Min. BOT Threshold — Jabodetabek (kWp) <button type="button" class="calc-input-info-btn" data-info="Minimum system size (kWp) required to qualify for ZeroCapEx Solar Leasing (BOT) in Jabodetabek." aria-label="More information about the Jabodetabek BOT threshold">i</button></label>
+          <div class="input-control">
+            <i class="fa-solid fa-city input-control__icon"></i>
+            <input type="number" id="botThresholdJabodetabekInput" min="0" step="1" value="100">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="botThresholdJawaInput" class="calc-input-label">Min. BOT Threshold — Java, Non-Jabodetabek (kWp)</label>
+          <div class="input-control">
+            <i class="fa-solid fa-city input-control__icon"></i>
+            <input type="number" id="botThresholdJawaInput" min="0" step="1" value="150">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="botThresholdLuarJawaInput" class="calc-input-label">Min. BOT Threshold — Outside Java (kWp)</label>
+          <div class="input-control">
+            <i class="fa-solid fa-city input-control__icon"></i>
+            <input type="number" id="botThresholdLuarJawaInput" min="0" step="1" value="200">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="maxPaybackThresholdInput" class="calc-input-label">Max Direct Purchase Payback (Years) <button type="button" class="calc-input-info-btn" data-info="Direct Purchase results are only shown if the estimated payback period is within this many years." aria-label="More information about Max Direct Purchase Payback">i</button></label>
+          <div class="input-control">
+            <i class="fa-solid fa-hourglass-half input-control__icon"></i>
+            <input type="number" id="maxPaybackThresholdInput" min="1" step="1" value="9">
+          </div>
+        </div>
+
+      </form>
+      </div>
+    </div>
+
+    <div class="calc-admin-modal__foot" id="calcAdminSettingsFoot" hidden>
+      <button type="button" class="btn-calc" id="calcAdminSettingsDone">
+        <span>Done</span>
+        <i class="fa-solid fa-check"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Floating WhatsApp chat widget ============ -->
+<div class="wa-widget" id="waWidget">
+
+  <div class="wa-popup" id="waPopup" hidden>
+    <button type="button" class="wa-popup__close" id="waPopupClose" aria-label="Close">&times;</button>
+    <a class="wa-popup__link" href="https://wa.me/6287775760575?text=Hi%20360energy%2C%20I%27d%20like%20to%20ask%20about%20solar%20panels%20for%20my%20facility." target="_blank" rel="noopener noreferrer">
+      <p class="wa-popup__text" id="waPopupText">Hi, thanks for visiting 360energy. We help businesses design &amp; install the right solar panel system to maximize their electricity savings. Feel free to reach out through this chat.</p>
+      <p class="wa-popup__sign" id="waPopupSign">360energy Team</p>
+    </a>
+  </div>
+
+  <a href="https://wa.me/6287775760575?text=Hi%20360energy%2C%20I%27d%20like%20to%20ask%20about%20solar%20panels%20for%20my%20facility." target="_blank" rel="noopener noreferrer" class="wa-widget__btn" id="waWidgetBtn" aria-label="Chat via WhatsApp">
+    <i class="fa-solid fa-comment-dots"></i>
+  </a>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="../js/api-config.js"></script>
+<script src="../js/activity-log-client.js"></script>
+<script src="../js/marketing-pixel-client.js"></script>
+<script src="../js/solar-calculator.js"></script>
+</body>
+</html>

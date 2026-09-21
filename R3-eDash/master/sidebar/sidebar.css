@@ -1,0 +1,586 @@
+/* ============================================================
+   Master Sidebar Component — 360eDash
+============================================================= */
+
+.edash-sidebar {
+  --sb-primary: #0f6a71;
+  --sb-primary-dark: #0b4f54;
+  --sb-primary-light: #6DC3BB;
+  --sb-primary-gradient: linear-gradient(90deg, var(--sb-primary), var(--sb-primary-light));
+  --sb-primary-soft: #e4f1f1;
+  --sb-primary-soft-hover: #d5eaea;
+  --sb-accent: #FA891A;
+  --sb-danger: #d64545;
+  --sb-danger-soft: #fbe8e8;
+  --sb-ink: #25343F;
+  --sb-greeting-color: #FA891A;
+  --sb-muted: #7c8b8d;
+  --sb-border: #e7edee;
+  --sb-surface: #ffffff;
+  --sb-footer-bg: #6DC3BB;
+  --sb-width: 264px;
+
+  font-family: 'Poppins', sans-serif;
+  width: var(--sb-width);
+  min-width: var(--sb-width);
+  height: 100vh;
+  overflow: hidden;
+  background: var(--sb-surface);
+  border-right: 1px solid var(--sb-border);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  transition: width 0.25s ease, min-width 0.25s ease;
+}
+
+.edash-sidebar * {
+  box-sizing: border-box;
+}
+
+/* Collapsed state (toggled via JS adding .is-collapsed) */
+.edash-sidebar.is-collapsed {
+  --sb-width: 76px;
+}
+.edash-sidebar.is-collapsed .sb-brand-logo,
+.edash-sidebar.is-collapsed .sb-greeting,
+.edash-sidebar.is-collapsed .sb-btn span:not(.sb-badge),
+.edash-sidebar.is-collapsed .sb-nav-title,
+.edash-sidebar.is-collapsed .sb-nav-item .sb-nav-label {
+  display: none;
+}
+.edash-sidebar.is-collapsed .sb-nav-item {
+  justify-content: center;
+}
+.edash-sidebar.is-collapsed .sb-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+/* Bug fix: with the logo hidden and the brand-id column left empty,
+   `justify-content: space-between` pushed the hamburger toggle to the
+   right edge while the Dashboard quick-action button stayed left-aligned
+   below it. Force both onto the exact same fixed size + auto margins so
+   they line up in the narrow rail regardless of their parent's layout. */
+.edash-sidebar.is-collapsed .sb-brand {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+.edash-sidebar.is-collapsed .sb-toggle {
+  margin: 0 auto;
+}
+.edash-sidebar.is-collapsed .sb-quick-actions {
+  align-items: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+.edash-sidebar.is-collapsed .sb-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: 0 auto;
+  justify-content: center;
+}
+.edash-sidebar.is-collapsed .sb-btn i {
+  width: auto;
+  margin: 0;
+}
+/* Collapsed rail: a full-width border-top divider between nav groups
+   reads as clutter on a narrow icon-only column (looks like a stray
+   line cutting across icons) — replace it with plain spacing instead,
+   and tighten the gaps a touch so more icons fit before the rail needs
+   to scroll, matching the tidy, evenly-spaced look of the Operator's
+   shorter rail. */
+.edash-sidebar.is-collapsed .sb-nav-group:not(:first-child) {
+  border-top: none;
+  padding-top: 8px;
+}
+.edash-sidebar.is-collapsed .sb-nav {
+  padding-top: 0;
+  gap: 4px;
+}
+.edash-sidebar.is-collapsed .sb-nav-group {
+  gap: 5px;
+}
+/* Collapsed rail runs noticeably taller than the full sidebar (9 icons
+   for Admin 360 vs. labeled rows that wrap naturally), so trim the
+   icon card and brand/quick-action chrome down a size to fit more of
+   it above the fold before the rail needs to scroll at all. */
+.edash-sidebar.is-collapsed .sb-brand {
+  padding-top: 16px;
+  padding-bottom: 12px;
+}
+.edash-sidebar.is-collapsed .sb-quick-actions {
+  padding-bottom: 12px;
+}
+.edash-sidebar.is-collapsed .sb-divider {
+  margin: 2px 16px 8px;
+}
+.edash-sidebar.is-collapsed .sb-nav-item {
+  padding: 6px;
+}
+.edash-sidebar.is-collapsed .sb-nav-icon {
+  width: 24px;
+  height: 24px;
+}
+.edash-sidebar.is-collapsed .sb-scroll {
+  padding-bottom: 8px;
+}
+
+/* ---------- Branding ---------- */
+.sb-brand {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 20px 18px;
+  background: var(--sb-surface);
+}
+
+/* ---------- Scrollable middle section ----------
+   Only this part scrolls; brand stays fixed on top,
+   footer group stays pinned at the bottom. */
+.sb-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 20px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-primary-soft-hover) transparent;
+}
+.sb-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.sb-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sb-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--sb-primary-soft-hover);
+  border-radius: 999px;
+}
+.sb-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: var(--sb-primary);
+}
+/* Kill the up/down arrow end-caps some Chromium builds still draw on
+   overflow-y:auto tracks — those little grey triangles are what made
+   the scroll rail look broken/ugly above the footer. */
+.sb-scroll::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.sb-brand-id {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sb-brand-logo {
+  height: 42px;
+  width: auto;
+  display: block;
+}
+
+.sb-toggle {
+  background: transparent;
+  border: none;
+  color: var(--sb-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  transition: background 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+.sb-toggle:hover {
+  background: var(--sb-primary-soft);
+  color: var(--sb-primary);
+}
+
+/* Themed focus ring for keyboard/tap focus — replaces the browser's
+   default outline (a thick, off-brand black/blue box) that otherwise
+   shows up around the hamburger toggle and nav icons and makes the
+   collapsed icon rail look messy/inconsistent. */
+.sb-toggle:focus-visible,
+.sb-btn:focus-visible,
+.sb-nav-item:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--sb-surface), 0 0 0 4px var(--sb-primary-light);
+}
+
+/* ---------- Greeting ---------- */
+.sb-greeting {
+  padding: 2px 20px 18px;
+  font-size: 19px;
+  color: var(--sb-greeting-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sb-greeting-label {
+  font-weight: 400;
+  margin-right: 5px;
+}
+.sb-greeting-name {
+  font-weight: 700;
+}
+
+/* ---------- Quick actions ---------- */
+.sb-quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px 20px;
+}
+
+.sb-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  text-align: left;
+}
+
+.sb-btn i {
+  font-size: 14px;
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.sb-btn-primary {
+  background: var(--sb-surface);
+  border: 1px solid var(--sb-border);
+  color: var(--sb-ink);
+}
+.sb-btn-primary i {
+  color: var(--sb-primary);
+}
+.sb-btn-primary:hover {
+  background: var(--sb-primary-soft);
+  border-color: var(--sb-primary-soft-hover);
+  color: var(--sb-primary-dark);
+}
+
+.sb-btn-secondary {
+  background: var(--sb-surface);
+  border: 1px solid var(--sb-border);
+  color: var(--sb-ink);
+}
+.sb-btn-secondary:hover {
+  background: var(--sb-primary-soft);
+  border-color: var(--sb-primary-soft-hover);
+  color: var(--sb-primary-dark);
+}
+
+.sb-badge {
+  margin-left: auto;
+  background: var(--sb-danger);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 999px;
+}
+
+/* ---------- Divider (Dashboard button -> nav groups) ---------- */
+.sb-divider {
+  height: 1px;
+  margin: 4px 16px 12px;
+  background: linear-gradient(90deg, #FA891A, #FFDE59);
+  border-radius: 999px;
+}
+
+/* ---------- Navigation ---------- */
+.sb-nav {
+  flex: 1;
+  padding: 4px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sb-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sb-nav-group:not(:first-child) {
+  border-top: 1px solid var(--sb-border);
+  padding-top: 16px;
+}
+
+.sb-nav-title {
+  margin: 0 0 6px 10px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sb-muted);
+}
+
+.sb-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--sb-border);
+  background: var(--sb-surface);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--sb-ink);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.sb-nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--sb-primary-soft);
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sb-nav-icon i {
+  width: 16px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--sb-primary);
+  transition: color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.sb-nav-item:hover {
+  background: var(--sb-primary-soft);
+  border-color: var(--sb-primary-soft-hover);
+  color: var(--sb-primary-dark);
+}
+.sb-nav-item:hover .sb-nav-icon {
+  background: var(--sb-surface);
+}
+
+/* Active item: gradient border (primary teal -> accent orange)
+   Shared by nav items AND the Dashboard quick-action button, so
+   whichever page is selected gets the exact same treatment. */
+.sb-nav-item.is-active,
+.sb-btn.is-active {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--sb-primary-soft), var(--sb-primary-soft)) padding-box,
+    linear-gradient(90deg, var(--sb-primary), var(--sb-accent)) border-box;
+  color: var(--sb-primary-dark);
+  font-weight: 600;
+}
+.sb-nav-item.is-active .sb-nav-icon {
+  background: var(--sb-ink);
+}
+.sb-nav-item.is-active .sb-nav-icon i {
+  color: #fff;
+}
+.sb-btn.is-active i {
+  color: var(--sb-primary-dark);
+}
+
+.sb-nav-item-danger {
+  border-color: var(--sb-danger-soft);
+}
+.sb-nav-item-danger .sb-nav-icon {
+  background: var(--sb-danger-soft);
+}
+.sb-nav-item-danger .sb-nav-icon i {
+  color: var(--sb-danger);
+}
+.sb-nav-item-danger:hover {
+  background: var(--sb-danger-soft);
+  border-color: var(--sb-danger);
+  color: var(--sb-danger);
+}
+.sb-nav-item-danger:hover .sb-nav-icon {
+  background: var(--sb-surface);
+}
+.sb-nav-item-danger:hover .sb-nav-icon i {
+  color: var(--sb-danger);
+}
+
+/* ---------- Footer group (Others) ----------
+   Sits OUTSIDE .sb-scroll (see sidebar.html) as a fixed-height flex
+   item, so it's always pinned to the bottom of the sidebar — visible
+   without scrolling no matter how short the nav above it is (e.g.
+   Operator, which only has a handful of items) or how tall it is
+   (e.g. Admin 360). flex-shrink: 0 keeps it from being squashed when
+   the viewport is short; the margin below replaces the padding that
+   used to come from the (now removed) parent .sb-scroll/.sb-nav. */
+.sb-nav-group.sb-nav-group-footer {
+  flex-shrink: 0;
+  margin: 8px 16px 16px;
+  border-top: none;
+  padding: 14px 12px;
+  background: var(--sb-footer-bg);
+  border-radius: 16px;
+}
+.edash-sidebar.is-collapsed .sb-nav-group.sb-nav-group-footer {
+  margin: 6px 12px 12px;
+  padding: 10px 8px;
+}
+.edash-sidebar.is-collapsed .sb-nav-group-footer .sb-nav-item {
+  padding: 6px;
+}
+.edash-sidebar.is-collapsed .sb-nav-group-footer .sb-nav-icon {
+  width: 24px;
+  height: 24px;
+}
+.sb-nav-group-footer .sb-nav-title {
+  margin-left: 6px;
+  color: rgba(255, 255, 255, 0.85);
+}
+.sb-nav-group-footer .sb-nav-item {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
+}
+.sb-nav-group-footer .sb-nav-item .sb-nav-icon {
+  background: rgba(255, 255, 255, 0.2);
+}
+.sb-nav-group-footer .sb-nav-item .sb-nav-icon i {
+  color: #fff;
+}
+.sb-nav-group-footer .sb-nav-item:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+.sb-nav-group-footer .sb-nav-item-danger {
+  background: var(--sb-danger);
+  border-color: var(--sb-danger);
+  color: #fff;
+}
+.sb-nav-group-footer .sb-nav-item-danger .sb-nav-icon {
+  background: rgba(255, 255, 255, 0.2);
+}
+.sb-nav-group-footer .sb-nav-item-danger .sb-nav-icon i {
+  color: #fff;
+}
+.sb-nav-group-footer .sb-nav-item-danger:hover {
+  background: #b93a3a;
+  border-color: #b93a3a;
+  color: #fff;
+}
+
+/* ---------- Backdrop (mobile only) ----------
+   Dimmed overlay shown behind the off-canvas sidebar on small
+   screens; tapping it closes the sidebar (see js/main.js). */
+.edash-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 42, 45, 0.42);
+  /* Must sit above any page content's own stacking (e.g. Project
+     Selector's floating map panels use z-index up to 600) so the
+     dimmed backdrop always covers the whole page behind the
+     off-canvas sidebar, and below the global header (z-index:800). */
+  z-index: 690;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.edash-sidebar-backdrop.is-open {
+  display: block;
+  opacity: 1;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .edash-sidebar {
+    --sb-width: 264px;
+    position: fixed;
+    inset: 0 auto 0 0;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    /* Must sit above any page content's own stacking (e.g. Project
+       Selector's floating map panels use z-index up to 600) so the
+       open off-canvas sidebar always renders in front of the page,
+       and below the global header (z-index:800). */
+    z-index: 700;
+    transform: translateX(-100%);
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+  }
+  /* On mobile the toggle button no longer "collapses" the sidebar to a
+     narrow rail (there's no room, and it can't be reached once
+     off-canvas) — it always shows the full-width panel; only the
+     open/closed (.is-open) state matters here. */
+  .edash-sidebar.is-collapsed {
+    --sb-width: 264px;
+  }
+  .edash-sidebar.is-collapsed .sb-brand-logo,
+  .edash-sidebar.is-collapsed .sb-greeting,
+  .edash-sidebar.is-collapsed .sb-btn span:not(.sb-badge),
+  .edash-sidebar.is-collapsed .sb-nav-title,
+  .edash-sidebar.is-collapsed .sb-nav-item .sb-nav-label {
+    display: revert;
+  }
+  .edash-sidebar.is-collapsed .sb-nav-item {
+    justify-content: flex-start;
+  }
+  .edash-sidebar.is-collapsed .sb-badge {
+    position: static;
+  }
+  .edash-sidebar.is-collapsed .sb-brand {
+    justify-content: space-between;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .edash-sidebar.is-collapsed .sb-toggle {
+    margin: 0;
+  }
+  .edash-sidebar.is-collapsed .sb-quick-actions {
+    align-items: stretch;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .edash-sidebar.is-collapsed .sb-btn {
+    width: 100%;
+    height: auto;
+    padding: 10px 14px;
+    margin: 0;
+    justify-content: flex-start;
+  }
+  .edash-sidebar.is-collapsed .sb-btn i {
+    width: 16px;
+    margin: 0;
+  }
+  .edash-sidebar.is-open {
+    transform: translateX(0);
+    box-shadow: 8px 0 24px rgba(15, 106, 113, 0.12);
+  }
+}
+
+@media (max-width: 360px) {
+  .edash-sidebar {
+    --sb-width: 88vw;
+  }
+  .edash-sidebar.is-collapsed {
+    --sb-width: 88vw;
+  }
+}

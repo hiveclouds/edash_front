@@ -1,0 +1,967 @@
+<style id="spBatteryProblem2Styles">
+.sp-battery-target-field{margin-top:12px;}
+.sp-battery-comparison{margin-top:10px;border:1px solid rgba(148,163,184,.25);border-radius:12px;overflow:auto;background:rgba(15,23,42,.18);}
+.sp-battery-comparison-title{font-size:12px;font-weight:700;padding:10px 12px;border-bottom:1px solid rgba(148,163,184,.18);}
+.sp-battery-comparison-table{min-width:720px;}
+.sp-battery-comparison-row{display:grid;grid-template-columns:minmax(220px,2fr) .8fr .6fr .9fr .9fr 1.1fr;gap:8px;align-items:center;padding:9px 10px;font-size:11px;border-bottom:1px solid rgba(148,163,184,.12);}
+.sp-battery-comparison-row:last-child{border-bottom:0;}
+.sp-battery-comparison-row.head{font-weight:700;color:var(--muted,#7c8b8d);background:rgba(148,163,184,.06);}
+.sp-battery-comparison-row.selected{background:rgba(34,197,94,.08);}
+.sp-battery-comparison-row span{min-width:0;}
+.sp-battery-comparison-row span:first-child{white-space:normal;}
+.sp-battery-comparison-row b{color:#22c55e;}
+.sp-battery-comparison-note{font-size:11px;line-height:1.5;color:var(--muted,#7c8b8d);margin-top:7px;}
+.sp-battery-empty{padding:10px;font-size:11px;color:#f59e0b;}
+</style>
+<!-- ============================================================
+     Page: Solar Planning Tool (Admin Calculator) — 360eDash
+     Important note: this file is loaded as a FRAGMENT via
+     loadPage() in js/main.js, then injected into #page-root
+     which already sits inside the main shell (index.html) — i.e.
+     .edash-layout > .edash-main > .edash-content.
+     Because of this, this file MUST NOT have its own <!DOCTYPE>,
+     <html>, <head>, <body>, or .edash-layout/#sidebar-root/
+     #header-root/.edash-content wrapper. Adding those again
+     would nest that wrapper inside the real one from index.html
+     → resulting in 2 stacked scrollbars (a bug that has happened
+     before, same as the pages/add-project.html case).
+     The CSS & font/link needed (admin-calculator.css,
+     sidebar.css, header.css, Poppins, Font Awesome) are all already
+     loaded once in index.html, so they don't need to be repeated here.
+     Compare this pattern with pages/alert.html or
+     pages/system-information.html, which were already correct from the start.
+============================================================= -->
+      <div class="sp-wrap">
+
+        <div class="sp-head">
+          <h1>Solar Planning Tool</h1>
+          <p>Integrated Solar PV Planning &amp; Costing Workspace</p>
+          <p class="sp-byline">by 360Energy (PT. Pionir Energi Hijau)</p>
+        </div>
+
+        <!-- Stepper -->
+        <div class="sp-stepper" id="spStepper">
+          <div class="sp-step is-done" data-step="1">
+            <div class="sp-step-circle"><i class="fa-solid fa-check"></i></div>
+            <span class="sp-step-label">Project Information</span>
+          </div>
+          <div class="sp-step-line is-done"></div>
+
+          <div class="sp-step is-done" data-step="2">
+            <div class="sp-step-circle"><i class="fa-solid fa-check"></i></div>
+            <span class="sp-step-label">System Configuration</span>
+          </div>
+          <div class="sp-step-line" id="spLine2"></div>
+
+          <div class="sp-step" data-step="3">
+            <div class="sp-step-circle">3</div>
+            <span class="sp-step-label">Calculate</span>
+          </div>
+          <div class="sp-step-line" id="spLine3"></div>
+
+          <div class="sp-step" data-step="4">
+            <div class="sp-step-circle">4</div>
+            <span class="sp-step-label">Result</span>
+          </div>
+        </div>
+
+        <div class="sp-layout">
+
+          <!-- LEFT: form -->
+          <div class="sp-form" id="spForm">
+
+            <!-- Project Information -->
+            <div class="sp-accordion" data-section="project-info">
+              <button type="button" class="sp-accordion-btn">
+                <i class="fa-solid fa-file-lines sp-acc-icon"></i>
+                Project Information
+                <i class="fa-solid fa-caret-right sp-caret"></i>
+              </button>
+              <div class="sp-accordion-body">
+                <div class="sp-accordion-inner">
+                  <h5>Enter Your Solar Project Data</h5>
+
+                  <div class="sp-field">
+                    <div class="sp-label-row"><label>Province (PSH source)</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="PSH (Peak Sun Hours) is the estimated average effective sun hours per day. This value is used to estimate solar PV energy production based on location.">i</button></div>
+                    <div class="sp-select-wrap">
+                      <select>
+                        <option>DKI Jakarta (PSH 3.824)</option>
+                        <option>Jawa Barat (PSH 4.021)</option>
+                        <option>Jawa Timur (PSH 4.187)</option>
+                      </select>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                  </div>
+
+                  <div class="sp-field">
+                    <label for="spCitySelect">City / Regency</label>
+                    <div class="sp-select-wrap">
+                      <select>
+                        <option>Jakarta Pusat</option>
+                        <option>Jakarta Selatan</option>
+                        <option>Jakarta Barat</option>
+                      </select>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                  </div>
+
+                  <div class="sp-field">
+                    <label for="spFacilitySelect">What type of facility do you have?</label>
+                    <div class="sp-select-wrap">
+                      <select>
+                        <option>Restaurant</option>
+                        <option>Office</option>
+                        <option>Factory</option>
+                        <option>Warehouse</option>
+                      </select>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                  </div>
+
+                  <div class="sp-field">
+                    <div class="sp-label-row"><label>Installed PLN Capacity (kVA)</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="The installed PLN electrical capacity at the site. This value helps provide context for the solar PV system size relative to the available electrical capacity.">i</button></div>
+                    <div class="sp-number-wrap">
+                      <input type="number" id="spPlnCapacity" value="66">
+                      <div class="sp-number-arrows">
+                        <button type="button" data-target="spPlnCapacity" data-dir="1"><i class="fa-solid fa-chevron-up"></i></button>
+                        <button type="button" data-target="spPlnCapacity" data-dir="-1"><i class="fa-solid fa-chevron-down"></i></button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="sp-field">
+                    <div class="sp-label-row"><label>PLN Tariff / Year (Rp/kWh)</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="The PLN electricity tariff category used to estimate electricity costs and the economic benefit of the solar PV system.">i</button></div>
+                    <div class="sp-select-wrap">
+                      <select>
+                        <option>R-2/TR3.500-5.000 VA</option>
+                        <option>B-2/TR6.600-200.000 VA</option>
+                        <option>I-3/TM &gt; 200 kVA</option>
+                      </select>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                  </div>
+
+                  <div class="sp-field">
+                    <div class="sp-label-row"><label>Energy Input Method</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="Choose the energy consumption data source. Monthly Bill uses the total monthly electricity bill, while Monthly Usage uses electricity consumption in kWh.">i</button></div>
+                    <div class="sp-select-wrap">
+                      <select>
+                        <option>Monthly Bill (IDR)</option>
+                        <option>Monthly Usage (kWh)</option>
+                      </select>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                  </div>
+
+                  <div class="sp-field">
+                    <div class="sp-label-row"><label>Total Monthly Bill (IDR)</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="The average total electricity bill per month. This value is used as one of the references for the project's energy needs.">i</button></div>
+                    <div class="sp-number-wrap">
+                      <input type="number" id="spMonthlyBill" value="16800000">
+                      <div class="sp-number-arrows">
+                        <button type="button" data-target="spMonthlyBill" data-dir="100000"><i class="fa-solid fa-chevron-up"></i></button>
+                        <button type="button" data-target="spMonthlyBill" data-dir="-100000"><i class="fa-solid fa-chevron-down"></i></button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="sp-checkbox-row">
+                    <input type="checkbox" id="spLimitRoof" checked>
+                    <label for="spLimitRoof">Limit by Roof Area</label>
+                  </div>
+
+                  <div class="sp-field">
+                    <div class="sp-label-row"><label>Total Roof Area (m²)</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="The total roof area available for solar panel installation, before subtracting unusable areas.">i</button></div>
+                    <div class="sp-number-wrap">
+                      <input type="number" id="spRoofArea" value="500">
+                      <div class="sp-number-arrows">
+                        <button type="button" data-target="spRoofArea" data-dir="10"><i class="fa-solid fa-chevron-up"></i></button>
+                        <button type="button" data-target="spRoofArea" data-dir="-10"><i class="fa-solid fa-chevron-down"></i></button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="sp-slider-row">
+                    <div class="sp-slider-head">
+                      <div class="sp-label-row"><label style="margin:0;">Usable Roof Space (%)</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="The realistic percentage of roof area usable for panels, after accounting for access, panel spacing, obstructions, and service areas.">i</button></div>
+                      <span class="sp-slider-badge" id="spRoofPctBadge">44%</span>
+                    </div>
+                    <input type="range" id="spRoofPct" min="10" max="90" value="44">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Primary Inputs -->
+            <div class="sp-accordion" data-section="primary-inputs">
+              <button type="button" class="sp-accordion-btn">
+                <i class="fa-solid fa-gear sp-acc-icon"></i>
+                Primary Inputs
+                <i class="fa-solid fa-caret-right sp-caret"></i>
+              </button>
+              <div class="sp-accordion-body">
+                <div class="sp-accordion-inner">
+                  <div class="sp-grid-2">
+                    <div class="sp-field">
+                      <div class="sp-label-row"><label>Target kWp</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="The target solar PV capacity to be designed. This value is one of the main inputs used to determine the system size.">i</button></div>
+                      <div class="sp-number-wrap">
+                        <input type="number" id="spTargetKwp" value="40">
+                        <div class="sp-number-arrows">
+                          <button type="button" data-target="spTargetKwp" data-dir="1"><i class="fa-solid fa-chevron-up"></i></button>
+                          <button type="button" data-target="spTargetKwp" data-dir="-1"><i class="fa-solid fa-chevron-down"></i></button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="sp-field">
+                      <div class="sp-label-row"><label>System Type</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="On-Grid is connected to the PLN grid, Hybrid uses a battery, and Off-Grid is designed without dependence on the main grid.">i</button></div>
+                      <div class="sp-select-wrap">
+                        <select>
+                          <option>On-Grid</option>
+                          <option>Hybrid</option>
+                          <option>Off-Grid</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                    <div class="sp-field" id="spBatterySelectionField">
+                      <div class="sp-label-row"><label>Battery Selection</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="Choose how the battery storage target is determined. Auto uses the calculated energy basis; Manual — Target Capacity lets you enter the target storage directly. Battery model is selected from the active catalog and quantity is calculated automatically.">i</button></div>
+                      <div class="sp-select-wrap">
+                        <select id="spBatterySizingMode" data-battery-sizing-modes="auto,capacity">
+                          <option value="auto" selected>Auto — Recommended</option>
+                          <option value="capacity">Manual — Target Capacity</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </div>
+                      <div class="sp-catalog-meta" id="spBatterySizingMeta">The system determines the storage target automatically from the selected energy basis.</div>
+                    </div>
+                    <div class="sp-field" id="spBatteryModelField">
+                      <div class="sp-label-row"><label for="spBatteryModelSelect">Battery Model</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="Select the active battery model from the company catalog. The system automatically calculates the required quantity for the selected storage target.">i</button></div>
+                      <div class="sp-select-wrap">
+                        <select id="spBatteryModelSelect"><option value="">Select from Catalog</option></select>
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </div>
+                      <div class="sp-catalog-meta" id="spBatteryModelMeta">No battery model selected.</div>
+                    </div>
+                    <div class="sp-field" id="spInverterPoolField" style="display:none">
+                      <div class="sp-label-row"><label for="spInverterPoolMode">Use inverter catalog</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="Choose which inverter catalog pool is used by the optimizer. On-Grid uses all active On-Grid inverter models; Hybrid uses all active Hybrid inverter models.">i</button></div>
+                      <div class="sp-select-wrap">
+                        <select id="spInverterPoolMode">
+                          <option value="ongrid" selected>On-Grid (default — more choices)</option>
+                          <option value="hybrid">Hybrid (hybrid inverter catalog only)</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </div>
+                      <div class="sp-catalog-meta" id="spInverterPoolMeta">Using On-Grid inverter catalog for calculations (default).</div>
+                    </div>
+                    <div class="sp-field" id="spBatteryManualCapacityRow" style="display:none">
+                      <div class="sp-label-row"><label for="spBatteryTargetCapacityKwh">Target Battery Capacity (kWh)</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="Set the battery storage capacity you want to achieve. The system then compares all active catalog batteries and automatically selects the best model and quantity to meet the target.">i</button></div>
+                      <div class="sp-number-wrap">
+                        <input type="number" id="spBatteryTargetCapacityKwh" value="0" min="0" step="0.01">
+                        <div class="sp-number-arrows">
+                          <button type="button" data-target="spBatteryTargetCapacityKwh" data-dir="1"><i class="fa-solid fa-chevron-up"></i></button>
+                          <button type="button" data-target="spBatteryTargetCapacityKwh" data-dir="-1"><i class="fa-solid fa-chevron-down"></i></button>
+                        </div>
+                      </div>
+                      <div class="sp-catalog-meta sp-battery-target-live" id="spBatteryCapacityTargetLive">Target storage: 0.00 kWh</div>
+                    </div>
+
+
+                  <div class="sp-field sp-package-field">
+                    <div class="sp-label-row">
+                      <label for="spPackageSelect">Configuration Preference</label>
+                      <button type="button" class="sp-info-btn" id="spPackageInfo" aria-expanded="false" data-info="The optimizer evaluates catalog inverter combinations by target kWp, technical fit, and cost. Choose the available result to make it active.">i</button>
+                    </div>
+                    <div class="sp-select-wrap">
+                      <select id="spPackageSelect">
+                        <option value="recommended" selected>⭐ Recommended · Best Value</option>
+                        <option value="price">💰 Best Price</option>
+                        <option value="quality">🏆 Best Quality</option>
+                      </select>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                    <div class="sp-package-summary" id="spPackageSummary">
+                      <strong>Components used</strong>
+                      <span>Components will be selected automatically from the active catalog once the system inputs are available.</span>
+                    </div>
+                  </div>
+
+                  <button type="button" class="sp-customize-toggle" id="spCustomizeToggle" aria-expanded="false">
+                    <span><i class="fa-solid fa-sliders"></i> Customize Components</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                  </button>
+                  <div class="sp-customize-note">Use this only when you want to manually replace an optimized component.</div>
+
+                  <div class="sp-customizable-components" id="spPrimaryCatalogComponents">
+                    <div class="sp-field">
+                      <label>Solar Panel Model <span class="sp-catalog-source">Catalog</span></label>
+                      <div class="sp-select-wrap">
+                        <select id="spPanelCatalogSelect">
+                          <option value="">Select from Catalog</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </div>
+                      <div class="sp-catalog-meta" id="spPanelCatalogMeta">No catalog item selected.</div>
+                    </div>
+
+                    <div class="sp-field">
+                      <label>Inverter Model <span class="sp-catalog-source">Catalog</span></label>
+                      <div class="sp-select-wrap">
+                        <select id="spInverterCatalogSelect">
+                          <option value="">Select from Catalog</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </div>
+                      <div class="sp-catalog-meta" id="spInverterCatalogMeta">No catalog item selected.</div>
+                    </div>
+
+                  </div>
+
+                  <div class="sp-grid-2">
+                    <div class="sp-field">
+                      <div class="sp-label-row"><label>Inverter efficiency</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="Inverter efficiency indicates the portion of DC energy that can be converted into AC energy. This value is used by the calculation engine.">i</button></div>
+                      <div class="sp-number-wrap">
+                        <input type="number" step="0.001" id="spInvEff" value="0.998">
+                        <div class="sp-number-arrows">
+                          <button type="button" data-target="spInvEff" data-dir="0.001"><i class="fa-solid fa-chevron-up"></i></button>
+                          <button type="button" data-target="spInvEff" data-dir="-0.001"><i class="fa-solid fa-chevron-down"></i></button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="sp-field">
+                      <div class="sp-label-row"><label>System PR</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="Performance Ratio is a concise factor representing system losses other than irradiance conditions.">i</button></div>
+                      <div class="sp-number-wrap">
+                        <input type="number" step="0.01" id="spSystemPr" value="0.89">
+                        <div class="sp-number-arrows">
+                          <button type="button" data-target="spSystemPr" data-dir="0.01"><i class="fa-solid fa-chevron-up"></i></button>
+                          <button type="button" data-target="spSystemPr" data-dir="-0.01"><i class="fa-solid fa-chevron-down"></i></button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="sp-field">
+                    <div class="sp-label-row"><label>Target DC/AC Oversizing Ratio</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="The target ratio of PV array (DC) capacity to inverter AC capacity. Common solar EPC practice usually targets 1.10x-1.30x (the DC array is intentionally oversized relative to the inverter's AC rating) so that annual energy production is higher, even with a slight potential for clipping at peak hours. This value is used both to select the inverter combination and to determine the number of panels per inverter.">i</button></div>
+                    <div class="sp-number-wrap">
+                      <input type="number" step="0.01" min="1" max="1.5" id="spDcAcRatio" value="1.15">
+                      <div class="sp-number-arrows">
+                        <button type="button" data-target="spDcAcRatio" data-dir="0.01"><i class="fa-solid fa-chevron-up"></i></button>
+                        <button type="button" data-target="spDcAcRatio" data-dir="-0.01"><i class="fa-solid fa-chevron-down"></i></button>
+                      </div>
+                    </div>
+                    <div class="sp-catalog-meta">Standard EPC practice: 1.10x–1.30x. A value of 1.00x means the DC array and inverter AC capacity are equal (no oversizing).</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- Advance Design Parameters -->
+            <div class="sp-accordion" data-section="advance-design">
+              <button type="button" class="sp-accordion-btn">
+                <i class="fa-solid fa-wand-magic-sparkles sp-acc-icon"></i>
+                Advance Design Parameters
+                <i class="fa-solid fa-caret-right sp-caret"></i>
+              </button>
+              <div class="sp-accordion-body">
+                <div class="sp-accordion-inner">
+                  <h5>Secondary - Cable Routing &amp; Safety Factors</h5>
+
+                  <button type="button" class="sp-customize-toggle sp-advanced-customize-toggle" id="spAdvancedCustomizeToggle" aria-expanded="false">
+                    <span><i class="fa-solid fa-sliders"></i> Customize Components</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                  </button>
+                  <div class="sp-customize-note">Use this if you want to replace the supporting components selected by the package.</div>
+
+                  <div class="sp-customizable-components" id="spAdvancedCatalogComponents">
+                    <p class="sp-subtitle">Catalog Components</p>
+                    <div class="sp-grid-2">
+                      <div class="sp-field"><label>Mounting</label><div class="sp-select-wrap"><select id="spMountingCatalogSelect"><option value="">Select from Catalog</option></select><i class="fa-solid fa-chevron-right"></i></div></div>
+                      <div class="sp-field"><label>DC Cable</label><div class="sp-select-wrap"><select id="spDcCableCatalogSelect"><option value="">Select from Catalog</option></select><i class="fa-solid fa-chevron-right"></i></div></div>
+                      <div class="sp-field"><label>AC Cable</label><div class="sp-select-wrap"><select id="spAcCableCatalogSelect"><option value="">Select from Catalog</option></select><i class="fa-solid fa-chevron-right"></i></div></div>
+                      <div class="sp-field"><label>PDI</label><div class="sp-select-wrap"><select id="spPdiCatalogSelect"><option value="">Select from Catalog</option></select><i class="fa-solid fa-chevron-right"></i></div></div>
+                      <div class="sp-field"><label>PDDC</label><div class="sp-select-wrap"><select id="spPddcCatalogSelect"><option value="">Select from Catalog</option></select><i class="fa-solid fa-chevron-right"></i></div></div>
+                      <div class="sp-field"><label>PDC</label><div class="sp-select-wrap"><select id="spPdcCatalogSelect"><option value="">Select from Catalog</option></select><i class="fa-solid fa-chevron-right"></i></div></div>
+                      <div class="sp-field"><label>Accessories</label><div class="sp-select-wrap"><select id="spAccCatalogSelect"><option value="">Select from Catalog</option></select><i class="fa-solid fa-chevron-right"></i></div></div>
+                      <div class="sp-field"><label>Installation Service</label><div class="sp-select-wrap"><select id="spJasaCatalogSelect"><option value="">Select from Catalog</option></select><i class="fa-solid fa-chevron-right"></i></div></div>
+                      <div class="sp-field"><label>SLO / NIDI</label><div class="sp-select-wrap"><select id="spSloCatalogSelect"><option value="">Select from Catalog</option></select><i class="fa-solid fa-chevron-right"></i></div></div>
+                    </div>
+                  </div>
+
+                  <p class="sp-subtitle">DC Cabling</p>
+                  <div class="sp-grid-2">
+                    <div class="sp-field">
+                      <div class="sp-label-row"><label>Cable Length (m)</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="The estimated cable route length from the array/equipment to the next point. This value affects the cable length estimate and voltage drop.">i</button></div>
+                      <div class="sp-number-wrap">
+                        <input type="number" id="spDcCableLength" value="5">
+                        <div class="sp-number-arrows">
+                          <button type="button" data-target="spDcCableLength" data-dir="1"><i class="fa-solid fa-chevron-up"></i></button>
+                          <button type="button" data-target="spDcCableLength" data-dir="-1"><i class="fa-solid fa-chevron-down"></i></button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="sp-field">
+                      <div class="sp-label-row"><label>Max Voltage Drop (%)</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="The maximum allowed voltage drop on the cable route.">i</button></div>
+                      <div class="sp-number-wrap">
+                        <input type="number" id="spDcVdrop" value="1.5" step="0.1">
+                        <div class="sp-number-arrows">
+                          <button type="button" data-target="spDcVdrop" data-dir="0.1"><i class="fa-solid fa-chevron-up"></i></button>
+                          <button type="button" data-target="spDcVdrop" data-dir="-0.1"><i class="fa-solid fa-chevron-down"></i></button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p class="sp-subtitle">AC Cabling</p>
+                  <div class="sp-grid-2">
+                    <div class="sp-field">
+                      <div class="sp-label-row"><label>Cable Length (m)</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="The estimated cable route length from the array/equipment to the next point. This value affects the cable length estimate and voltage drop.">i</button></div>
+                      <div class="sp-number-wrap">
+                        <input type="number" id="spAcCableLength" value="15">
+                        <div class="sp-number-arrows">
+                          <button type="button" data-target="spAcCableLength" data-dir="1"><i class="fa-solid fa-chevron-up"></i></button>
+                          <button type="button" data-target="spAcCableLength" data-dir="-1"><i class="fa-solid fa-chevron-down"></i></button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="sp-field">
+                      <div class="sp-label-row"><label>Max Voltage Drop (%)</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="The maximum allowed voltage drop on the cable route.">i</button></div>
+                      <div class="sp-number-wrap">
+                        <input type="number" id="spAcVdrop" value="2" step="0.1">
+                        <div class="sp-number-arrows">
+                          <button type="button" data-target="spAcVdrop" data-dir="0.1"><i class="fa-solid fa-chevron-up"></i></button>
+                          <button type="button" data-target="spAcVdrop" data-dir="-0.1"><i class="fa-solid fa-chevron-down"></i></button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p class="sp-subtitle">Safety Factors</p>
+                  <div class="sp-grid-2">
+                    <div class="sp-field">
+                      <div class="sp-label-row"><label>Isc Safety Factor (×)</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="The short-circuit current multiplier factor used to provide a safety margin in component sizing.">i</button></div>
+                      <div class="sp-number-wrap">
+                        <input type="number" id="spIscFactor" value="1.25" step="0.05">
+                        <div class="sp-number-arrows">
+                          <button type="button" data-target="spIscFactor" data-dir="0.05"><i class="fa-solid fa-chevron-up"></i></button>
+                          <button type="button" data-target="spIscFactor" data-dir="-0.05"><i class="fa-solid fa-chevron-down"></i></button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="sp-field">
+                      <div class="sp-label-row"><label>Voc Cold Factor (×)</label><button type="button" class="sp-info-btn" aria-expanded="false" data-info="The factor used to account for changes in Voc due to low-temperature conditions.">i</button></div>
+                      <div class="sp-number-wrap">
+                        <input type="number" id="spVocFactor" value="0.98" step="0.01">
+                        <div class="sp-number-arrows">
+                          <button type="button" data-target="spVocFactor" data-dir="0.01"><i class="fa-solid fa-chevron-up"></i></button>
+                          <button type="button" data-target="spVocFactor" data-dir="-0.01"><i class="fa-solid fa-chevron-down"></i></button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="spCalcWarning" class="sp-calc-warning" role="status" aria-live="polite">
+              <strong>✓ Initial configuration is valid.</strong>
+            </div>
+            <button type="button" class="sp-btn-calculate" id="spCalculateBtn">
+              <i class="fa-solid fa-bolt"></i>
+              Calculate &amp; View Results
+            </button>
+          </div>
+
+          <!-- RIGHT: result panel -->
+          <div class="sp-panel">
+            <div class="sp-tabs" id="spTabs">
+              <button type="button" class="sp-tab-btn active" data-tab="design" disabled>Design</button>
+              <button type="button" class="sp-tab-btn" data-tab="visual" disabled>Visual</button>
+              <button type="button" class="sp-tab-btn" data-tab="configuration" disabled>Configuration</button>
+              <button type="button" class="sp-tab-btn" data-tab="rab" disabled>BOQ</button>
+              <button type="button" class="sp-tab-btn" data-tab="customer" disabled>Customer</button>
+              <button type="button" class="sp-tab-btn" data-tab="summary" disabled>Summary</button>
+            </div>
+
+            <div class="sp-panel-body">
+
+              <!-- Empty state before calculate -->
+              <div class="sp-empty" id="spEmptyState">
+                <i class="fa-solid fa-solar-panel"></i>
+                <p>Complete the project data on the left, then click <strong>"Calculate &amp; View Results"</strong> to see the system design, energy output, and inverter configuration options.</p>
+              </div>
+
+              <!-- Result content (hidden until calculated) -->
+              <div class="hidden" id="spResultContent">
+
+                <!-- TAB: Design -->
+                <div class="sp-tab-pane active" data-pane="design">
+                  <p class="sp-active-label" id="spDesignActiveLabel">Active Configuration — <b>40kW</b></p>
+
+                  <div class="sp-config-card">
+                    <strong id="spDesignConfigTitle">2× Inverter 15kW — 40,2 kWp</strong>
+                    <span class="sp-config-components" id="spDesignConfigComponents">Panel: —</span>
+                    <span class="sp-badge sp-badge-primary">Recommended</span>
+                  </div>
+
+                  <p class="sp-section-title">Quick Output Cards</p>
+                  <div class="sp-metric-grid">
+                    <div class="sp-metric-card">
+                      <div class="sp-metric-label">Panel Counts</div>
+                      <div class="sp-metric-value" id="spDesignPanelCount">70</div>
+                      <div class="sp-metric-sub" id="spDesignPanelCountSub">5 str × 14p max · last 13p</div>
+                    </div>
+                    <div class="sp-metric-card">
+                      <div class="sp-metric-label">Actual array</div>
+                      <div class="sp-metric-value" id="spDesignActualArray">40.95</div>
+                      <div class="sp-metric-sub" id="spDesignActualArraySub">kWp (target 40)</div>
+                    </div>
+                    <div class="sp-metric-card">
+                      <div class="sp-metric-label">Peak DC</div>
+                      <div class="sp-metric-value" id="spDesignPeakDc">40.95</div>
+                      <div class="sp-metric-sub" id="spDesignPeakDcSub">kW — array</div>
+                    </div>
+                    <div class="sp-metric-card">
+                      <div class="sp-metric-label">Peak AC</div>
+                      <div class="sp-metric-value" id="spDesignPeakAc">39.93</div>
+                      <div class="sp-metric-sub" id="spDesignPeakAcSub">kW — 40kW inv.</div>
+                    </div>
+                  </div>
+
+                  <div class="sp-table-wrap">
+                    <table class="sp-table">
+                      <thead>
+                        <tr><th>Parameter</th><th>Value</th><th>Status</th></tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Inverter</td>
+                          <td class="sp-mono">40kW</td>
+                          <td><span class="sp-badge sp-badge-success">DC/AC 1.024x no clipping</span></td>
+                        </tr>
+                        <tr>
+                          <td>Topology string</td>
+                          <td class="sp-mono">5×14p (uniform)</td>
+                          <td><span class="sp-badge sp-badge-info">3/4 MPPT active</span></td>
+                        </tr>
+                        <tr>
+                          <td>String length [Lmin–Lmax]</td>
+                          <td class="sp-mono">14 panel/str [6–18]
+                            <span class="sp-sub">Lmax_abs=20 · Lmax_mppt=18</span>
+                          </td>
+                          <td><span class="sp-badge sp-badge-primary">N_target=69p</span></td>
+                        </tr>
+                        <tr class="sp-table-section">
+                          <td colspan="3">Voltage feasibility (§14 checks)</td>
+                        </tr>
+                        <tr data-design-row="voc">
+                          <td>CHECK 1 — Abs. max (Voc_cold)</td>
+                          <td class="sp-mono">737.1 V ≤ 1000×0.98 = 980V</td>
+                          <td><span class="sp-badge sp-badge-success"><i class="fa-solid fa-check"></i> PASS</span></td>
+                        </tr>
+                        <tr data-design-row="footprint">
+                          <td>Array footprint</td>
+                          <td class="sp-mono">24.5×6.1 m</td>
+                          <td><span class="sp-badge sp-badge-info">149 m²</span></td>
+                        </tr>
+                        <tr data-design-row="dc-cable">
+                          <td>DC cable (×1.55F)</td>
+                          <td class="sp-mono">55.2 m/str → 414 m</td>
+                          <td><span class="sp-badge sp-badge-warning">-0.56%</span></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- TAB: Visual -->
+                <div class="sp-tab-pane" data-pane="visual">
+                  <div class="sp-metric-grid">
+                    <div class="sp-metric-card">
+                      <div class="sp-metric-label">Peak DC (array)</div>
+                      <div class="sp-metric-value">40.95</div>
+                      <div class="sp-metric-sub">kW — 70 panel</div>
+                    </div>
+                    <div class="sp-metric-card">
+                      <div class="sp-metric-label">Peak AC</div>
+                      <div class="sp-metric-value">39.93</div>
+                      <div class="sp-metric-sub">kW — 40kW inv.</div>
+                    </div>
+                    <div class="sp-metric-card">
+                      <div class="sp-metric-label">Daily Energy</div>
+                      <div class="sp-metric-value">129.8</div>
+                      <div class="sp-metric-sub">kWh/day — PSH 3.824</div>
+                    </div>
+                    <div class="sp-metric-card">
+                      <div class="sp-metric-label">Annual Energy</div>
+                      <div class="sp-metric-value">47.37</div>
+                      <div class="sp-metric-sub">MWh/year</div>
+                    </div>
+                  </div>
+
+                  <div class="sp-solar-production-chart-card hidden" id="spSolarProductionChartCard">
+
+                    <div class="sp-solar-chart-head">
+
+                      <h3><i class="fa-solid fa-chart-area"></i> Estimated Daily Production vs. Consumption</h3>
+
+                      <div class="sp-solar-chart-controls">
+
+                        <label class="sp-solar-battery-toggle">
+
+                          <span><i class="fa-solid fa-battery-half"></i> Battery Storage</span>
+
+                          <input type="checkbox" id="spSolarBatteryChartToggle" checked aria-label="Enable battery storage scenario">
+
+                          <span class="sp-solar-battery-track"><span class="sp-solar-battery-thumb"></span></span>
+
+                        </label>
+
+                        <div class="sp-solar-chart-legend" id="spSolarChartLegend">
+
+                          <span class="sp-solar-legend-item"><i class="sp-solar-dot sp-solar-dot-consumption"></i> Consumption</span>
+
+                          <span class="sp-solar-legend-item"><i class="sp-solar-dot sp-solar-dot-solar"></i> Solar Production</span>
+
+                          <span class="sp-solar-legend-item"><i class="sp-solar-dot sp-solar-dot-used"></i> Solar Used</span>
+
+                          <span class="sp-solar-legend-item" id="spSolarBatteryLegend"><i class="sp-solar-dot sp-solar-dot-battery"></i> Stored in Battery</span>
+
+                          <span class="sp-solar-legend-item" id="spSolarDischargeLegend"><i class="sp-solar-dot sp-solar-dot-discharge"></i> Battery Discharge</span>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                    <div class="sp-solar-chart-box" id="spSolarProductionChart"></div>
+
+                  </div>
+
+
+
+                  <div class="sp-battery-scenario-card hidden" id="spBatteryScenarioCard">
+
+                    <div class="sp-battery-scenario-head">
+                      <p class="sp-chart-title"><i class="fa-solid fa-battery-half"></i> Battery Storage Scenario <span>(Estimate)</span></p>
+                    </div>
+
+                    <div class="sp-battery-scenario-grid">
+                      <div class="sp-battery-scenario-metric">
+                        <div class="sp-battery-scenario-icon is-green"><i class="fa-solid fa-bolt"></i></div>
+                        <div><span>Excess Solar Available</span><strong id="spScenarioExcess">—</strong></div>
+                      </div>
+                      <div class="sp-battery-scenario-metric">
+                        <div class="sp-battery-scenario-icon is-purple"><i class="fa-solid fa-battery-full"></i></div>
+                        <div><span>Estimated Battery Capacity</span><strong id="spScenarioCapacity">—</strong></div>
+                      </div>
+                      <div class="sp-battery-scenario-metric">
+                        <div class="sp-battery-scenario-icon is-purple"><i class="fa-solid fa-arrow-down"></i></div>
+                        <div><span>Energy Stored</span><strong id="spScenarioStored">—</strong></div>
+                      </div>
+                      <div class="sp-battery-scenario-metric">
+                        <div class="sp-battery-scenario-icon is-purple"><i class="fa-solid fa-battery-quarter"></i></div>
+                        <div><span>Energy Discharged</span><strong id="spScenarioDischarged">—</strong></div>
+                      </div>
+                      <div class="sp-battery-scenario-metric">
+                        <div class="sp-battery-scenario-icon is-blue"><i class="fa-solid fa-arrows-rotate"></i></div>
+                        <div><span>Battery Round-trip Efficiency</span><strong id="spScenarioEfficiency">—</strong></div>
+                      </div>
+                    </div>
+
+                  </div>
+
+
+                  <div class="sp-battery-visual-card hidden" id="spBatteryVisualCard">
+                    <div class="sp-battery-visual-head">
+                      <div><p class="sp-chart-title">Battery Storage</p><p class="sp-battery-visual-sub" id="spBatteryVisualSub">Hybrid system planning</p></div>
+                      <span class="sp-badge sp-badge-primary">Hybrid</span>
+                    </div>
+                    <div class="sp-battery-visual-grid" id="spBatteryVisualGrid"></div>
+                    <div class="sp-battery-visual-note" id="spBatteryVisualNote"></div>
+                  </div>
+
+                  <div class="sp-battery-comparison-card" id="spBatteryComparisonCard">
+                    <div id="spBatteryComparison"></div>
+                    <div class="sp-battery-visual-note" id="spBatteryComparisonNote"></div>
+                  </div>
+
+                  <div class="sp-chart-card">
+                    <p class="sp-chart-title">Monthly Energy Chart</p>
+                    <div class="sp-bar-chart">
+                      <div class="sp-bar-yaxis" id="spBarYAxis">
+                        <span>4.5k</span><span>4.0k</span><span>3.5k</span><span>3.0k</span>
+                        <span>2.5k</span><span>2.0k</span><span>1.5k</span><span>1.0k</span>
+                        <span>0.5k</span><span>0</span>
+                      </div>
+                      <div class="sp-bar-plot" id="spBarPlot">
+                        <div class="sp-bar" style="height:78%"><span class="sp-bar-month">Jan</span></div>
+                        <div class="sp-bar" style="height:74%"><span class="sp-bar-month">Feb</span></div>
+                        <div class="sp-bar" style="height:82%"><span class="sp-bar-month">Mar</span></div>
+                        <div class="sp-bar" style="height:79%"><span class="sp-bar-month">Apr</span></div>
+                        <div class="sp-bar" style="height:85%"><span class="sp-bar-month">May</span></div>
+                        <div class="sp-bar" style="height:91%"><span class="sp-bar-month">Jun</span></div>
+                        <div class="sp-bar" style="height:94%"><span class="sp-bar-month">Jul</span></div>
+                        <div class="sp-bar" style="height:88%"><span class="sp-bar-month">Aug</span></div>
+                        <div class="sp-bar" style="height:81%"><span class="sp-bar-month">Sep</span></div>
+                        <div class="sp-bar" style="height:76%"><span class="sp-bar-month">Oct</span></div>
+                        <div class="sp-bar" style="height:72%"><span class="sp-bar-month">Nov</span></div>
+                        <div class="sp-bar" style="height:75%"><span class="sp-bar-month">Dec</span></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="sp-chart-card">
+                    <p class="sp-chart-title">System Flow Diagram</p>
+                    <div class="sp-flow" id="spFlow">
+                      <div class="sp-flow-multi">
+                        <div class="sp-flow-units">
+                          <div class="sp-flow-unit-row">
+                            <div class="sp-flow-node"><strong>Array PV</strong><span>70 panel</span></div>
+                            <i class="fa-solid fa-chevron-right sp-flow-arrow"></i>
+                            <div class="sp-flow-node"><strong>DC Combiner</strong><span>5 string</span></div>
+                            <i class="fa-solid fa-chevron-right sp-flow-arrow"></i>
+                            <div class="sp-flow-node"><strong>40kW Inverter</strong><span>DC/AC 1.024x</span></div>
+                          </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right sp-flow-arrow sp-flow-bus-arrow"></i>
+                        <div class="sp-flow-node"><strong>AC Distribution</strong><span>39.93 kW</span></div>
+                        <i class="fa-solid fa-chevron-right sp-flow-arrow"></i>
+                        <div class="sp-flow-node"><strong>Load</strong><span>Facility</span></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="sp-chart-card">
+                    <p class="sp-chart-title">String Layout per MPPT</p>
+                    <div id="spStringLayoutRows">
+                      <div class="sp-string-row">
+                        <span class="sp-string-label">MPPT 1</span>
+                        <div class="sp-string-dots"></div>
+                        <span class="sp-string-meta">2 str · Vstring ~ 630V</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="sp-chart-card">
+                    <p class="sp-chart-title">Clipping AC</p>
+                    <svg viewBox="0 0 700 200" width="100%" height="200" xmlns="http://www.w3.org/2000/svg">
+                      <line x1="0" y1="180" x2="700" y2="180" stroke="var(--border)" stroke-width="1"/>
+                      <line x1="0" y1="60" x2="700" y2="60" stroke="var(--danger)" stroke-width="1.5" stroke-dasharray="6 5"/>
+                      <path d="M 20 175 C 150 175, 200 20, 350 15 C 500 20, 550 175, 680 175" fill="none" stroke="#b9c3c5" stroke-width="2" stroke-dasharray="5 4"/>
+                      <path id="spClipActual" d="M 20 175 C 150 175, 210 60, 280 60 L 420 60 C 490 60, 550 175, 680 175" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+                    </svg>
+                    <div class="sp-legend">
+                      <div class="sp-legend-item"><span class="sp-legend-swatch" style="background:var(--primary);"></span> Actual AC Output</div>
+                      <div class="sp-legend-item"><span class="sp-legend-swatch" style="background:#b9c3c5;border-top:2px dashed #b9c3c5;background:none;"></span> Potential without clipping</div>
+                      <div class="sp-legend-item"><span class="sp-legend-swatch" style="background:var(--danger);"></span> Inverter Capacity (<span id="spClipInvCap">40kW</span>)</div>
+                    </div>
+                    <p class="sp-legend-caption" id="spClipCaption">Inverter capacity is sufficient for the array output under design conditions.</p>
+                  </div>
+                </div>
+
+                <!-- TAB: Configuration -->
+                <div class="sp-tab-pane" data-pane="configuration">
+                  <p class="sp-section-title">Optimal System Configurations</p>
+                  <div class="sp-config-method-note">Recommended / Best Value balances technical fit and estimated cost. Best Quality means the strongest technical-fit score from the available catalog data; it is not a brand-quality rating.</div>
+
+                  <div id="spConfigList"></div>
+                </div>
+
+                <!-- TAB: RAB -->
+                <div class="sp-tab-pane" data-pane="rab">
+                  <div class="sp-rab-head">
+                    <p class="sp-active-label" id="spRabActiveLabel">BOQ for: <b>2×20kW</b> · Price: <b>Best Price</b></p>
+                    <div class="sp-rab-head-actions">
+                      <button type="button" class="sp-btn sp-btn-outline" id="spRabExportPdfBtn"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
+                      <button type="button" class="sp-btn sp-btn-outline" id="spRabExportExcelBtn"><i class="fa-solid fa-file-excel"></i> Export Excel</button>
+                      <button type="button" class="sp-btn sp-btn-outline" id="spRabGantiBtn">change <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                  </div>
+
+                  <div class="sp-table-wrap">
+                    <table class="sp-table" id="spRabTable">
+                      <thead>
+                        <tr><th>No</th><th>Item</th><th>Unit</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr>
+                      </thead>
+                      <tbody id="spRabTableBody">
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="sp-rab-mini-cards">
+                    <div class="sp-rab-mini-card">
+                      <label>Cost/kWp (pre-VAT)</label>
+                      <strong id="spRabCostPerKwp">Rp 0</strong>
+                    </div>
+                    <div class="sp-rab-mini-card">
+                      <label>Subtotal pre-VAT</label>
+                      <strong id="spRabSubtotalMini">Rp 0</strong>
+                    </div>
+                    <div class="sp-rab-mini-card">
+                      <label>Total including VAT</label>
+                      <strong id="spRabTotalMini">Rp 0</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TAB: Customer -->
+                <div class="sp-tab-pane" data-pane="customer">
+                  <div class="sp-customer-layout">
+
+                    <div class="sp-customer-left">
+                      <p class="sp-section-title">Profit Margin Settings</p>
+
+                      <div class="sp-customer-card">
+                        <p class="sp-customer-card-label">Profit Margin</p>
+                        <input type="range" id="spMarginSlider" min="0" max="40" value="21">
+                        <p class="sp-margin-readout"><span id="spMarginValue">21</span>% selected</p>
+                      </div>
+
+                      <div class="sp-customer-card">
+                        <p class="sp-customer-card-label">Cost Breakdown</p>
+                        <div class="sp-cost-row">
+                          <span>Base Cost</span>
+                          <strong id="spBaseCost">Rp 412.483.076</strong>
+                        </div>
+                        <div class="sp-cost-row">
+                          <span>Margin</span>
+                          <strong id="spMarginAmount">Rp 86.621.446 (21%)</strong>
+                        </div>
+                        <div class="sp-cost-row">
+                          <span>Selling Price (pre-VAT)</span>
+                          <strong id="spCustomerDpp">Rp 499.104.522</strong>
+                        </div>
+                        <div class="sp-cost-row">
+                          <span>VAT 11%</span>
+                          <strong id="spCustomerPpn">Rp 54.901.497</strong>
+                        </div>
+                      </div>
+
+                      <div class="sp-customer-card sp-customer-card-highlight">
+                        <p class="sp-customer-card-label">Total Customer Invoice (Including VAT)</p>
+                        <p class="sp-selling-price" id="spSellingPrice">Rp 499.104.522</p>
+                      </div>
+                    </div>
+
+                    <div class="sp-customer-right">
+                      <p class="sp-section-title">Proposal Preview</p>
+                      <div class="sp-table-wrap sp-table-wrap-mini">
+                        <table class="sp-table sp-table-mini">
+                          <thead>
+                            <tr><th>No</th><th>Item</th><th>Unit</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr>
+                          </thead>
+                          <tbody>
+                            <tr class="sp-table-section"><td colspan="6">I. Parts</td></tr>
+                            <tr><td>1</td><td>Panel Surya Mono 585 Wp — Phono SNI</td><td>pcs</td><td>70</td><td>Rp 1.675.000</td><td>Rp 117.250.000</td></tr>
+                            <tr><td>2</td><td>On-Grid Inverter 20 kW 3-phase</td><td>pcs</td><td>2</td><td>Rp 35.500.000</td><td>Rp 71.000.000</td></tr>
+                            <tr><td>3</td><td>Mounting Galvanis (per panel)</td><td>pcs</td><td>70</td><td>Rp 1.200.000</td><td>Rp 84.000.000</td></tr>
+
+                            <tr class="sp-table-section"><td colspan="6">II. Installation Materials</td></tr>
+                            <tr><td>4</td><td>Kabel NYY 4×25 mm²</td><td>mtr</td><td>38</td><td>Rp 550.000</td><td>Rp 20.900.000</td></tr>
+                            <tr><td>5</td><td>Kabel PV 1×4 mm² (415 m)</td><td>mtr</td><td>415</td><td>Rp 15.000</td><td>Rp 6.225.000</td></tr>
+                            <tr><td>6</td><td>Panel Distribusi Inverter 20 kW</td><td>pc</td><td>2</td><td>Rp 29.500.000</td><td>Rp 59.000.000</td></tr>
+                            <tr><td>7</td><td>Panel Distribusi DC Combiner 40 kW</td><td>pc</td><td>1</td><td>Rp 17.950.000</td><td>Rp 17.950.000</td></tr>
+                            <tr><td>8</td><td>Panel DC Combiner (string box) std</td><td>pcs</td><td>3</td><td>Rp 6.000.000</td><td>Rp 15.000.000</td></tr>
+
+                            <tr class="sp-table-section"><td colspan="6">III. Services</td></tr>
+                            <tr><td>10</td><td>Jasa Instalasi</td><td>lot</td><td>1</td><td>Rp 87.000.000</td><td>Rp 87.000.000</td></tr>
+                            <tr><td>11</td><td>SLO / NIDI</td><td>lot</td><td>1</td><td>Rp 34.128.571</td><td>Rp 36.128.571</td></tr>
+
+                            <tr class="sp-rab-summary-row"><td colspan="5">Subtotal (pre-VAT)</td><td>Rp 543.643.571</td></tr>
+                            <tr class="sp-rab-summary-row"><td colspan="5">VAT 11%</td><td>Rp 59.690.793</td></tr>
+                            <tr class="sp-rab-summary-row sp-rab-total-row"><td colspan="5">TOTAL (including VAT)</td><td>Rp 602.334.364</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button type="button" class="sp-btn-calculate sp-btn-export-offer" id="spCustomerExportBtn">
+                    <i class="fa-solid fa-file-export"></i> Export Customer Offer
+                  </button>
+                </div>
+
+                <!-- TAB: Summary -->
+                <div class="sp-tab-pane" data-pane="summary">
+                  <div class="sp-summary-head">
+                    <h3>Executive Summary — Solar PV System Design</h3>
+                    <p class="sp-summary-sub" id="spSummarySub">Not yet calculated</p>
+                  </div>
+
+                  <div class="sp-summary-text" id="spSummaryText"></div>
+
+                  <div class="sp-summary-grid" id="spSummaryGrid"></div>
+
+                  <div class="sp-summary-actions">
+                    <button type="button" class="sp-btn sp-btn-outline" id="spSummarySavePdfBtn"><i class="fa-solid fa-file-pdf"></i> Save PDF</button>
+                    <button type="button" class="sp-btn sp-btn-outline" id="spSummaryPrintPdfBtn"><i class="fa-solid fa-print"></i> Print PDF</button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+<!-- Notice / validation modal (replaces browser's native alert()) -->
+<div class="sp-modal-backdrop" id="spNoticeModal" aria-hidden="true">
+  <div class="sp-confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="spNoticeTitle">
+    <div class="sp-confirm-icon sp-confirm-icon-warning">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    <div class="sp-confirm-title" id="spNoticeTitle">Notice</div>
+    <p class="sp-confirm-text" id="spNoticeText"></p>
+    <div class="sp-confirm-actions">
+      <button type="button" class="sp-modal-btn sp-modal-btn-primary" id="spNoticeOkBtn">OK, Got It</button>
+    </div>
+  </div>
+</div><style id="spBatteryProblem2PreviewFix">
+  .sp-package-component-preview{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;margin:10px 0 8px;}
+  .sp-package-component-preview span{display:block;font-size:.82rem;line-height:1.35;color:var(--muted,#7c8b8d);}
+  .sp-package-component-preview b{color:var(--ink,#25343F);font-weight:600;}
+  .sp-package-total{display:block;padding-top:8px;border-top:1px solid rgba(148,163,184,.18);font-weight:700;color:var(--ink,#25343F);}
+  .sp-battery-target-live{font-weight:700;color:var(--ink,#25343F) !important;}
+  @media(max-width:800px){.sp-package-component-preview{grid-template-columns:1fr;}}
+</style>
+<style id="spBatteryProblem2VisualFix">
+  /* Keep the automatic configuration preview readable — uses the theme's own
+     --ink/--muted variables (not --text-primary/--text-secondary, which are
+     never defined anywhere in this stylesheet and were silently falling back
+     to near-white colors meant for a dark theme, washing the text out on this
+     page's light card background). */
+  .sp-package-summary{
+    color:var(--ink,#25343F) !important;
+    opacity:1 !important;
+  }
+  .sp-package-summary > strong{
+    display:block;
+    color:var(--ink,#25343F) !important;
+    opacity:1 !important;
+  }
+  .sp-package-active-label{
+    display:block;
+    margin-top:3px;
+    font-size:.78rem;
+    line-height:1.35;
+    color:var(--muted,#7c8b8d) !important;
+    opacity:1 !important;
+  }
+  .sp-package-component-preview span{
+    color:var(--ink,#25343F) !important;
+    opacity:1 !important;
+  }
+  .sp-package-component-preview b{
+    color:var(--ink,#25343F) !important;
+    opacity:1 !important;
+  }
+  .sp-package-total{
+    color:var(--ink,#25343F) !important;
+    opacity:1 !important;
+  }
+  .sp-package-summary span,
+  .sp-package-summary div{
+    opacity:1 !important;
+  }
+</style>

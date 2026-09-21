@@ -1,0 +1,323 @@
+<!-- ============================================================
+     Page: Task Management — 360eDash
+     Tab 4 dari Project Monitoring. Berisi 2 sub-tab:
+       1. Future Maintenance   — jadwal pemeliharaan mendatang,
+          bisa menambahkan unit yang bermasalah.
+       2. Historical Maintenance — riwayat maintenance tiap unit.
+     Data diambil dari window.__siSystems (sumber data yang sama
+     dengan System Information) supaya konsisten.
+============================================================= -->
+<div class="si tm" id="tmRoot">
+
+  <div class="si-stats-row" id="tmStatsRow"></div>
+
+  <!-- ---------- Sub tabs ---------- -->
+  <nav class="tm-subtabs" id="tmSubtabs">
+    <button class="tm-subtab is-active" type="button" data-subtab="future">
+      <i class="fa-solid fa-calendar-plus"></i>
+      <span>Future Maintenance</span>
+    </button>
+    <button class="tm-subtab" type="button" data-subtab="history">
+      <i class="fa-solid fa-clock-rotate-left"></i>
+      <span>Historical Maintenance</span>
+    </button>
+  </nav>
+
+  <!-- ============================================================
+       SUB-TAB 1 — Future Maintenance
+  ============================================================= -->
+  <div class="tm-subpanel is-active" id="tmFuturePanel" data-subpanel="future">
+
+    <div class="si-list-toolbar">
+      <div class="si-filter-group">
+        <span class="si-filter-label">Unit</span>
+        <select class="si-filter-select" id="tmFutureUnitFilter">
+          <option value="all">Semua Unit</option>
+        </select>
+      </div>
+      <div class="si-filter-group">
+        <span class="si-filter-label">Priority</span>
+        <select class="si-filter-select" id="tmFuturePriorityFilter">
+          <option value="all">Semua Priority</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+      <button class="si-btn si-btn-primary tm-add-btn" id="tmAddFutureBtn" type="button">
+        <i class="fa-solid fa-plus"></i>
+        <span>Tambah Unit Bermasalah</span>
+      </button>
+    </div>
+
+    <div class="si-section">
+      <div class="si-section-head">
+        <h2>Jadwal Mendatang<span class="si-section-count" id="tmFutureCount"></span></h2>
+      </div>
+      <div class="si-maint-list" id="tmFutureList"></div>
+      <div class="si-pagination" id="tmFuturePagination"></div>
+    </div>
+
+  </div>
+
+  <!-- ============================================================
+       SUB-TAB 2 — Historical Maintenance
+  ============================================================= -->
+  <div class="tm-subpanel" id="tmHistoryPanel" data-subpanel="history">
+
+    <div class="si-list-toolbar">
+      <div class="si-filter-group">
+        <span class="si-filter-label">Unit</span>
+        <select class="si-filter-select" id="tmHistoryUnitFilter">
+          <option value="all">Semua Unit</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="si-section">
+      <div class="si-section-head">
+        <h2>Riwayat Pemeliharaan<span class="si-section-count" id="tmHistoryCount"></span></h2>
+      </div>
+      <div class="si-timeline" id="tmHistoryList"></div>
+      <div class="si-pagination" id="tmHistoryPagination"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ============================================================
+     MODAL — Add / Edit Future Maintenance (pilih unit + jadwal)
+============================================================= -->
+<div class="si-modal-overlay" id="tmScheduleOverlay">
+  <div class="si-modal si-modal-sm">
+    <div class="si-modal-head">
+      <div>
+        <h2 id="tmScheduleModalTitle">Tambah Unit Bermasalah</h2>
+        <p>Pilih unit yang membutuhkan maintenance dan lengkapi jadwalnya.</p>
+      </div>
+      <button class="si-modal-close" id="tmScheduleCloseBtn" type="button" aria-label="Tutup">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="si-modal-body">
+      <form id="tmScheduleForm" novalidate>
+        <div class="si-form-grid si-form-grid-1">
+          <div class="si-field">
+            <label>Unit / System<span class="si-req">*</span></label>
+            <select name="unitId" id="tmUnitSelect" required>
+              <option value="">Pilih unit</option>
+            </select>
+            <span class="si-field-error">Unit wajib dipilih.</span>
+          </div>
+          <div class="si-field">
+            <label>Maintenance Title</label>
+            <input type="text" name="title" placeholder="Contoh: Inverter tidak stabil">
+          </div>
+          <div class="si-field">
+            <label>Description</label>
+            <textarea name="description" placeholder="Jelaskan detail masalah / pekerjaan..."></textarea>
+          </div>
+        </div>
+        <div class="si-form-grid" style="margin-top:14px;">
+          <div class="si-field">
+            <label>Scheduled Date<span class="si-req">*</span></label>
+            <input type="date" name="scheduledDate">
+            <span class="si-field-error">Scheduled Date wajib diisi.</span>
+          </div>
+          <div class="si-field">
+            <label>Priority</label>
+            <input type="hidden" name="priority" value="medium">
+            <div class="si-priority-select">
+              <button type="button" class="si-priority-opt si-priority-opt-low" data-value="low">Low</button>
+              <button type="button" class="si-priority-opt si-priority-opt-medium is-selected" data-value="medium">Medium</button>
+              <button type="button" class="si-priority-opt si-priority-opt-high" data-value="high">High</button>
+            </div>
+          </div>
+          <div class="si-field si-span-2">
+            <label>Assign Technician</label>
+            <select name="technician">
+              <option value="">Pilih teknisi</option>
+              <option>Dedi Kurniawan</option>
+              <option>Andi Wijaya</option>
+              <option>Budi Santoso</option>
+              <option>Citra Lestari</option>
+              <option value="other">Lainnya...</option>
+            </select>
+            <input type="text" name="technicianCustom" placeholder="Nama teknisi lain" class="si-conditional-field">
+          </div>
+          <div class="si-field si-span-2">
+            <label>Notes</label>
+            <textarea name="notes" placeholder="Catatan tambahan (opsional)"></textarea>
+          </div>
+        </div>
+        <br>
+        <div class="si-form-grid">
+          <div class="si-field si-span-2">
+            <label>Foto Dokumentasi</label>
+            <div class="tm-photo-upload" id="tmPhotoUpload">
+              <button type="button" class="tm-photo-add-btn" id="tmPhotoAddBtn">
+                <i class="fa-solid fa-camera"></i>
+                <span>Tambah Foto</span>
+              </button>
+            </div>
+            <input type="file" id="tmPhotoInput" accept="image/*" multiple hidden>
+          </div>
+          <div class="si-field si-span-2">
+            <label>Items Purchased</label>
+            <textarea name="itemsPurchased" placeholder="Contoh: 2x MC4 Connector, 1x Kabel NYAF 4mm, 1x Fuse 10A"></textarea>
+          </div>
+          <div class="si-field">
+            <label>Hardware Expenses</label>
+            <div class="si-input-rp"><span>Rp</span><input type="number" min="0" step="1000" name="hardwareExpense" placeholder="0"></div>
+          </div>
+          <div class="si-field">
+            <label>Software Costs</label>
+            <div class="si-input-rp"><span>Rp</span><input type="number" min="0" step="1000" name="softwareCost" placeholder="0"></div>
+          </div>
+          <div class="si-field">
+            <label>Transportation Costs</label>
+            <div class="si-input-rp"><span>Rp</span><input type="number" min="0" step="1000" name="transportCost" placeholder="0"></div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="si-modal-foot">
+      <button class="si-btn si-btn-ghost" id="tmScheduleCancelBtn" type="button">Cancel</button>
+      <div class="si-modal-foot-right">
+        <button class="si-btn si-btn-primary" id="tmScheduleSaveBtn" type="button">
+          <i class="fa-solid fa-floppy-disk"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Future Maintenance Detail
+============================================================= -->
+<div class="si-modal-overlay" id="tmFutureDetailOverlay">
+  <div class="si-modal si-modal-sm">
+    <div class="si-modal-head">
+      <div>
+        <h2>Maintenance Detail</h2>
+        <p>Informasi lengkap jadwal pemeliharaan.</p>
+      </div>
+      <button class="si-modal-close" id="tmFutureDetailCloseBtn" type="button" aria-label="Tutup">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="si-modal-body">
+      <div class="si-detail-modal-top">
+        <div class="si-maint-icon si-maint-icon-lg"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        <div style="min-width:0;">
+          <h3 id="tmFutureDetailTitle" class="si-detail-modal-title" data-no-translate>—</h3>
+          <div id="tmFutureDetailTags" class="si-maint-tags"></div>
+        </div>
+      </div>
+      <dl class="si-dl si-detail-modal-dl" id="tmFutureDetailDl"></dl>
+      <div class="si-detail-modal-block" id="tmFutureDetailDescWrap">
+        <b>Description</b>
+        <p id="tmFutureDetailDesc" data-no-translate>—</p>
+      </div>
+      <div class="si-detail-modal-block" id="tmFutureDetailNotesWrap">
+        <b>Notes</b>
+        <p id="tmFutureDetailNotes" data-no-translate>—</p>
+      </div>
+      <div class="si-detail-modal-block" id="tmFutureDetailPhotosWrap">
+        <b>Foto Dokumentasi</b>
+        <div class="tm-detail-photo-grid" id="tmFutureDetailPhotos"></div>
+      </div>
+      <div class="si-detail-modal-block" id="tmFutureDetailItemsWrap">
+        <b>Items Purchased</b>
+        <p id="tmFutureDetailItems">—</p>
+      </div>
+      <div class="si-detail-modal-block" id="tmFutureDetailCostWrap">
+        <b>Biaya</b>
+        <div class="tm-cost-summary" id="tmFutureDetailCost"></div>
+      </div>
+    </div>
+    <div class="si-modal-foot">
+      <button class="si-btn si-btn-danger-ghost" id="tmFutureDetailDeleteBtn" type="button">
+        <i class="fa-solid fa-trash"></i> Delete
+      </button>
+      <div class="si-modal-foot-right">
+        <button class="si-btn si-btn-secondary" id="tmFutureDetailCloseBtn2" type="button">Close</button>
+        <button class="si-btn si-btn-primary" id="tmFutureDetailEditBtn" type="button">
+          <i class="fa-solid fa-pen"></i> Edit Schedule
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Historical Maintenance Detail
+============================================================= -->
+<div class="si-modal-overlay" id="tmHistoryDetailOverlay">
+  <div class="si-modal si-modal-sm">
+    <div class="si-modal-head">
+      <div>
+        <h2>Maintenance Log Detail</h2>
+        <p>Riwayat lengkap pekerjaan pemeliharaan yang telah diselesaikan.</p>
+      </div>
+      <button class="si-modal-close" id="tmHistoryDetailCloseBtn" type="button" aria-label="Tutup">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="si-modal-body">
+      <div class="si-detail-modal-top">
+        <div class="si-maint-icon si-maint-icon-lg si-maint-icon-done"><i class="fa-solid fa-check"></i></div>
+        <div style="min-width:0;">
+          <h3 id="tmHistoryDetailTitle" class="si-detail-modal-title" data-no-translate>—</h3>
+          <div id="tmHistoryDetailTags" class="si-maint-tags"></div>
+        </div>
+      </div>
+      <dl class="si-dl si-detail-modal-dl" id="tmHistoryDetailDl"></dl>
+      <div class="si-detail-modal-block">
+        <b>Problem</b>
+        <p id="tmHistoryDetailProblem" data-no-translate>—</p>
+      </div>
+      <div class="si-detail-modal-block">
+        <b>Action Taken</b>
+        <p id="tmHistoryDetailAction" data-no-translate>—</p>
+      </div>
+      <div class="si-detail-modal-block" id="tmHistoryDetailNotesWrap">
+        <b>Notes</b>
+        <p id="tmHistoryDetailNotes" data-no-translate>—</p>
+      </div>
+      <div class="si-detail-modal-block" id="tmHistoryDetailPhotosWrap">
+        <b>Foto Dokumentasi</b>
+        <div class="tm-detail-photo-grid" id="tmHistoryDetailPhotos"></div>
+      </div>
+      <div class="si-detail-modal-block" id="tmHistoryDetailItemsWrap">
+        <b>Items Purchased</b>
+        <p id="tmHistoryDetailItems">—</p>
+      </div>
+      <div class="si-detail-modal-block" id="tmHistoryDetailCostWrap">
+        <b>Biaya</b>
+        <div class="tm-cost-summary" id="tmHistoryDetailCost"></div>
+      </div>
+    </div>
+    <div class="si-modal-foot">
+      <div></div>
+      <div class="si-modal-foot-right">
+        <button class="si-btn si-btn-secondary" id="tmHistoryDetailCloseBtn2" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="si-toast" id="tmToast">
+  <i class="fa-solid fa-circle-check"></i>
+  <span id="tmToastMsg">Saved.</span>
+</div>
+
+<!-- Lightbox — lihat foto dokumentasi ukuran penuh -->
+<div class="tm-lightbox-overlay" id="tmLightboxOverlay">
+  <button class="tm-lightbox-close" id="tmLightboxCloseBtn" type="button" aria-label="Tutup">
+    <i class="fa-solid fa-xmark"></i>
+  </button>
+  <img id="tmLightboxImg" src="" alt="Foto dokumentasi">
+</div>

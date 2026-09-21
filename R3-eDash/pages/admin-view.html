@@ -1,0 +1,343 @@
+<!-- ============================================================
+     Page: Admin View (User Management) — 360eDash
+     Catatan penting: file ini di-load sebagai FRAGMENT lewat
+     loadPage() di js/main.js, lalu di-inject ke dalam #page-root
+     yang sudah berada di dalam shell utama (index.html) — yaitu
+     .edash-layout > .edash-main > .edash-content.
+     Karena itu file ini TIDAK BOLEH punya <!DOCTYPE>, <html>,
+     <head>, <body>, ataupun wrapper .edash-layout/#sidebar-root/
+     #header-root/.edash-content sendiri. Kalau ditambahkan lagi,
+     itu akan membuat wrapper tsb NESTED di dalam punya index.html
+     yang asli → hasilnya 2 scrollbar bertumpuk.
+     CSS & font/link yang dibutuhkan (admin-view.css, sidebar.css,
+     header.css, Poppins, Font Awesome) semuanya sudah di-load
+     sekali di index.html, jadi tidak perlu diulang di sini.
+     Bandingkan pola ini dengan pages/alert.html atau
+     pages/admin-calculator.html yang sudah benar.
+============================================================= -->
+      <div class="um-wrap">
+
+        <div class="um-head">
+          <div>
+            <h1>Admin View</h1>
+            <p>Kelola akun pengguna, hak akses, dan penugasan proyek di platform 360eDash.</p>
+          </div>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="um-stats">
+          <div class="um-stat-card">
+            <div class="um-stat-icon"><i class="fa-solid fa-users"></i></div>
+            <div>
+              <div class="um-stat-label">Total Users</div>
+              <div class="um-stat-value" id="statTotal">—</div>
+            </div>
+          </div>
+          <div class="um-stat-card">
+            <div class="um-stat-icon is-info"><i class="fa-solid fa-user-shield"></i></div>
+            <div>
+              <div class="um-stat-label">Admin 360</div>
+              <div class="um-stat-value" id="statAdmin360">—</div>
+            </div>
+          </div>
+          <div class="um-stat-card">
+            <div class="um-stat-icon is-purple"><i class="fa-solid fa-user-graduate"></i></div>
+            <div>
+              <div class="um-stat-label">Intern</div>
+              <div class="um-stat-value" id="statIntern">—</div>
+            </div>
+          </div>
+          <div class="um-stat-card">
+            <div class="um-stat-icon is-warning"><i class="fa-solid fa-user-gear"></i></div>
+            <div>
+              <div class="um-stat-label">Operator</div>
+              <div class="um-stat-value" id="statOperator">—</div>
+            </div>
+          </div>
+          <div class="um-stat-card">
+            <div class="um-stat-icon is-success"><i class="fa-solid fa-user-tie"></i></div>
+            <div>
+              <div class="um-stat-label">Staff</div>
+              <div class="um-stat-value" id="statViewer">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="um-toolbar">
+          <div class="um-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="umSearch" placeholder="Search by username, email, or User Id...">
+          </div>
+          <select id="umRoleFilter">
+            <option value="">All Roles</option>
+            <option value="root">360master</option>
+            <option value="biofloc_intern_lead">360 Smart Biofloc Intern Lead</option>
+            <option value="rems_intern_lead">360 REMS Intern Lead</option>
+            <option value="biofloc_intern">360 Smart Biofloc Intern</option>
+            <option value="rems_intern">360 REMS Intern</option>
+            <option value="operator">Operator</option>
+            <option value="staff">Staff</option>
+          </select>
+          <button type="button" class="um-btn um-btn-primary" id="umOpenCreate">
+            <i class="fa-solid fa-user-plus"></i> Create User
+          </button>
+        </div>
+
+        <!-- Table -->
+        <div class="um-table-card">
+          <div class="um-table-scroll">
+            <table class="um-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Email</th>
+                  <th>User Id</th>
+                  <th>Role</th>
+                  <th>Projects</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="umTableBody"></tbody>
+            </table>
+          </div>
+          <div class="um-empty hidden" id="umEmpty">
+            <i class="fa-solid fa-user-slash"></i>
+            <p>No users match this search/filter.</p>
+          </div>
+          <div class="um-table-footer">
+            <span id="umCount">Showing 0 of 0 users</span>
+            <!-- Rows-per-page -- admin bisa pilih berapa baris ditampilkan
+                 per halaman (10/25/50/100), pilihan disimpan di localStorage
+                 biar kepakai lagi pas balik ke halaman ini (lihat umPageSize
+                 di admin-view.js). -->
+            <div class="um-pagesize">
+              <label for="umPageSizeSelect">Rows per page</label>
+              <select id="umPageSizeSelect">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+            <div class="um-pager" id="umPager"></div>
+          </div>
+        </div>
+
+      </div>
+
+<!-- Assign Projects modal -->
+<div class="um-modal-overlay hidden" id="umModalOverlay">
+  <div class="um-modal" role="dialog" aria-modal="true" aria-labelledby="umModalTitle">
+    <div class="um-modal-head">
+      <h3 id="umModalTitle">Assign Projects to <span id="umModalUser">—</span></h3>
+      <button type="button" class="um-modal-close" id="umModalClose" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="um-modal-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="umModalSearch" placeholder="Search projects...">
+    </div>
+    <div class="um-modal-list" id="umModalList"></div>
+    <div class="um-modal-foot">
+      <button type="button" class="um-btn um-btn-secondary" id="umModalCancel">Cancel</button>
+      <button type="button" class="um-btn um-btn-primary" id="umModalSave">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create User modal -->
+<div class="um-modal-overlay hidden" id="umCreateModalOverlay">
+  <div class="um-modal um-modal-create" role="dialog" aria-modal="true" aria-labelledby="umCreateModalTitle">
+    <div class="um-modal-head">
+      <h3 id="umCreateModalTitle"><i class="fa-solid fa-user-plus"></i> Create User</h3>
+      <button type="button" class="um-modal-close" id="umCreateModalClose" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="um-modal-create-body">
+      <p class="um-modal-create-sub">Tambahkan akun baru dan tentukan hak aksesnya.</p>
+      <form id="umCreateForm">
+        <div class="um-form-grid">
+          <div class="um-field">
+            <label for="umNewUsername">Username</label>
+            <div class="um-input-wrap">
+              <i class="fa-solid fa-user"></i>
+              <input type="text" id="umNewUsername" placeholder="e.g. abdul">
+            </div>
+            <span class="um-field-hint">Harus unik, tanpa spasi.</span>
+          </div>
+          <div class="um-field">
+            <label for="umNewEmail">Email</label>
+            <div class="um-input-wrap">
+              <i class="fa-solid fa-envelope"></i>
+              <input type="email" id="umNewEmail" placeholder="e.g. abdul@360energy.co">
+            </div>
+            <span class="um-field-hint">Dipakai untuk notifikasi &amp; reset password.</span>
+          </div>
+          <div class="um-field">
+            <label for="umNewPassword">Password</label>
+            <div class="um-input-wrap has-toggle">
+              <i class="fa-solid fa-lock"></i>
+              <input type="password" id="umNewPassword" placeholder="Minimum 8 characters">
+              <button type="button" class="um-toggle-pass" id="umTogglePass" title="Show password" aria-label="Show password">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+            <span class="um-field-hint" id="umPassHint">Minimal 8 karakter.</span>
+          </div>
+          <div class="um-field">
+            <label for="umNewRole">Role</label>
+            <div class="um-input-wrap">
+              <i class="fa-solid fa-user-shield"></i>
+              <select id="umNewRole">
+                <option value="root">360master</option>
+                <option value="biofloc_intern_lead">360 Smart Biofloc Intern Lead</option>
+                <option value="rems_intern_lead">360 REMS Intern Lead</option>
+                <option value="biofloc_intern">360 Smart Biofloc Intern</option>
+                <option value="rems_intern">360 REMS Intern</option>
+                <option value="operator">Operator</option>
+                <option value="staff" selected>Staff</option>
+              </select>
+            </div>
+            <span class="um-field-hint">Role menentukan hak akses akun ini di seluruh dashboard.</span>
+          </div>
+          <div class="um-field" id="umNewProjectField">
+            <label for="umNewProject">Assign Project</label>
+            <div class="um-input-wrap">
+              <i class="fa-solid fa-diagram-project"></i>
+              <select id="umNewProject">
+                <option value="">Loading projects…</option>
+              </select>
+            </div>
+            <span class="um-field-hint">Wajib untuk role Staff — staff cuma bisa pegang 1 project.</span>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="um-modal-foot">
+      <button type="button" class="um-btn um-btn-secondary" id="umCreateModalCancel">Cancel</button>
+      <button type="submit" form="umCreateForm" class="um-btn um-btn-primary">
+        <i class="fa-solid fa-circle-plus"></i> Create User
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete User confirmation modal -->
+<div class="um-modal-overlay hidden" id="umDeleteModalOverlay">
+  <div class="um-modal um-alert-modal" role="dialog" aria-modal="true" aria-labelledby="umDeleteModalTitle">
+    <button type="button" class="um-alert-close" id="umDeleteModalClose" aria-label="Close">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="um-alert-body">
+      <div class="um-alert-icon is-danger-solid"><i class="fa-solid fa-trash"></i></div>
+      <h3 class="um-alert-title" id="umDeleteModalTitle">Hapus user ini?</h3>
+      <p class="um-alert-text">
+        Akun berikut akan dihapus permanen:<br>
+        <strong id="umDeleteUserName">—</strong>
+      </p>
+      <div class="um-alert-actions">
+        <button type="button" class="um-pill um-pill-muted" id="umDeleteModalCancel">Cancel</button>
+        <button type="button" class="um-pill um-pill-danger" id="umDeleteModalConfirm">
+          <i class="fa-solid fa-trash"></i> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Role modal -->
+<div class="um-modal-overlay hidden" id="umEditRoleModalOverlay">
+  <div class="um-modal um-modal-create" role="dialog" aria-modal="true" aria-labelledby="umEditRoleModalTitle">
+    <div class="um-modal-head">
+      <h3 id="umEditRoleModalTitle"><i class="fa-solid fa-user-pen"></i> Edit Role</h3>
+      <button type="button" class="um-modal-close" id="umEditRoleModalClose" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="um-modal-create-body">
+      <p class="um-modal-create-sub">Ubah role untuk <strong id="umEditRoleUsername">—</strong>. Perubahan langsung tersimpan ke database.</p>
+      <form id="umEditRoleForm">
+        <div class="um-form-grid">
+          <div class="um-field">
+            <label for="umEditRoleSelect">Role</label>
+            <div class="um-input-wrap">
+              <i class="fa-solid fa-user-shield"></i>
+              <select id="umEditRoleSelect">
+                <option value="root">360master</option>
+                <option value="biofloc_intern_lead">360 Smart Biofloc Intern Lead</option>
+                <option value="rems_intern_lead">360 REMS Intern Lead</option>
+                <option value="biofloc_intern">360 Smart Biofloc Intern</option>
+                <option value="rems_intern">360 REMS Intern</option>
+                <option value="operator">Operator</option>
+                <option value="staff">Staff</option>
+              </select>
+            </div>
+            <span class="um-field-hint" id="umEditRoleHint">Role menentukan hak akses akun ini di seluruh dashboard.</span>
+          </div>
+          <div class="um-field" id="umEditRoleProjectField">
+            <label for="umEditRoleProject">Assign Project</label>
+            <div class="um-input-wrap">
+              <i class="fa-solid fa-diagram-project"></i>
+              <select id="umEditRoleProject">
+                <option value="">Loading projects…</option>
+              </select>
+            </div>
+            <span class="um-field-hint">Wajib untuk role Staff — staff cuma bisa pegang 1 project.</span>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="um-modal-foot">
+      <button type="button" class="um-btn um-btn-secondary" id="umEditRoleModalCancel">Cancel</button>
+      <button type="submit" form="umEditRoleForm" class="um-btn um-btn-primary">
+        <i class="fa-solid fa-check"></i> Save Role
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Create User success modal -->
+<div class="um-modal-overlay hidden" id="umSuccessModalOverlay">
+  <div class="um-modal um-alert-modal" role="dialog" aria-modal="true" aria-labelledby="umSuccessModalTitle">
+    <button type="button" class="um-alert-close" id="umSuccessModalClose" aria-label="Close">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="um-alert-body">
+      <div class="um-alert-icon is-success"><i class="fa-solid fa-check"></i></div>
+      <h3 class="um-alert-title" id="umSuccessModalTitle">Berhasil!</h3>
+      <p class="um-alert-text">
+        User <strong id="umSuccessUsername">—</strong> dengan role
+        <strong id="umSuccessRole">—</strong> berhasil dibuat.
+      </p>
+      <div class="um-success-id-box">
+        <span id="umSuccessId">—</span>
+        <button type="button" class="um-copy-btn" id="umSuccessCopyId" title="Copy User ID">
+          <i class="fa-regular fa-copy"></i>
+        </button>
+      </div>
+      <div class="um-alert-actions">
+        <button type="button" class="um-pill um-pill-primary" id="umSuccessModalOk">Selesai</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notice modal (validasi form, dsb.) -->
+<div class="um-modal-overlay hidden" id="umNoticeModalOverlay">
+  <div class="um-modal um-alert-modal" role="dialog" aria-modal="true" aria-labelledby="umNoticeModalTitle">
+    <button type="button" class="um-alert-close" id="umNoticeModalClose" aria-label="Close">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="um-alert-body">
+      <div class="um-alert-icon is-warning"><i class="fa-solid fa-exclamation"></i></div>
+      <h3 class="um-alert-title" id="umNoticeModalTitle">Perhatian!</h3>
+      <p class="um-alert-text" id="umNoticeMessage">—</p>
+      <div class="um-alert-actions">
+        <button type="button" class="um-pill um-pill-primary" id="umNoticeModalOk">OK</button>
+      </div>
+    </div>
+  </div>
+</div>

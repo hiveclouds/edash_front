@@ -1,0 +1,435 @@
+<!-- ============================================================
+     Page: Activity Log — 360eDash
+     Mencatat aktivitas penggunaan dashboard: login/logout dan
+     penggunaan tools (Solar Calculator, Admin Calculator).
+
+     CATATAN: halaman ini BELUM terintegrasi ke backend — semua
+     data yang tampil adalah data DUMMY yang dibuat di
+     js/activity-log.js (variabel ALDummyLogs). Saat backend siap,
+     cukup ganti bagian "sumber data" di file tersebut dengan
+     pemanggilan API sesungguhnya; struktur render, filter, dan
+     pagination di bawah ini bisa dipakai apa adanya.
+
+     Semua id diberi prefix "al" dan class diberi prefix "al-"
+     supaya tidak bentrok dengan halaman lain yang bisa hidup
+     bersamaan di DOM.
+
+     BAHASA TAMPILAN: seluruh string yang tampil ke pengguna di
+     halaman ini menggunakan English (default), dan seluruh teks
+     mengikuti font Poppins (lihat css/activity-log.css).
+============================================================= -->
+<div class="al-page" id="alRoot">
+
+  <!-- ============ Page head ============ -->
+  <div class="al-page-head">
+    <div>
+      <h1>Activity Log</h1>
+      <p data-i18n="activityLog.subtitle">View and monitor user activity across the platform.</p>
+    </div>
+    <div class="al-head-actions">
+      <button class="btn btn-secondary" id="alRefreshBtn" type="button">
+        <i class="fa-solid fa-rotate-right"></i> Refresh
+      </button>
+      <button class="btn btn-primary" id="alExportBtn" type="button">
+        <i class="fa-solid fa-download"></i> Export CSV
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       DASHBOARD ACTIVITY ANALYTICS — infografis
+       Mengikuti pola tab "Overview" pada admin.html (referensi):
+       kartu KPI + tabel aktivitas ber-checkbox ("centang baris untuk
+       diplot") + satu chart yang bisa Line/Bar/Stacked/100% Stacked,
+       dengan rentang tanggal bebas (From/To) plus preset cepat.
+       Data & fungsi ada di AM_ACTIVITIES / AMState di
+       js/activity-log.js — 8 unsur inti dashboard ini sendiri:
+       Visitors from Indonesia, Visitors from United States,
+       Visitors from elsewhere, Switched to Indonesian, Login,
+       Logout, Simulated calculator, Export monthly report.
+       Tidak ada kaitan dengan campaign/media sosial di luar dashboard.
+  ============================================================= -->
+  <!-- Analytics stat cards -->
+  <div class="al-stat-grid" id="amStatGrid">
+    <div class="al-stat-card">
+      <span class="al-stat-icon al-stat-icon-primary"><i class="fa-solid fa-users"></i></span>
+      <div>
+        <span class="al-stat-value" id="amStatVisitors">0</span>
+        <div class="al-stat-label" id="amStatVisitorsDelta">Total Visitors</div>
+      </div>
+    </div>
+    <div class="al-stat-card">
+      <span class="al-stat-icon al-stat-icon-info"><i class="fa-solid fa-earth-asia"></i></span>
+      <div>
+        <span class="al-stat-value" id="amStatTopCountry">0%</span>
+        <div class="al-stat-label" id="amStatTopCountrySub">From Indonesia</div>
+      </div>
+    </div>
+    <div class="al-stat-card">
+      <span class="al-stat-icon al-stat-icon-warning"><i class="fa-solid fa-right-to-bracket"></i></span>
+      <div>
+        <span class="al-stat-value" id="amStatLoginTotal">0</span>
+        <div class="al-stat-label" id="amStatLoginDelta">Login Activity</div>
+      </div>
+    </div>
+    <div class="al-stat-card">
+      <span class="al-stat-icon al-stat-icon-success"><i class="fa-solid fa-calculator"></i></span>
+      <div>
+        <span class="al-stat-value" id="amStatCalcTotal">0</span>
+        <div class="al-stat-label" id="amStatCalcDelta">Simulated Calculator Usage</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity summary table — centang baris untuk memilih apa yang tampil di grafik -->
+  <div class="al-card am-summary-card">
+    <div class="al-card-head">
+      <span class="al-card-title"><i class="fa-solid fa-list-check"></i> Activity Summary</span>
+      <span class="al-card-count" id="amRangeLbl">last 30 days</span>
+    </div>
+    <p class="am-summary-hint">Tick a row to plot it on the chart below.</p>
+    <div class="al-table-wrap">
+      <table class="al-table am-summary-table am-pick-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Activity Type</th>
+            <th>Detail</th>
+            <th>In Range</th>
+            <th>Past Day</th>
+            <th>Past Week</th>
+          </tr>
+        </thead>
+        <tbody id="amSummaryTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Analytics chart card -->
+  <div class="al-card am-chart-card">
+
+    <div class="al-card-head am-chart-head">
+      <span class="al-card-title"><i class="fa-solid fa-chart-column"></i> Activity Trend</span>
+
+      <div class="am-controls">
+        <span class="al-card-count" id="amSelLbl">2 series selected</span>
+        <button class="btn btn-secondary am-export-btn" id="amExportBtn" type="button">
+          <i class="fa-solid fa-download"></i> Export Data
+        </button>
+      </div>
+    </div>
+
+    <div class="am-range-row">
+      <div class="am-range-fields">
+        <div class="al-field">
+          <label for="amFromDate">From</label>
+          <input type="date" id="amFromDate" class="al-date-input">
+        </div>
+        <div class="al-field">
+          <label for="amToDate">to</label>
+          <input type="date" id="amToDate" class="al-date-input">
+        </div>
+      </div>
+      <div class="am-seg" id="amPresetSeg" role="tablist" aria-label="Quick range">
+        <button type="button" class="am-seg-btn" data-preset="1">24h</button>
+        <button type="button" class="am-seg-btn" data-preset="7">7d</button>
+        <button type="button" class="am-seg-btn is-active" data-preset="30">30d</button>
+        <button type="button" class="am-seg-btn" data-preset="90">90d</button>
+        <button type="button" class="am-seg-btn" data-preset="365">1y</button>
+      </div>
+    </div>
+
+    <div class="am-chart-type-row">
+      <span class="am-chart-type-label">Chart Type</span>
+      <div class="am-seg" id="amChartTypeSeg" role="tablist" aria-label="Chart type">
+        <button type="button" class="am-seg-btn is-active" data-chart-type="line"><i class="fa-solid fa-chart-line"></i> Line</button>
+        <button type="button" class="am-seg-btn" data-chart-type="bar"><i class="fa-solid fa-chart-bar"></i> Bar</button>
+        <button type="button" class="am-seg-btn" data-chart-type="stacked"><i class="fa-solid fa-layer-group"></i> Stacked Bar</button>
+        <button type="button" class="am-seg-btn" data-chart-type="percent"><i class="fa-solid fa-percent"></i> 100% Stacked</button>
+      </div>
+    </div>
+
+    <div class="am-chart-wrap" id="amChartWrap">
+      <canvas id="amMainChart"></canvas>
+    </div>
+
+  </div>
+
+  <!-- ============================================================
+       MARKETING ANALYTICS (Meta Pixel) — infografis ringkas dari
+       event Meta Pixel yang benar-benar terpasang di Solar Calculator
+       (pages/solar-calculator.html, lihat fbq(...) di js/solar-
+       calculator.js). Data diambil dari mirror event Meta Pixel milik
+       kita sendiri (tabel marketing_pixel_events di PostgreSQL, via
+       GET /marketing-pixel-events lewat edashboard_api) — BUKAN dari
+       Activity Log internal, dan TIDAK PERNAH ditulis ke activity_logs.
+       Logika & render ada di js/marketing-analytics.js.
+
+       Kenapa bukan data langsung dari Meta Ads Manager: Pixel di
+       proyek ini hanya mengirim event satu arah ke Meta (client-side
+       fbq), tidak ada Graph API/Conversions API/access token yang
+       dikonfigurasi untuk membaca balik data agregat dari Meta.
+       Penjelasan ini juga ditampilkan ke pengguna lewat tombol
+       "View Details" di bawah supaya tidak disalahartikan sebagai
+       data resmi Meta Ads Manager.
+  ============================================================= -->
+  <div class="al-section-label">
+    <i class="fa-solid fa-bullhorn"></i> Marketing Analytics
+  </div>
+
+  <div class="al-card mkt-card" id="mktRoot">
+
+    <div class="al-card-head mkt-card-head">
+      <div>
+        <span class="al-card-title"><i class="fa-solid fa-chart-pie"></i> <span data-i18n="marketing.metaOverview">Meta Pixel Overview</span></span>
+        <p class="mkt-subtitle" data-i18n="marketing.subtitle">Solar Calculator visitor &amp; conversion funnel, sourced from the Meta Pixel events already firing on that page.</p>
+      </div>
+      <div class="mkt-head-actions">
+        <span class="al-card-count" id="mktRangeLbl">last 30 days</span>
+        <button class="btn btn-secondary" id="mktDetailsBtn" type="button">
+          <i class="fa-solid fa-circle-info"></i> <span data-i18n="marketing.viewDetails">View Details</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Marketing stat cards -->
+    <div class="al-stat-grid mkt-stat-grid" id="mktStatGrid">
+      <div class="al-stat-card">
+        <span class="al-stat-icon al-stat-icon-primary"><i class="fa-solid fa-users"></i></span>
+        <div>
+          <span class="al-stat-value" id="mktStatVisitors">0</span>
+          <div class="al-stat-label" data-i18n="marketing.totalVisitors">Total Visitors</div>
+        </div>
+      </div>
+      <div class="al-stat-card">
+        <span class="al-stat-icon al-stat-icon-info"><i class="fa-solid fa-sliders"></i></span>
+        <div>
+          <span class="al-stat-value" id="mktStatEngagement">0</span>
+          <div class="al-stat-label" data-i18n="marketing.calculatorEngagement">Calculator Engagement</div>
+        </div>
+      </div>
+      <div class="al-stat-card">
+        <span class="al-stat-icon al-stat-icon-warning"><i class="fa-solid fa-calculator"></i></span>
+        <div>
+          <span class="al-stat-value" id="mktStatCalculate">0</span>
+          <div class="al-stat-label" data-i18n="marketing.calculateClicks">Calculate Estimate Clicks</div>
+        </div>
+      </div>
+      <div class="al-stat-card">
+        <span class="al-stat-icon al-stat-icon-success"><i class="fa-solid fa-envelope-circle-check"></i></span>
+        <div>
+          <span class="al-stat-value" id="mktStatLeads">0</span>
+          <div class="al-stat-label" data-i18n="marketing.leads">Leads (Email Submissions)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mkt-rate-row" id="mktRateRow">
+      <div class="mkt-rate-chip">
+        <span class="mkt-rate-value" id="mktRateEngagement">0%</span>
+        <span class="mkt-rate-label"><span data-i18n="marketing.engagementRate">Engagement rate</span><br><small data-i18n="marketing.engagedVisitors">engaged visitors &divide; total visitors</small></span>
+      </div>
+      <div class="mkt-rate-chip">
+        <span class="mkt-rate-value" id="mktRateConversion">0%</span>
+        <span class="mkt-rate-label"><span data-i18n="marketing.conversionRate">Conversion rate</span><br><small data-i18n="marketing.leadsVisitors">leads &divide; total visitors</small></span>
+      </div>
+    </div>
+
+    <!-- Funnel -->
+    <div class="mkt-funnel-wrap">
+      <div class="mkt-funnel-title"><i class="fa-solid fa-filter"></i> <span data-i18n="marketing.funnelTitle">Visitor &rarr; Lead Funnel</span></div>
+      <div class="mkt-funnel" id="mktFunnel">
+        <!-- Dirender oleh js/marketing-analytics.js -->
+      </div>
+    </div>
+
+    <!-- Trend chart -->
+    <div class="mkt-chart-wrap" id="mktChartWrap">
+      <canvas id="mktTrendChart"></canvas>
+    </div>
+
+    <div class="mkt-empty" id="mktEmptyState" hidden>
+      <i class="fa-solid fa-bullhorn"></i>
+      <p data-i18n="marketing.empty">No Meta Pixel events recorded yet. Numbers will appear here as soon as someone visits the Solar Calculator page.</p>
+    </div>
+
+  </div>
+
+  <!-- ============ Marketing Analytics Details modal ============ -->
+  <div class="al-modal-overlay hidden" id="mktDetailModalOverlay">
+    <div class="al-modal mkt-modal" role="dialog" aria-modal="true" aria-labelledby="mktDetailModalTitle">
+      <div class="al-modal-head">
+        <h3 id="mktDetailModalTitle"><i class="fa-solid fa-bullhorn"></i> <span data-i18n="marketing.detailsTitle">Marketing Analytics Details</span></h3>
+        <button type="button" class="al-modal-close" id="mktDetailModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="al-modal-body" id="mktDetailModalBody">
+        <!-- Diisi oleh js/marketing-analytics.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SYSTEM ACTIVITY LOG (existing — login/logout/calculator)
+  ============================================================= -->
+  <div class="al-section-label">
+    <i class="fa-solid fa-clock-rotate-left"></i> System Activity Log
+  </div>
+
+  <!-- ============ Filter toolbar ============ -->
+  <div class="al-card al-toolbar-card">
+    <div class="al-toolbar">
+
+      <div class="al-field al-field-search">
+        <label for="alSearchInput">Search</label>
+        <div class="al-input-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="alSearchInput" placeholder="Search name, email, or activity detail...">
+        </div>
+      </div>
+
+      <div class="al-field">
+        <label id="alTypeFilterLabel">Activity Type</label>
+        <div class="al-ms" id="alTypeMs">
+          <button type="button" class="al-ms-trigger" id="alTypeMsTrigger" aria-haspopup="listbox" aria-expanded="false">
+            <span id="alTypeMsText">All Types</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="al-ms-panel" id="alTypeMsPanel" role="listbox" aria-multiselectable="true" hidden>
+            <label class="al-ms-option al-ms-option-all">
+              <input type="checkbox" id="alTypeMsAll" checked>
+              <span>All Types</span>
+            </label>
+            <div class="al-ms-divider"></div>
+            <label class="al-ms-option"><input type="checkbox" class="al-type-ms-item" value="login" checked><span>Login</span></label>
+            <label class="al-ms-option"><input type="checkbox" class="al-type-ms-item" value="logout" checked><span>Logout</span></label>
+            <label class="al-ms-option"><input type="checkbox" class="al-type-ms-item" value="solar-calculator" checked><span>Solar Calculator</span></label>
+            <label class="al-ms-option"><input type="checkbox" class="al-type-ms-item" value="admin-calculator" checked><span>Admin Calculator</span></label>
+            <label class="al-ms-option"><input type="checkbox" class="al-type-ms-item" value="export-report" checked><span>Export Monthly Report</span></label>
+            <label class="al-ms-option"><input type="checkbox" class="al-type-ms-item" value="visitors" checked><span>Visitors</span></label>
+            <label class="al-ms-option"><input type="checkbox" class="al-type-ms-item" value="language" checked><span>Language</span></label>
+            <label class="al-ms-option"><input type="checkbox" class="al-type-ms-item" value="theme" checked><span>Change Theme</span></label>
+            <label class="al-ms-option"><input type="checkbox" class="al-type-ms-item" value="password" checked><span>Change Password</span></label>
+            <label class="al-ms-option"><input type="checkbox" class="al-type-ms-item" value="profile-info" checked><span>Change Profile Info</span></label>
+            <label class="al-ms-option"><input type="checkbox" class="al-type-ms-item" value="profile-photo" checked><span>Change Profile Photo</span></label>
+            <label class="al-ms-option"><input type="checkbox" class="al-type-ms-item" value="ticketing" checked><span>Ticketing</span></label>
+            <label class="al-ms-option"><input type="checkbox" class="al-type-ms-item" value="other" checked><span>Other</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="al-field">
+        <label for="alCountryFilter">Country of Origin</label>
+        <div class="al-select-wrap">
+          <select id="alCountryFilter">
+            <option value="all">All Countries</option>
+          </select>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+      </div>
+
+      <div class="al-field">
+        <label for="alStatusFilter">Status</label>
+        <div class="al-select-wrap">
+          <select id="alStatusFilter">
+            <option value="all">All Status</option>
+            <option value="success">Success</option>
+            <option value="failed">Failed</option>
+          </select>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+      </div>
+
+      <div class="al-field al-field-daterange">
+        <label>Date Range</label>
+        <div class="al-daterange">
+          <input type="date" id="alDateFrom" class="al-date-input" aria-label="From date">
+          <span class="al-daterange-sep">–</span>
+          <input type="date" id="alDateTo" class="al-date-input" aria-label="To date">
+        </div>
+      </div>
+
+      <button class="btn btn-secondary al-reset-btn" id="alResetBtn" type="button">
+        <i class="fa-solid fa-arrow-rotate-left"></i> Reset Filter
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ============ Table ============ -->
+  <div class="al-card al-table-card">
+
+    <div class="al-card-head">
+      <span class="al-card-title"><i class="fa-solid fa-list"></i> Activity History</span>
+      <span class="al-card-count" id="alResultCount">0 activities</span>
+    </div>
+
+    <div class="al-table-wrap">
+      <table class="al-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Time</th>
+            <th>User</th>
+            <th>Country of Origin</th>
+            <th>Activity Type</th>
+            <th>Activity Detail</th>
+            <th>Device &amp; IP</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="alTableBody">
+          <!-- Baris tabel dirender oleh js/activity-log.js -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="al-table-empty" id="alEmptyState" hidden>
+      <i class="fa-solid fa-inbox"></i>
+      <p>No activity matches this filter.</p>
+    </div>
+
+    <div class="al-table-foot">
+      <div class="al-table-foot-left">
+        <span class="al-page-info" id="alPageInfo">Showing 0-0 of 0 activities</span>
+        <div class="al-page-size">
+          <label for="alPageSizeSelect">Rows per page</label>
+          <div class="al-select-wrap al-select-wrap-sm">
+            <select id="alPageSizeSelect">
+              <option value="8">8</option>
+              <option value="16">16</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+              <option value="all">All</option>
+            </select>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+        </div>
+      </div>
+      <div class="al-pagination" id="alPagination"></div>
+    </div>
+
+  </div>
+
+  <!-- ============ Activity Detail modal ============
+       Event-specific (bagian J): isinya berbeda tergantung eventType
+       si log yang sedang dibuka (login/logout/admin_calculator/
+       calculator_calculate/calculator_export/dst). Markup tabel
+       utama tetap satu, hanya modal ini yang berubah isinya. -->
+  <div class="al-modal-overlay hidden" id="alDetailModalOverlay">
+    <div class="al-modal" role="dialog" aria-modal="true" aria-labelledby="alDetailModalTitle">
+      <div class="al-modal-head">
+        <h3 id="alDetailModalTitle"><i class="fa-solid fa-circle-info"></i> Activity Details</h3>
+        <button type="button" class="al-modal-close" id="alDetailModalClose" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="al-modal-body" id="alDetailModalBody">
+        <!-- Diisi oleh js/activity-log.js sesuai eventType -->
+      </div>
+    </div>
+  </div>
+
+</div>

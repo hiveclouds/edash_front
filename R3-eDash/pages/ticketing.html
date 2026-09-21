@@ -1,0 +1,881 @@
+<!-- ============================================================
+     Page: Ticketing (WebDev) — 360eDash
+     Tempat semua role submit bug/improvement request untuk web
+     ini sendiri, lalu tim WebDev meng-assign & mengerjakannya.
+     Dimuat sebagai FRAGMENT lewat loadPage() di js/main.js dan
+     di-inject ke #page-root — TIDAK boleh punya <!DOCTYPE>, <html>,
+     <head>, <body>, atau wrapper .edash-layout/#sidebar-root/
+     #header-root/.edash-content sendiri (lihat catatan yang sama
+     di pages/admin-view.html).
+============================================================= -->
+<div class="tk-wrap">
+
+  <div class="tk-head">
+    <div>
+      <h1 data-i18n="ticketing.title">Ticketing</h1>
+      <p data-i18n="ticketing.subtitle">Report and track technical issues, bug fixes, and feature requests across teams.</p>
+    </div>
+    <!-- Tombol "New Ticket" DIPINDAH dari sini ke kotak besar tepat di
+         atas tabel (lihat #tkOpenCreateBar sebelum .tk-table-card) supaya
+         lebih kelihatan -- tombol kecil di header ini dihapus. -->
+  </div>
+
+  <!-- ---------- Stat cards ---------- -->
+  <!-- Urutan SENGAJA: Total - Open - In Progress - Waiting Approval -
+       Resolved - Rejected (urutan alur status tiket dari awal ke akhir). -->
+  <div class="tk-stats" id="tkStats">
+    <div class="tk-stat-card">
+      <div class="tk-stat-icon"><i class="fa-solid fa-ticket"></i></div>
+      <div>
+        <div class="tk-stat-label" data-i18n="ticketing.stats.total">Total Tickets</div>
+        <div class="tk-stat-value" id="tkStatTotal">0</div>
+      </div>
+    </div>
+    <div class="tk-stat-card">
+      <div class="tk-stat-icon is-open"><i class="fa-solid fa-circle-dot"></i></div>
+      <div>
+        <div class="tk-stat-label" data-i18n="ticketing.stats.open">Open</div>
+        <div class="tk-stat-value" id="tkStatOpen">0</div>
+      </div>
+    </div>
+    <div class="tk-stat-card">
+      <div class="tk-stat-icon is-warning"><i class="fa-solid fa-person-digging"></i></div>
+      <div>
+        <div class="tk-stat-label" data-i18n="ticketing.stats.inProgress">In Progress</div>
+        <div class="tk-stat-value" id="tkStatInProgress">0</div>
+      </div>
+    </div>
+    <div class="tk-stat-card">
+      <div class="tk-stat-icon is-info"><i class="fa-solid fa-hourglass-half"></i></div>
+      <div>
+        <div class="tk-stat-label" data-i18n="ticketing.stats.waitingApproval">Waiting Approval</div>
+        <div class="tk-stat-value" id="tkStatWaitingApproval">0</div>
+      </div>
+    </div>
+    <div class="tk-stat-card">
+      <div class="tk-stat-icon is-success"><i class="fa-solid fa-circle-check"></i></div>
+      <div>
+        <div class="tk-stat-label" data-i18n="ticketing.stats.resolved">Resolved</div>
+        <div class="tk-stat-value" id="tkStatResolved">0</div>
+      </div>
+    </div>
+    <div class="tk-stat-card">
+      <div class="tk-stat-icon is-danger"><i class="fa-solid fa-circle-xmark"></i></div>
+      <div>
+        <div class="tk-stat-label" data-i18n="ticketing.stats.rejected">Rejected</div>
+        <div class="tk-stat-value" id="tkStatRejected">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- Leaderboard + Ticket Activity (side by side) ---------- -->
+  <!-- Digabung dalam satu row flex supaya dua card ini sebelahan di
+       layar lebar, lalu stack lagi di tablet/mobile (lihat breakpoint
+       .tk-lb-heatmap-row di ticketing.css). -->
+  <div class="tk-lb-heatmap-row">
+
+  <!-- ---------- Leaderboard ---------- -->
+  <!-- Layout 2 kolom: TOP PERFORMERS (podium top-3, kolom kiri sempit) +
+       CONTENDERS (list ranking penuh, kolom kanan, scrollable). Toggle
+       collapse (chevron) & tombol bantuan (?) di header ditangani di
+       ticketing.js (lihat initLeaderboardHeaderControls()). -->
+  <div class="tk-leaderboard-card">
+    <div class="tk-leaderboard-head">
+      <div>
+        <h3><span data-i18n="ticketing.leaderboard.title">Leaderboard</span></h3>
+        <p class="tk-heatmap-subtitle" data-i18n="ticketing.leaderboard.subtitle">Top contributors ranked by completed tickets and delivery speed.</p>
+      </div>
+      <div class="tk-leaderboard-head-actions">
+        <div class="tk-points-help">
+          <button type="button" class="tk-leaderboard-icon-btn" id="tkLeaderboardHelpBtn"
+                  aria-label="How points are calculated" aria-expanded="false"
+                  aria-controls="tkPointsHelpPopover">
+            <i class="fa-solid fa-circle-question"></i>
+          </button>
+          <div class="tk-points-help-popover" id="tkPointsHelpPopover" role="tooltip">
+            <div class="tk-points-help-title" data-i18n="ticketing.leaderboard.pointsHelp.title">Points &amp; Scoring</div>
+            <ul class="tk-points-help-tiers">
+              <li class="tk-points-tier tk-points-tier--low">
+                <span class="tk-points-tier-badge" data-i18n="ticketing.priority.low">Low</span>
+                <span class="tk-points-tier-value">1 pt</span>
+              </li>
+              <li class="tk-points-tier tk-points-tier--medium">
+                <span class="tk-points-tier-badge" data-i18n="ticketing.priority.medium">Medium</span>
+                <span class="tk-points-tier-value">2 pts</span>
+              </li>
+              <li class="tk-points-tier tk-points-tier--high">
+                <span class="tk-points-tier-badge" data-i18n="ticketing.priority.high">High</span>
+                <span class="tk-points-tier-value">3 pts</span>
+              </li>
+              <li class="tk-points-tier tk-points-tier--critical">
+                <span class="tk-points-tier-badge" data-i18n="ticketing.priority.critical">Critical</span>
+                <span class="tk-points-tier-value">5 pts</span>
+              </li>
+            </ul>
+            <div class="tk-points-help-bonus">
+              <i class="fa-solid fa-bolt"></i>
+              <span>
+                <strong data-i18n="ticketing.leaderboard.pointsHelp.bonusLabel">Speed bonus:</strong>
+                <span data-i18n="ticketing.leaderboard.pointsHelp.bonusText">Complete before target time to earn bonus points.</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tk-leaderboard-body" id="tkLeaderboardBody">
+      <div class="tk-leaderboard-columns">
+        <div class="tk-leaderboard-top-performers">
+          <div class="tk-leaderboard-col-label tk-leaderboard-col-label--top"><i class="fa-solid fa-crown"></i> <span data-i18n="ticketing.leaderboard.topPerformers">Top Performers</span></div>
+          <div class="tk-leaderboard-podium" id="tkLeaderboardPodium"></div>
+        </div>
+        <div class="tk-leaderboard-contenders">
+          <div class="tk-leaderboard-col-label-row">
+            <div class="tk-leaderboard-col-label"><i class="fa-solid fa-list-ol"></i> <span data-i18n="ticketing.leaderboard.contenders">Contenders</span></div>
+            <span class="tk-leaderboard-ranked-badge" id="tkLeaderboardRankedBadge">0 ranked</span>
+          </div>
+          <div class="tk-leaderboard-list" id="tkLeaderboardList"></div>
+        </div>
+      </div>
+      <div class="tk-leaderboard-empty hidden" id="tkLeaderboardEmpty">
+        <p data-i18n="ticketing.leaderboard.empty">No rankings yet. Completed tickets will appear here.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- Activity heatmap ---------- -->
+  <div class="tk-heatmap-card">
+    <div class="tk-heatmap-head">
+      <div>
+        <h3 data-i18n="ticketing.heatmap.title">Ticket Activity</h3>
+        <p class="tk-heatmap-subtitle" data-i18n="ticketing.heatmap.subtitle">Daily log of ticket submissions, updates, and resolutions.</p>
+      </div>
+    </div>
+    <!-- Filter aktivitas -- team (All Teams/R1/R2/R3) + status (All
+         Status/Open/In Progress/Waiting Approval/Resolved/Rejected).
+         Cuma mempengaruhi heatmap di bawah (tkBuildActivityMap()),
+         TIDAK mempengaruhi tabel/tab status utama di luar card ini. -->
+    <div class="tk-heatmap-filters">
+      <div class="tk-team-toggle tk-team-toggle--pill" id="tkHeatmapTeamToggle" role="tablist">
+        <button type="button" class="tk-team-toggle-btn is-active" data-team="" role="tab" data-i18n="ticketing.filters.allTeams">All Teams</button>
+        <button type="button" class="tk-team-toggle-btn" data-team="R1" role="tab">R1</button>
+        <button type="button" class="tk-team-toggle-btn" data-team="R2" role="tab">R2</button>
+        <button type="button" class="tk-team-toggle-btn" data-team="R3" role="tab">R3</button>
+      </div>
+      <!-- FIX (visual): dulu <select> dropdown -- diganti jadi pill row
+           yang tinggal diklik, sama persis polanya dengan status tabs
+           utama (.tk-status-tabs/.tk-status-tab) di toolbar bawah,
+           supaya konsisten dengan cara filter tim di sebelahnya (klik,
+           bukan dropdown). Lihat JS: heatmapStatusToggle click handler
+           (menggantikan heatmapStatusFilter "change" listener yang lama). -->
+      <div class="tk-status-tabs tk-status-tabs--compact" id="tkHeatmapStatusToggle" role="tablist">
+        <button type="button" class="tk-status-tab is-active" data-status="" role="tab" data-i18n="ticketing.filters.allStatus">All Status</button>
+        <button type="button" class="tk-status-tab" data-status="open" role="tab" data-i18n="ticketing.status.open">Open</button>
+        <button type="button" class="tk-status-tab" data-status="in_progress" role="tab" data-i18n="ticketing.status.inProgress">In Progress</button>
+        <button type="button" class="tk-status-tab" data-status="waiting_approval" role="tab" data-i18n="ticketing.status.waitingApproval">Waiting Approval</button>
+        <button type="button" class="tk-status-tab" data-status="resolved" role="tab" data-i18n="ticketing.status.resolved">Resolved</button>
+        <button type="button" class="tk-status-tab" data-status="rejected" role="tab" data-i18n="ticketing.status.rejected">Rejected</button>
+      </div>
+    </div>
+    <!-- Digabung dalam satu wrapper (.tk-heatmap-graphic) supaya chart +
+         legend bisa di-center vertikal sebagai satu kelompok kalau card
+         ini sedang di-stretch lebih tinggi dari isinya sendiri (mis.
+         disandingkan dengan Leaderboard yang lebih tinggi) -- lihat
+         .tk-heatmap-graphic di ticketing.css. Ukuran cell/gap di dalam
+         .tk-heatmap-scroll dihitung ulang tiap render oleh
+         tkFitHeatmapMetrics() di ticketing.js supaya strip Aug-Jul muat
+         pas tanpa perlu scroll horizontal. -->
+    <div class="tk-heatmap-graphic">
+      <div class="tk-heatmap-scroll" id="tkHeatmapScroll">
+        <!-- Konten (2 baris bulan: Aug-Jan lalu Feb-Jul) di-generate penuh
+             oleh JS -- lihat renderActivityHeatmap()/tkRenderHeatmapHalf()
+             di ticketing.js. Dulu 1 baris strip 12 bulan lebar (sekarang
+             dipecah 2 supaya card ini lebih tinggi & tidak nyisain
+             whitespace kosong di bawah pas disandingkan sama Leaderboard). -->
+        <div class="tk-heatmap-inner" id="tkHeatmapInner"></div>
+      </div>
+      <div class="tk-heatmap-legend">
+        <span data-i18n="ticketing.heatmap.less">Less</span>
+        <span class="tk-heatmap-cell tk-heat-0" id="tkHeatLegend0"></span>
+        <span class="tk-heatmap-cell tk-heat-1" id="tkHeatLegend1"></span>
+        <span class="tk-heatmap-cell tk-heat-2" id="tkHeatLegend2"></span>
+        <span class="tk-heatmap-cell tk-heat-3" id="tkHeatLegend3"></span>
+        <span class="tk-heatmap-cell tk-heat-4" id="tkHeatLegend4"></span>
+        <span data-i18n="ticketing.heatmap.more">More</span>
+      </div>
+    </div>
+    <div class="tk-heatmap-tooltip" id="tkHeatmapTooltip" role="tooltip"></div>
+  </div>
+
+  </div><!-- /.tk-lb-heatmap-row -->
+
+  <!-- ---------- Toolbar ---------- -->
+  <div class="tk-toolbar">
+    <div class="tk-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="tkSearch" data-i18n-placeholder="ticketing.searchPlaceholder" placeholder="Search by title, submitter, or ticket ID...">
+    </div>
+    <select id="tkTypeFilter">
+      <option value="" data-i18n="ticketing.filters.allTypes">All Types</option>
+      <option value="Bug" data-i18n="ticketing.type.bug">Bug</option>
+      <option value="Feature Request" data-i18n="ticketing.type.featureRequest">Feature Request</option>
+      <option value="UI/UX Feedback" data-i18n="ticketing.type.uiUxFeedback">UI/UX Feedback</option>
+      <option value="Data Issue" data-i18n="ticketing.type.dataIssue">Data Issue</option>
+      <option value="Performance Issue" data-i18n="ticketing.type.performanceIssue">Performance Issue</option>
+      <option value="Question" data-i18n="ticketing.type.question">Question</option>
+      <option value="Other" data-i18n="ticketing.type.other">Other</option>
+    </select>
+    <!-- Toggle tim (R1/Hardware, R2/Backend, R3/Frontend) -- di samping
+         dropdown All Types. Generik, dibaca lewat data-team seperti pola
+         tk-status-tab (lihat tkActiveTeamFilter di ticketing.js). -->
+    <div class="tk-team-toggle" id="tkTeamToggle" role="tablist">
+      <button type="button" class="tk-team-toggle-btn is-active" data-team="" role="tab" data-i18n="ticketing.filters.allTeams">All Teams</button>
+      <button type="button" class="tk-team-toggle-btn" data-team="R1" role="tab">R1</button>
+      <button type="button" class="tk-team-toggle-btn" data-team="R2" role="tab">R2</button>
+      <button type="button" class="tk-team-toggle-btn" data-team="R3" role="tab">R3</button>
+    </div>
+  </div>
+
+  <!-- ---------- Status subtabs (In Progress / Waiting Approval / Resolved / Rejected) ----------
+       "Submitted" dibuang -- status itu tidak pernah benar-benar
+       dipakai backend (tiket baru selalu langsung "In Progress"), jadi
+       tab-nya dulu selalu 0. Approve/Reject sekarang tombol terpisah di
+       modal Detail (lihat tkDetailApproveBtn/tkDetailRejectBtn di
+       bawah), bukan lewat dropdown status lagi -- backend menolak PATCH
+       status langsung ke resolved/rejected (lihat ticket.service.ts). -->
+  <div class="tk-status-tabs" id="tkStatusTabs" role="tablist">
+    <button type="button" class="tk-status-tab is-active" data-status="" role="tab">
+      <span data-i18n="ticketing.filters.allStatus">All Status</span>
+      <span class="tk-status-tab-count" id="tkTabCountAll">0</span>
+    </button>
+    <button type="button" class="tk-status-tab" data-status="open" role="tab">
+      <span data-i18n="ticketing.status.open">Open</span>
+      <span class="tk-status-tab-count" id="tkTabCountOpen">0</span>
+    </button>
+    <button type="button" class="tk-status-tab" data-status="in_progress" role="tab">
+      <span data-i18n="ticketing.status.inProgress">In Progress</span>
+      <span class="tk-status-tab-count" id="tkTabCountInProgress">0</span>
+    </button>
+    <button type="button" class="tk-status-tab" data-status="waiting_approval" role="tab">
+      <span data-i18n="ticketing.status.waitingApproval">Waiting Approval</span>
+      <span class="tk-status-tab-count" id="tkTabCountWaitingApproval">0</span>
+    </button>
+    <button type="button" class="tk-status-tab" data-status="resolved" role="tab">
+      <span data-i18n="ticketing.status.resolved">Resolved</span>
+      <span class="tk-status-tab-count" id="tkTabCountResolved">0</span>
+    </button>
+    <button type="button" class="tk-status-tab" data-status="rejected" role="tab">
+      <span data-i18n="ticketing.status.rejected">Rejected</span>
+      <span class="tk-status-tab-count" id="tkTabCountRejected">0</span>
+    </button>
+  </div>
+
+  <!-- ---------- Big "New Ticket" button, di tengah tepat di atas tabel
+       (dipindah dari header, biar lebih kelihatan) ---------- -->
+  <div class="tk-open-create-bar">
+    <button type="button" class="tk-open-create-btn" id="tkOpenCreate">
+      <i class="fa-solid fa-plus"></i>
+      <span data-i18n="ticketing.newTicket">New Ticket</span>
+    </button>
+  </div>
+
+  <!-- ---------- Table ---------- -->
+  <div class="tk-table-card">
+    <div class="tk-table-scroll">
+      <table class="tk-table">
+        <thead>
+          <tr>
+            <th data-i18n="ticketing.table.id">Ticket</th>
+            <th data-i18n="ticketing.table.team">Team</th>
+            <th data-i18n="ticketing.table.type">Type</th>
+            <th data-i18n="ticketing.table.priority">Priority</th>
+            <th data-i18n="ticketing.table.status">Status</th>
+            <th data-i18n="ticketing.table.submittedBy">Submitted By</th>
+            <th data-i18n="ticketing.table.assignedTo">Assigned To</th>
+            <th data-i18n="ticketing.table.created">Created</th>
+            <th data-i18n="ticketing.table.due">Due</th>
+            <th data-i18n="ticketing.table.actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tkTableBody"></tbody>
+      </table>
+    </div>
+    <div class="tk-empty hidden" id="tkEmpty">
+      <i class="fa-solid fa-ticket"></i>
+      <p data-i18n="ticketing.emptyState">No tickets found matching your filters.</p>
+    </div>
+    <div class="tk-table-footer">
+      <span id="tkCount">Showing 0 of 0 tickets</span>
+      <!-- Custom rows-per-page -- 10/20/30/40/50 predetermined + input
+           custom manual (lihat tkPageSize di ticketing.js). -->
+      <div class="tk-pagesize">
+        <label for="tkPageSizeSelect" data-i18n="ticketing.table.rowsPerPage">Rows per page</label>
+        <select id="tkPageSizeSelect">
+          <option value="10">10</option>
+          <option value="20" selected>20</option>
+          <option value="30">30</option>
+          <option value="40">40</option>
+          <option value="50">50</option>
+          <option value="custom" data-i18n="ticketing.table.rowsPerPageCustom">Custom...</option>
+        </select>
+        <input type="number" id="tkPageSizeCustomInput" min="1" step="1" class="hidden" placeholder="e.g. 75">
+      </div>
+      <div class="tk-pagination" id="tkPagination"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     MODAL — New Ticket
+============================================================= -->
+<div class="tk-modal-overlay" id="tkCreateOverlay">
+  <div class="tk-modal">
+    <div class="tk-modal-head">
+      <h3><i class="fa-solid fa-plus"></i> <span id="tkCreateModalTitle" data-i18n="ticketing.createModal.title">Submit New Ticket</span></h3>
+      <button type="button" class="tk-modal-close" id="tkCreateCloseBtn" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="tk-modal-body">
+
+      <div class="tk-field">
+        <label for="tkFormTitle" data-i18n="ticketing.createModal.titleLabel">Title</label>
+        <input type="text" id="tkFormTitle" maxlength="120" data-i18n-placeholder="ticketing.createModal.titlePlaceholder" placeholder="Short summary of the bug/improvement">
+        <span class="tk-field-error" id="tkFormTitleError" data-i18n="ticketing.createModal.titleError">Title is required.</span>
+      </div>
+
+      <div class="tk-field-row">
+        <div class="tk-field">
+          <label for="tkFormTeam" data-i18n="ticketing.createModal.teamLabel">Team</label>
+          <select id="tkFormTeam">
+            <option value="R1" data-i18n="ticketing.team.r1">R1 - Hardware</option>
+            <option value="R2" data-i18n="ticketing.team.r2">R2 - Backend</option>
+            <option value="R3" data-i18n="ticketing.team.r3">R3 - Frontend</option>
+          </select>
+        </div>
+        <!-- Type HANYA relevan/ditampilkan untuk tim R3 (lihat spek:
+             "related page dan type dihapus jika assign ke R1/R2, tapi
+             dipertahankan kalau R3") -- toggle di tkUpdateTeamScopedFieldsUI()
+             di ticketing.js, dipanggil tiap tkFormTeam berubah. Kalau
+             disembunyikan, field TIDAK dikirim ke backend -- backend
+             otomatis fallback ke kategori "Other" (lihat resolveCategory()
+             di ticket.service.ts), yang juga otomatis membebaskan Related
+             Page dari wajib diisi. -->
+        <div class="tk-field" id="tkFormTypeField">
+          <label for="tkFormType" data-i18n="ticketing.createModal.typeLabel">Type</label>
+          <select id="tkFormType">
+            <option value="Bug" data-i18n="ticketing.type.bug">Bug</option>
+            <option value="Feature Request" data-i18n="ticketing.type.featureRequest">Feature Request</option>
+            <option value="UI/UX Feedback" data-i18n="ticketing.type.uiUxFeedback">UI/UX Feedback</option>
+            <option value="Data Issue" data-i18n="ticketing.type.dataIssue">Data Issue</option>
+            <option value="Performance Issue" data-i18n="ticketing.type.performanceIssue">Performance Issue</option>
+            <option value="Question" data-i18n="ticketing.type.question">Question</option>
+            <option value="Other" data-i18n="ticketing.type.other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="tk-field-row">
+        <div class="tk-field">
+          <label for="tkFormPriority" data-i18n="ticketing.createModal.priorityLabel">
+            Priority
+            <i class="fa-solid fa-circle-info tk-priority-info" tabindex="0"
+               data-i18n-tooltip="ticketing.createModal.priorityTooltip"
+               data-tooltip="Low: Minor visual issue. Medium: Feature impaired with workaround. High: Major feature unavailable. Critical: System outage or risk of data loss."></i>
+          </label>
+          <select id="tkFormPriority">
+            <option value="low" data-i18n="ticketing.priority.low">Low</option>
+            <option value="medium" selected data-i18n="ticketing.priority.medium">Medium</option>
+            <option value="high" data-i18n="ticketing.priority.high">High</option>
+            <option value="critical" data-i18n="ticketing.priority.critical">Critical</option>
+          </select>
+        </div>
+        <!-- Expected time -- WAJIB, dipakai backend buat due date DAN
+             basis bonus poin leaderboard (lihat awardPoints() di
+             ticket.service.ts: makin cepat dari sini, makin besar
+             bonus). Ditentukan PEMBUAT tiket saat submit, bukan lagi
+             assignee belakangan. -->
+        <div class="tk-field">
+          <label for="tkFormExpectedHours" data-i18n="ticketing.createModal.expectedHoursLabel">Expected time (hours)</label>
+          <input type="number" id="tkFormExpectedHours" min="1" step="1" data-i18n-placeholder="ticketing.createModal.expectedHoursPlaceholder" placeholder="e.g. 6">
+          <span class="tk-field-error" id="tkFormExpectedHoursError" data-i18n="ticketing.createModal.expectedHoursError">Expected time is required (whole number of hours, at least 1).</span>
+        </div>
+      </div>
+
+      <div class="tk-field" id="tkFormPageField">
+        <label for="tkFormPage" id="tkFormPageLabel" data-i18n="ticketing.createModal.pageLabel">Related Page</label>
+        <select id="tkFormPage">
+          <!-- Diisi dinamis oleh tkPopulateRelatedPageOptions() di
+               ticketing.js, dari sumber PAGE_LABELS yang sama dengan
+               sidebar + opsi "Other" di paling akhir. -->
+        </select>
+        <input type="text" id="tkFormPageOther" maxlength="80" class="hidden"
+               data-i18n-placeholder="ticketing.createModal.pageOtherPlaceholder"
+               placeholder="Type the page/feature name">
+        <span class="tk-field-error" id="tkFormPageError" data-i18n="ticketing.createModal.pageError">Related Page is required (except for Question/Other tickets).</span>
+      </div>
+
+      <div class="tk-field">
+        <label for="tkFormDesc" data-i18n="ticketing.createModal.descLabel">Description</label>
+        <textarea id="tkFormDesc" rows="4" data-i18n-placeholder="ticketing.createModal.descPlaceholder" placeholder="Describe the issue, reproduction steps, or desired outcome..."></textarea>
+        <span class="tk-field-error" id="tkFormDescError" data-i18n="ticketing.createModal.descError">Description is required.</span>
+      </div>
+
+      <!-- "Assigned to" + "Deadline" -- HANYA muncul di mode EDIT (bukan
+           Create) DAN buat admin master (root)/REMS Intern Lead saja
+           (lihat openEdit()/openCreate() di ticketing.js). Digabung di
+           form Edit yang sama biar admin/lead bisa ubah title/deskripsi/
+           task, assignee, DAN deadline sekaligus dari satu tempat --
+           bukan kepisah-pisah kayak sebelumnya (assignee/DL cuma bisa
+           diubah dari modal Detail). Kosongin dua-duanya field deadline
+           = deadline tiket TIDAK diubah (tetap seperti sebelumnya). -->
+      <div class="tk-field-row hidden" id="tkFormAssignDeadlineRow">
+        <div class="tk-field" id="tkFormAssigneeField">
+          <label data-i18n="ticketing.createModal.assignedToLabel">Assigned to</label>
+          <div class="tk-assignee-current" id="tkFormAssigneeSelectionText">Unassigned</div>
+          <div id="tkFormAssigneePicker" class="tk-assignee-picker" aria-label="Ticket assignees"></div>
+        </div>
+        <div class="tk-field" id="tkFormDeadlineField">
+          <label data-i18n="ticketing.createModal.deadlineLabel">Deadline</label>
+          <input type="number" id="tkFormEstimatedDays" min="1" step="1" data-i18n-placeholder="ticketing.createModal.deadlineDaysPlaceholder" placeholder="Estimated days from today">
+          <input type="date" id="tkFormDueDateDirect">
+          <span class="tk-field-error" id="tkFormDeadlineError" data-i18n="ticketing.createModal.deadlineError">Estimated days must be a positive whole number.</span>
+          <p class="tk-hint" data-i18n="ticketing.createModal.deadlineHint">Leave both empty to keep the current deadline unchanged. If both are filled, the exact date wins.</p>
+        </div>
+      </div>
+
+      <div class="tk-field">
+        <label for="tkFormAttachment" id="tkFormAttachmentLabel" data-i18n="ticketing.createModal.attachmentLabel">Attachments (required)</label>
+        <div class="tk-attach-row tk-attach-dropzone" id="tkCreateAttachmentDropzone">
+          <input type="file" id="tkFormAttachment" accept=".pdf,.doc,.docx,.mp4,.mov,.webm,.avi,image/*" multiple hidden>
+          <button type="button" class="tk-btn tk-btn-secondary tk-attach-btn" id="tkAttachPickBtn">
+            <i class="fa-solid fa-paperclip"></i>
+            <span data-i18n="ticketing.createModal.attachmentPick">Add files</span>
+          </button>
+          <span class="tk-attach-filename" id="tkAttachFilename" data-i18n="ticketing.createModal.attachmentNone">No file selected</span>
+          <span class="tk-attach-drop-hint">Drop or paste files here</span>
+        </div>
+        <p class="tk-attach-hint" data-i18n="ticketing.createModal.attachmentHint">PDF, Word, video, or image (max. 10 files, 25 MB each). Required for bug reports and feature requests.</p>
+        <div class="tk-attach-grid hidden" id="tkAttachPreviewWrap"></div>
+        <span class="tk-field-error" id="tkFormAttachmentError" data-i18n="ticketing.createModal.attachmentError">At least 1 file is required (max 10 files, 25MB each, PDF/Word/video/image only).</span>
+      </div>
+
+      <p class="tk-hint">
+        <i class="fa-solid fa-circle-info"></i>
+        <span data-i18n="ticketing.createModal.submitterHint">Submitted as</span>
+        <strong id="tkFormSubmitterName">—</strong>
+      </p>
+
+    </div>
+    <div class="tk-modal-foot">
+      <button type="button" class="tk-btn tk-btn-secondary" id="tkCreateCancelBtn" data-i18n="ticketing.createModal.cancel">Cancel</button>
+      <button type="button" class="tk-btn tk-btn-primary" id="tkCreateSubmitBtn">
+        <i class="fa-solid fa-paper-plane"></i>
+        <span data-i18n="ticketing.createModal.submit">Submit Ticket</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Ticket Detail (view, assign, change status, comment)
+============================================================= -->
+<div class="tk-modal-overlay" id="tkDetailOverlay">
+  <div class="tk-modal tk-modal-lg">
+    <div class="tk-modal-head">
+      <h3><i class="fa-solid fa-ticket"></i> <span id="tkDetailIdLabel">TKT-000000</span></h3>
+      <!-- Version history ala Google Docs: icon jam doang (gak ada
+           teks), toggle drawer geser dari kanan (#tkHistoryDrawer) yang
+           isinya daftar versi -- lihat tkOpenHistoryDrawer() di
+           ticketing.js. Tetap disembunyikan kalau tiket ini belum
+           pernah diedit sama sekali (log kosong). -->
+      <button type="button" class="tk-modal-head-icon-btn hidden" id="tkDetailHistoryBtn" title="Version history" aria-label="Version history">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+      </button>
+      <!-- Salin link langsung ke ticket ini (?ticket=<id>) supaya bisa
+           dikirim ke channel eksternal (WhatsApp/Slack/email) dan
+           langsung membuka modal ini kalau diklik sesama pekerja yang
+           sudah login -- lihat tkBuildTicketLink() di ticketing.js. -->
+      <button type="button" class="tk-btn tk-btn-secondary tk-modal-head-copylink" id="tkDetailCopyLinkBtn">
+        <i class="fa-solid fa-link"></i>
+        <span data-i18n="ticketing.detail.copyLink">Copy Link</span>
+      </button>
+      <!-- HANYA terlihat kalau kamu pembuat tiket ini DAN belum ada
+           yang mengambil (assignedTo masih kosong) -- lihat openDetail()
+           di ticketing.js. -->
+      <button type="button" class="tk-btn tk-btn-secondary tk-modal-head-edit hidden" id="tkDetailEditBtn">
+        <i class="fa-solid fa-pen"></i>
+        <span data-i18n="ticketing.detail.edit">Edit</span>
+      </button>
+      <button type="button" class="tk-modal-close" id="tkDetailCloseBtn" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <!-- Drawer version history -- absolute di dalam .tk-modal, geser
+         masuk dari kanan NUTUPIN tk-modal-body waktu dibuka (mirip
+         panel "Version history" Google Docs, cuma diadaptasi ke lebar
+         modal kita yang lebih sempit daripada Docs full-page). -->
+    <div class="tk-history-drawer" id="tkHistoryDrawer">
+      <div class="tk-history-drawer-head">
+        <button type="button" class="tk-history-drawer-close" id="tkHistoryDrawerCloseBtn" aria-label="Close version history">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <span data-i18n="ticketing.detail.historyTitle">Version history</span>
+      </div>
+      <div class="tk-history-drawer-list" id="tkHistoryDrawerList"></div>
+    </div>
+    <div class="tk-modal-body">
+
+      <!-- Banner "melihat versi lama" -- muncul kalau user klik salah
+           satu item BUKAN "Current version" di drawer Version history.
+           Seluruh field title/desc/badge/assignee/DL di bawah DIGANTI
+           SEMENTARA ke nilai versi itu (tkApplyEditLogSnapshot()),
+           sampai diklik "Back to latest". -->
+      <div class="tk-editlog-banner hidden" id="tkEditLogBanner">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        <span id="tkEditLogBannerText">—</span>
+        <button type="button" class="tk-pill tk-pill-muted" id="tkEditLogBackBtn" data-i18n="ticketing.detail.editLogBack">Back to latest</button>
+      </div>
+
+      <div class="tk-detail-top">
+        <h4 id="tkDetailTitle">—</h4>
+        <div class="tk-detail-badges">
+          <span class="tk-pill" id="tkDetailTeamBadge">—</span>
+          <span class="tk-pill" id="tkDetailTypeBadge">—</span>
+          <span class="tk-pill" id="tkDetailPriorityBadge">—</span>
+          <span class="tk-pill" id="tkDetailStatusBadge">—</span>
+        </div>
+      </div>
+
+      <p class="tk-detail-desc" id="tkDetailDesc">—</p>
+
+      <div class="tk-detail-attachment hidden" id="tkDetailAttachmentWrap">
+        <span class="tk-detail-meta-label" data-i18n="ticketing.detail.attachment">Attachments</span>
+        <div class="tk-attach-grid" id="tkDetailAttachmentGrid"></div>
+      </div>
+
+      <div class="tk-detail-meta">
+        <div class="tk-detail-meta-item">
+          <span class="tk-detail-meta-label" data-i18n="ticketing.detail.submittedBy">Submitted by</span>
+          <span class="tk-detail-meta-value" id="tkDetailSubmitter">—</span>
+        </div>
+        <div class="tk-detail-meta-item">
+          <span class="tk-detail-meta-label" data-i18n="ticketing.detail.relatedPage">Related page</span>
+          <span class="tk-detail-meta-value" id="tkDetailPage">—</span>
+        </div>
+        <div class="tk-detail-meta-item">
+          <span class="tk-detail-meta-label" data-i18n="ticketing.detail.created">Created</span>
+          <span class="tk-detail-meta-value" id="tkDetailCreated">—</span>
+        </div>
+        <div class="tk-detail-meta-item">
+          <span class="tk-detail-meta-label" data-i18n="ticketing.detail.updated">Last updated</span>
+          <span class="tk-detail-meta-value" id="tkDetailUpdated">—</span>
+        </div>
+        <div class="tk-detail-meta-item" id="tkDetailDueDateWrap">
+          <span class="tk-detail-meta-label" data-i18n="ticketing.detail.dueDate">Estimated completion</span>
+          <span class="tk-detail-meta-value" id="tkDetailDueDate">—</span>
+        </div>
+        <!-- Expected time (jam) -- diisi PEMBUAT tiket saat submit
+             (menggantikan alur lama assignee set DL belakangan). -->
+        <div class="tk-detail-meta-item">
+          <span class="tk-detail-meta-label" data-i18n="ticketing.detail.expectedHours">Expected time</span>
+          <span class="tk-detail-meta-value" id="tkDetailExpectedHours">—</span>
+        </div>
+        <!-- Timer pengerjaan -- akumulasi total_worked_seconds dari
+             backend + live-ticking kalau sedang berjalan (lihat
+             tkStartTimerTick()/tkStopTimerTick() di ticketing.js). -->
+        <div class="tk-detail-meta-item">
+          <span class="tk-detail-meta-label" data-i18n="ticketing.detail.workedTime">Time worked</span>
+          <span class="tk-detail-meta-value" id="tkDetailWorkedTime">—</span>
+        </div>
+        <!-- Ringkasan edit TERAKHIR aja (bukan daftar histori penuh --
+             histori lengkap semua aksi tiket termasuk approve/reject/
+             delete/dll sudah bisa dilihat di halaman Activity Log).
+             Diisi dari GET /tickets/:id/edit-logs (log paling baru,
+             lihat tkLoadTicketLastEdited() di ticketing.js), field ini
+             cuma nongol kalau tiket ini PERNAH diedit (reassign/DL/field
+             dasar) -- kalau belum pernah, tetap "—". -->
+        <div class="tk-detail-meta-item">
+          <span class="tk-detail-meta-label" data-i18n="ticketing.detail.lastEdited">Last edited</span>
+          <span class="tk-detail-meta-value" id="tkDetailLastEdited">—</span>
+        </div>
+      </div>
+
+      <!-- Proof of Completion (read-only) -- kalau tiket ini PERNAH ada
+           submission proof (termasuk yang abis di-reject), ditaruh DI
+           SINI, DI ATAS section Status -- independen dari status pill
+           yang lagi dipilih (cuma bergantung ke hasResolution, BUKAN
+           isEnteringWaitingApproval lagi), lihat
+           tkRefreshResolutionSectionVisibility() di ticketing.js.
+           (Divider di dalam card ini udah dihapus -- card ini sendiri
+           udah punya border/background sendiri jadi garis tambahan di
+           atasnya cuma bikin dobel. Jarak ke card meta di atasnya diatur
+           lewat margin-top di .tk-resolution-card.is-view, css.) -->
+      <div id="tkResolutionViewWrap" class="hidden tk-resolution-card is-view">
+        <h5 data-i18n="ticketing.detail.resolutionViewTitle"><i class="fa-solid fa-circle-check"></i> Proof of Completion</h5>
+        <p class="tk-detail-desc" id="tkResolutionNoteView">—</p>
+        <div class="tk-detail-attachment" id="tkResolutionAttachmentWrap">
+          <span class="tk-detail-meta-label" data-i18n="ticketing.detail.resolutionAttachment">Evidence files</span>
+          <div class="tk-attach-grid" id="tkResolutionAttachmentGrid"></div>
+        </div>
+      </div>
+
+      <!-- Divider ini SEKARANG conditional -- ikut hidden bareng baris
+           Assigned to/Status (lihat toggle #tkAssignStatusDivider di
+           ticketing.js openDetail()), supaya pas tiket Open (baris itu
+           disembunyikan total) tidak nyisa garis pembatas nganggur pas
+           di atas tombol "Assign to me". -->
+      <div class="tk-divider" id="tkAssignStatusDivider"></div>
+
+      <div class="tk-field-row">
+        <!-- "Assigned to" -- HANYA admin master (root) atau REMS Intern
+             Lead yang lihat field ini sama sekali (lihat toggle
+             showAssignedToField di ticketing.js openDetail()). Selain itu
+             (assignee biasa/orang lain) field ini disembunyikan total,
+             bukan cuma di-disable. -->
+        <div class="tk-field" id="tkAssignedToField">
+          <label data-i18n="ticketing.detail.assignedTo">Assigned to</label>
+          <div class="tk-assignee-current" id="tkDetailAssigneeSelectionText">Unassigned</div>
+          <select id="tkDetailAssignee" class="hidden" multiple size="5" tabindex="-1" aria-hidden="true"></select>
+          <div id="tkDetailAssigneePicker" class="tk-assignee-picker" aria-label="Ticket assignees"></div>
+          <p class="tk-hint" id="tkDetailAssigneeHint">Admins and Leads can assign multiple team members. Other members can self-assign.</p>
+        </div>
+        <!-- "Status" -- HANYA assignee tiket ini (yang sedang megang/
+             ngerjain) atau REMS Intern Lead yang lihat field ini (lihat
+             toggle showStatusField di ticketing.js openDetail()). Admin
+             master TIDAK lihat field ini sama sekali -- dia cuma ngurus
+             "Assigned to" di sebelah kiri. Pilihan statusnya sendiri
+             sekarang berupa pill/tombol (tkDetailStatusPicker), bukan
+             <select> polos -- <select id="tkDetailStatus"> aslinya
+             disembunyikan, tetap jadi satu-satunya sumber kebenaran
+             value/disabled per opsi (dibaca/diisi dari ticketing.js). -->
+        <div class="tk-field" id="tkStatusField">
+          <label data-i18n="ticketing.detail.status">Status</label>
+          <select id="tkDetailStatus" class="hidden" tabindex="-1" aria-hidden="true">
+            <option value="in_progress" data-i18n="ticketing.status.inProgress">In Progress</option>
+            <option value="waiting_approval" data-i18n="ticketing.status.waitingApproval">Waiting Approval</option>
+          </select>
+          <!-- "Resolved"/"Rejected" TIDAK ADA di sini sama sekali --
+               backend menolak PATCH status langsung ke situ (lihat
+               ticket.service.ts). Dua status itu HANYA lewat tombol
+               Approve/Reject di bawah (root/REMS Intern Lead saja). -->
+          <div id="tkDetailStatusPicker" class="tk-status-picker" role="radiogroup" aria-label="Ticket status"></div>
+          <p class="tk-hint" data-i18n="ticketing.detail.waitingApprovalHint">Submit for review once complete. An admin or lead will review and verify the changes.</p>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           Bukti pengerjaan (proof-of-work) -- form INPUT ini sekarang
+           HANYA muncul kalau status pill "Waiting Approval" lagi
+           dipilih (isEnteringWaitingApproval) DAN kamu boleh submit
+           (assignee efektif/root) -- sebelumnya form ini ikut nongol
+           begitu timer di-start walau status pill masih "In Progress",
+           bikin bingung (kesannya udah "tersimpan" padahal status belum
+           pindah ke Waiting Approval sampai pill-nya beneran diklik).
+           Tampilan read-only submission SEBELUMNYA (kalau ada) sudah
+           dipisah ke #tkResolutionViewWrap DI ATAS section Status --
+           lihat tkRefreshResolutionSectionVisibility() di ticketing.js.
+      ============================================================= -->
+      <div id="tkResolutionSection" class="hidden">
+        <div class="tk-divider"></div>
+
+        <div id="tkResolutionInputWrap" class="tk-resolution-card is-input">
+          <h5 data-i18n="ticketing.detail.resolutionInputTitle"><i class="fa-solid fa-clipboard-check"></i> Proof of Completion</h5>
+          <p class="tk-hint">
+            <i class="fa-solid fa-circle-info"></i>
+            <span data-i18n="ticketing.detail.resolutionInputHint">Outline the solution and attach proof of completion before requesting approval.</span>
+          </p>
+          <div class="tk-field">
+            <label for="tkResolutionNoteInput" data-i18n="ticketing.detail.resolutionNoteLabel">Description of work done</label>
+            <textarea id="tkResolutionNoteInput" rows="3" data-i18n-placeholder="ticketing.detail.resolutionNotePlaceholder" placeholder="Summarize the changes made or fix applied..."></textarea>
+            <span class="tk-field-error" id="tkResolutionNoteError" data-i18n="ticketing.detail.resolutionNoteError">Description is required before marking this ticket as Waiting Approval.</span>
+          </div>
+          <div class="tk-field">
+            <label for="tkResolutionFileInput" id="tkResolutionFileLabel" data-i18n="ticketing.detail.resolutionAttachmentLabel">Evidence files (required)</label>
+            <div class="tk-attach-row tk-attach-dropzone" id="tkResolutionAttachmentDropzone">
+              <input type="file" id="tkResolutionFileInput" accept=".pdf,.doc,.docx,.mp4,.mov,.webm,.avi,image/*" multiple hidden>
+              <button type="button" class="tk-btn tk-btn-secondary tk-attach-btn" id="tkResolutionFilePickBtn">
+                <i class="fa-solid fa-paperclip"></i>
+                <span data-i18n="ticketing.createModal.attachmentPick">Add files</span>
+              </button>
+              <span class="tk-attach-filename" id="tkResolutionFilename" data-i18n="ticketing.createModal.attachmentNone">No file selected</span>
+              <span class="tk-attach-drop-hint">Drop or paste files here</span>
+            </div>
+            <p class="tk-attach-hint" data-i18n="ticketing.detail.resolutionAttachmentHint">PDF, Word, video, or image (max. 10 files, 25 MB each). At least 1 file is required.</p>
+            <div class="tk-attach-grid hidden" id="tkResolutionPreviewWrap"></div>
+            <span class="tk-field-error" id="tkResolutionFileError" data-i18n="ticketing.detail.resolutionAttachmentError">At least 1 file is required (max 10 files, 25MB each, PDF/Word/video/image only).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action buttons -- semua action utama berada dalam SATU baris.
+           Untuk tiket Open: Assign to me | Reject Ticket.
+           Untuk tiket In Progress (assignee): Mulai Mengerjakan | Save Changes | Reject Ticket.
+           Untuk Waiting Approval (approver): Approve & Resolve | Reject Submission.
+           Masing-masing tombol tetap diatur visibility/otorisasinya oleh JS + backend. -->
+      <div class="tk-detail-actions-row hidden" id="tkPrimaryActionsRow">
+        <button type="button" class="tk-btn tk-btn-secondary hidden" id="tkClaimBtn">
+          <i class="fa-solid fa-hand"></i>
+          <span data-i18n="ticketing.detail.claim">Assign to me</span>
+        </button>
+        <button type="button" class="tk-btn tk-btn-secondary hidden" id="tkStartTimerBtn">
+          <i class="fa-solid fa-play"></i>
+          <span data-i18n="ticketing.detail.startTimer">Start Working</span>
+        </button>
+        <button type="button" class="tk-btn tk-btn-primary hidden" id="tkSaveDetailBtn">
+          <i class="fa-solid fa-floppy-disk"></i>
+          <span data-i18n="ticketing.detail.save">Save Changes</span>
+        </button>
+        <button type="button" class="tk-btn tk-btn-danger hidden" id="tkDetailRejectBtn">
+          <i class="fa-solid fa-ban"></i>
+          <span data-i18n="ticketing.detail.reject">Reject Ticket</span>
+        </button>
+        <button type="button" class="tk-btn tk-btn-success hidden" id="tkDetailApproveBtn">
+          <i class="fa-solid fa-check-double"></i>
+          <span data-i18n="ticketing.detail.approve">Approve &amp; Resolve</span>
+        </button>
+      </div>
+
+      <!-- Panel kolaborator -- muncul begitu "Assign to me" diklik pada
+           tiket Open (BELUM langsung claim). User pilih 0+ rekan satu
+           tim buat ikut mengerjakan, baru "Confirm Claim" benar-benar
+           memanggil POST /tickets/:id/claim. Lihat tkOpenClaimPanel()/
+           tkConfirmClaimBtn di ticketing.js. -->
+      <div class="tk-claim-panel hidden" id="tkClaimPanel">
+        <h5 data-i18n="ticketing.detail.claimPanelTitle">Claim Ticket</h5>
+        <p class="tk-hint">
+          <i class="fa-solid fa-circle-info"></i>
+          <span data-i18n="ticketing.detail.claimPanelHint">Optional: select teammates who will collaborate on this ticket.</span>
+        </p>
+        <div id="tkClaimCollabPicker" class="tk-assignee-picker" aria-label="Collaborators"></div>
+        <div class="tk-detail-actions-row">
+          <button type="button" class="tk-btn tk-btn-secondary" id="tkClaimCancelBtn" data-i18n="ticketing.detail.claimCancel">Cancel</button>
+          <button type="button" class="tk-btn tk-btn-primary" id="tkClaimConfirmBtn">
+            <i class="fa-solid fa-hand"></i>
+            <span data-i18n="ticketing.detail.claimConfirm">Confirm Claim</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="tk-divider"></div>
+
+      <!-- Override DL manual -- HANYA admin master (root). Due date
+           normalnya sudah otomatis dihitung dari Expected Time yang
+           diisi pembuat tiket saat submit; ini cuma jalur darurat kalau
+           admin perlu koreksi manual. -->
+      <div id="tkDueDateSection" class="hidden">
+        <h5 data-i18n="ticketing.detail.dueDateSection">Adjust Completion Deadline</h5>
+        <p class="tk-hint">
+          <i class="fa-solid fa-circle-info"></i>
+          <span data-i18n="ticketing.detail.dueDateHint">Admin only. By default, the deadline is calculated automatically from the expected hours.</span>
+        </p>
+        <div class="tk-field-row">
+          <div class="tk-field">
+            <label for="tkDueDateEstimatedDays" data-i18n="ticketing.detail.dueDateEstimatedDaysLabel">Estimated days from today</label>
+            <input type="number" id="tkDueDateEstimatedDays" min="1" step="1" data-i18n-placeholder="ticketing.createModal.estimatedDaysPlaceholder" placeholder="Number of days">
+          </div>
+          <div class="tk-field">
+            <label for="tkDueDateDirect" data-i18n="ticketing.detail.dueDateDirectLabel">Or pick an exact date</label>
+            <input type="date" id="tkDueDateDirect">
+          </div>
+        </div>
+        <div class="tk-detail-actions-row">
+          <button type="button" class="tk-btn tk-btn-secondary" id="tkDueDateClearBtn" data-i18n="ticketing.detail.dueDateClear">Clear DL</button>
+          <button type="button" class="tk-btn tk-btn-primary" id="tkDueDateSaveBtn">
+            <i class="fa-solid fa-calendar-check"></i>
+            <span data-i18n="ticketing.detail.dueDateSave">Save DL</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Divider ini juga conditional -- ikut hidden bareng
+           tkDueDateSection di atas (lihat toggle #tkDueDateDivider di
+           ticketing.js openDetail()). Kalau dueDateSection disembunyikan
+           (bukan admin master), divider ini juga ikut hilang -- jadi
+           cuma nyisa SATU pembatas (yang di atas tkDueDateSection) di
+           antara tombol aksi dan Comments, bukan dobel. -->
+      <div class="tk-divider" id="tkDueDateDivider"></div>
+      <div class="tk-comments">
+        <div class="tk-comments-header">
+          <h5 data-i18n="ticketing.detail.comments">Comments</h5>
+          <span class="tk-comments-count" id="tkCommentsCount">0</span>
+        </div>
+        <div class="tk-comments-list" id="tkCommentsList"></div>
+        <div class="tk-comment-form">
+          <div class="tk-comment-input-wrap">
+            <textarea id="tkCommentInput" rows="2" data-i18n-placeholder="ticketing.detail.commentPlaceholder" placeholder="Add a comment or work update..."></textarea>
+            <div class="tk-comment-form-actions">
+              <button type="button" class="tk-btn tk-btn-primary tk-comment-submit-btn" id="tkCommentSubmitBtn">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span data-i18n="ticketing.detail.commentSubmit">Comment</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tk-divider"></div>
+
+      <button type="button" class="tk-delete-link" id="tkDeleteTicketBtn">
+        <i class="fa-solid fa-trash-can"></i>
+        <span data-i18n="ticketing.detail.delete">Delete this ticket</span>
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<!-- ---------- Delete confirmation ---------- -->
+<div class="tk-modal-overlay" id="tkDeleteOverlay">
+  <div class="tk-modal tk-modal-alert">
+    <button type="button" class="tk-alert-close" id="tkDeleteCancelX" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="tk-alert-body">
+      <span class="tk-alert-icon is-danger-solid"><i class="fa-solid fa-trash-can"></i></span>
+      <h2 class="tk-alert-title" data-i18n="ticketing.deleteModal.title">Delete Ticket</h2>
+      <p class="tk-alert-text" data-i18n="ticketing.deleteModal.text">This ticket, its attachments, and all comments will be permanently deleted. This action cannot be undone.</p>
+      <div class="tk-alert-actions">
+        <button type="button" class="tk-pill tk-pill-muted" id="tkDeleteCancelBtn" data-i18n="ticketing.deleteModal.cancel">Cancel</button>
+        <button type="button" class="tk-pill tk-pill-danger" id="tkDeleteConfirmBtn" data-i18n="ticketing.deleteModal.confirm">Delete Permanently</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ---------- Generic confirmation popup (Reject Ticket, Reject
+     Submission, Assign to me/Claim, Save Changes/Submit, Approve &
+     Resolve, dst) -- SATU modal dipakai ulang untuk beberapa aksi,
+     isinya (ikon/judul/teks/label tombol) diisi dinamis lewat
+     tkConfirm() di ticketing.js sebelum overlay dibuka. Beda dari
+     tkDeleteOverlay (khusus delete, teksnya statis). ---------- -->
+<div class="tk-modal-overlay" id="tkConfirmOverlay">
+  <div class="tk-modal tk-modal-alert">
+    <button type="button" class="tk-alert-close" id="tkConfirmCancelX" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="tk-alert-body">
+      <span class="tk-alert-icon is-danger-solid" id="tkConfirmIcon"><i class="fa-solid fa-circle-question"></i></span>
+      <h2 class="tk-alert-title" id="tkConfirmTitle">Are you sure?</h2>
+      <p class="tk-alert-text" id="tkConfirmText">Please confirm this action.</p>
+      <div class="tk-alert-actions">
+        <button type="button" class="tk-pill tk-pill-muted" id="tkConfirmCancelBtn">Cancel</button>
+        <button type="button" class="tk-pill tk-pill-danger" id="tkConfirmActionBtn">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ---------- Attachment image lightbox -- dipakai untuk semua
+     thumbnail foto attachment (New Ticket preview, Edit mode, Detail
+     view, Resolution proof) supaya klik foto buka popup di tempat,
+     BUKAN pindah tab baru. Klik area gelap di luar foto atau tombol X
+     sama-sama menutup popup ini -- lihat tkOpenImageLightbox() /
+     tkCloseImageLightbox() di ticketing.js. ---------- -->
+<div class="tk-lightbox-overlay" id="tkImageLightboxOverlay">
+  <button type="button" class="tk-lightbox-close" id="tkImageLightboxCloseBtn" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+  <img class="tk-lightbox-img" id="tkImageLightboxImg" src="" alt="">
+</div>
+
+<!-- Toast (save / success feedback) -->
+<div class="tk-toast" id="tkToast" role="status" aria-live="polite">
+  <i class="fa-solid fa-circle-check"></i>
+  <span id="tkToastMsg">Saved</span>
+</div>

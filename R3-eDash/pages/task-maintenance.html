@@ -1,0 +1,311 @@
+<!-- ============================================================
+     Page: Task Maintenance — 360eDash
+     Halaman untuk viewer/staff: melihat daftar task maintenance
+     yang ditugaskan oleh admin/operator (dibuat lewat Project
+     Monitoring > Task Management), menerima task, memperbarui
+     progress pekerjaan, dan mengirim laporan hasil (foto + deskripsi)
+     saat task selesai.
+
+     3 status: Pending -> Accepted -> Completed.
+     Sumber data: window.__siSystems (sama dengan System Information
+     & Task Management) supaya konsisten di seluruh dashboard.
+============================================================= -->
+<div class="si tkm" id="tkmRoot">
+
+  <div class="si-page-head">
+    <div>
+      <h1 data-i18n="sidebar.nav.taskMaintenance">Pemeliharaan Tugas</h1>
+      <p data-i18n="taskMaintenance.subtitle">Daftar tugas maintenance yang ditugaskan kepada Anda. Terima tugas, perbarui progres pekerjaan, lalu kirim laporan hasil saat sudah selesai.</p>
+    </div>
+  </div>
+
+  <!-- ---------- Stats ---------- -->
+  <div class="si-stats-row tkm-stats-row" id="tkmStatsRow"></div>
+
+  <!-- ---------- Status tabs ---------- -->
+  <nav class="tm-subtabs" id="tkmSubtabs">
+    <button class="tm-subtab is-active" type="button" data-status="pending">
+      <span class="tm-subtab-icon"><i class="fa-solid fa-inbox"></i></span>
+      <span>Pending</span>
+      <span class="tkm-tab-count" id="tkmCountPending">0</span>
+    </button>
+    <button class="tm-subtab" type="button" data-status="accepted">
+      <span class="tm-subtab-icon"><i class="fa-solid fa-person-digging"></i></span>
+      <span>Sedang Dikerjakan</span>
+      <span class="tkm-tab-count" id="tkmCountAccepted">0</span>
+    </button>
+    <button class="tm-subtab" type="button" data-status="completed">
+      <span class="tm-subtab-icon"><i class="fa-solid fa-circle-check"></i></span>
+      <span>Selesai</span>
+      <span class="tkm-tab-count" id="tkmCountCompleted">0</span>
+    </button>
+  </nav>
+
+  <!-- ---------- Toolbar ---------- -->
+  <div class="si-list-toolbar">
+    <div class="si-filter-group">
+      <span class="si-filter-label">Unit</span>
+      <select class="si-filter-select" id="tkmUnitFilter">
+        <option value="all">Semua Unit</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ---------- PANEL: Pending ---------- -->
+  <div class="tm-subpanel is-active" id="tkmPanel-pending" data-panel="pending">
+    <div class="tkm-task-list" id="tkmPendingList"></div>
+    <div class="si-pagination" id="tkmPendingPagination"></div>
+  </div>
+
+  <!-- ---------- PANEL: Accepted ---------- -->
+  <div class="tm-subpanel" id="tkmPanel-accepted" data-panel="accepted">
+    <div class="tkm-task-list" id="tkmAcceptedList"></div>
+    <div class="si-pagination" id="tkmAcceptedPagination"></div>
+  </div>
+
+  <!-- ---------- PANEL: Completed ---------- -->
+  <div class="tm-subpanel" id="tkmPanel-completed" data-panel="completed">
+    <div class="tkm-task-list" id="tkmCompletedList"></div>
+    <div class="si-pagination" id="tkmCompletedPagination"></div>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     MODAL — Task Detail (read-only, tombol aksi menyesuaikan status)
+============================================================= -->
+<div class="si-modal-overlay" id="tkmDetailOverlay">
+  <div class="si-modal si-modal-sm">
+    <div class="si-modal-head">
+      <div>
+        <h2>Detail Tugas Maintenance</h2>
+        <p>Informasi lengkap tugas yang ditugaskan kepada Anda.</p>
+      </div>
+      <button class="si-modal-close" id="tkmDetailCloseBtn" type="button" aria-label="Tutup">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="si-modal-body">
+      <div class="si-detail-modal-top">
+        <div class="si-maint-icon si-maint-icon-lg" id="tkmDetailIcon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        <div style="min-width:0;">
+          <h3 id="tkmDetailTitle" class="si-detail-modal-title">—</h3>
+          <div id="tkmDetailTags" class="si-maint-tags"></div>
+        </div>
+      </div>
+      <dl class="si-dl si-detail-modal-dl" id="tkmDetailDl"></dl>
+      <div class="si-detail-modal-block" id="tkmDetailDescWrap">
+        <b>Deskripsi Pekerjaan</b>
+        <p id="tkmDetailDesc">—</p>
+      </div>
+      <div class="si-detail-modal-block" id="tkmDetailNotesWrap">
+        <b>Catatan dari Admin</b>
+        <p id="tkmDetailNotes">—</p>
+      </div>
+      <div class="si-detail-modal-block" id="tkmDetailProgressWrap">
+        <b>Progress Pekerjaan</b>
+        <div class="tkm-progress-wrap">
+          <div class="tkm-progress-label"><span id="tkmDetailProgressNote">Belum ada catatan progres.</span><span id="tkmDetailProgressPct">0%</span></div>
+          <div class="tkm-progress"><div class="tkm-progress-fill" id="tkmDetailProgressFill" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="si-detail-modal-block" id="tkmDetailReportWrap">
+        <b>Laporan Hasil Pekerjaan</b>
+        <p id="tkmDetailReportDesc">—</p>
+      </div>
+      <div class="si-detail-modal-block" id="tkmDetailPhotosWrap">
+        <b>Foto Dokumentasi</b>
+        <div class="tm-detail-photo-grid" id="tkmDetailPhotos"></div>
+      </div>
+      <div class="si-detail-modal-block" id="tkmDetailItemsWrap">
+        <b>Items Purchased</b>
+        <p id="tkmDetailItems">—</p>
+      </div>
+      <div class="si-detail-modal-block" id="tkmDetailCostWrap">
+        <b>Cost</b>
+        <div id="tkmDetailCost"></div>
+      </div>
+    </div>
+    <div class="si-modal-foot">
+      <div></div>
+      <div class="si-modal-foot-right">
+        <button class="si-btn si-btn-secondary" id="tkmDetailCloseBtn2" type="button">Tutup</button>
+        <button class="si-btn si-btn-secondary" id="tkmDetailProgressBtn" type="button">
+          <i class="fa-solid fa-gauge-high"></i> Update Progress
+        </button>
+        <button class="si-btn si-btn-primary" id="tkmDetailAcceptBtn" type="button">
+          <i class="fa-solid fa-check"></i> Terima Tugas
+        </button>
+        <button class="si-btn si-btn-primary" id="tkmDetailSubmitBtn" type="button">
+          <i class="fa-solid fa-paper-plane"></i> Submit Selesai
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Konfirmasi Terima Tugas
+============================================================= -->
+<div class="si-modal-overlay" id="tkmAcceptOverlay">
+  <div class="si-modal si-modal-xs">
+    <div class="si-modal-head">
+      <div>
+        <h2>Terima Tugas Maintenance</h2>
+        <p>Konfirmasi bahwa Anda akan mengerjakan tugas ini.</p>
+      </div>
+      <button class="si-modal-close" id="tkmAcceptCloseBtn" type="button" aria-label="Tutup">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="si-modal-body">
+      <div class="tkm-confirm-box">
+        <div class="tkm-confirm-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        <div>
+          <div class="tkm-confirm-title" id="tkmAcceptTaskTitle">—</div>
+          <div class="tkm-confirm-sub" id="tkmAcceptTaskUnit">—</div>
+        </div>
+      </div>
+      <p class="tkm-confirm-note">Setelah diterima, tugas ini akan pindah ke tab <b>Sedang Dikerjakan</b> dan Anda bisa mulai memperbarui progres pekerjaan.</p>
+    </div>
+    <div class="si-modal-foot">
+      <button class="si-btn si-btn-ghost" id="tkmAcceptCancelBtn" type="button">Batal</button>
+      <div class="si-modal-foot-right">
+        <button class="si-btn si-btn-primary" id="tkmAcceptConfirmBtn" type="button">
+          <i class="fa-solid fa-check"></i> Ya, Terima Tugas
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Update Progress
+============================================================= -->
+<div class="si-modal-overlay" id="tkmProgressOverlay">
+  <div class="si-modal si-modal-xs">
+    <div class="si-modal-head">
+      <div>
+        <h2>Update Progress</h2>
+        <p>Perbarui persentase pekerjaan yang sudah diselesaikan.</p>
+      </div>
+      <button class="si-modal-close" id="tkmProgressCloseBtn" type="button" aria-label="Tutup">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="si-modal-body">
+      <div class="tkm-confirm-box tkm-confirm-box-sm">
+        <div class="tkm-confirm-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        <div>
+          <div class="tkm-confirm-title" id="tkmProgressTaskTitle">—</div>
+          <div class="tkm-confirm-sub" id="tkmProgressTaskUnit">—</div>
+        </div>
+      </div>
+      <form id="tkmProgressForm" novalidate>
+        <div class="si-field">
+          <label>Progress Pekerjaan<span class="si-req">*</span></label>
+          <div class="tkm-range-row">
+            <input type="range" id="tkmProgressRange" min="0" max="100" step="5" value="0">
+            <span class="tkm-range-readout" id="tkmProgressReadout">0%</span>
+          </div>
+          <div class="tkm-progress" style="margin-top:2px;"><div class="tkm-progress-fill" id="tkmProgressPreviewFill" style="width:0%"></div></div>
+        </div>
+        <div class="tkm-quick-row">
+          <button type="button" class="tkm-quick-btn" data-value="25">25%</button>
+          <button type="button" class="tkm-quick-btn" data-value="50">50%</button>
+          <button type="button" class="tkm-quick-btn" data-value="75">75%</button>
+          <button type="button" class="tkm-quick-btn" data-value="90">90%</button>
+        </div>
+        <div class="si-field" style="margin-top:16px;">
+          <label>Catatan Progress (opsional)</label>
+          <textarea name="progressNote" id="tkmProgressNote" placeholder="Ceritakan progres pekerjaan saat ini..."></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="si-modal-foot">
+      <button class="si-btn si-btn-ghost" id="tkmProgressCancelBtn" type="button">Batal</button>
+      <div class="si-modal-foot-right">
+        <button class="si-btn si-btn-primary" id="tkmProgressSaveBtn" type="button">
+          <i class="fa-solid fa-floppy-disk"></i> Simpan Progress
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Submit Hasil Maintenance (penyelesaian task)
+============================================================= -->
+<div class="si-modal-overlay" id="tkmSubmitOverlay">
+  <div class="si-modal si-modal-sm">
+    <div class="si-modal-head">
+      <div>
+        <h2>Submit Hasil Maintenance</h2>
+        <p>Lengkapi laporan hasil pekerjaan untuk menyelesaikan tugas ini.</p>
+      </div>
+      <button class="si-modal-close" id="tkmSubmitCloseBtn" type="button" aria-label="Tutup">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="si-modal-body">
+      <div class="tkm-confirm-box tkm-confirm-box-sm">
+        <div class="tkm-confirm-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        <div>
+          <div class="tkm-confirm-title" id="tkmSubmitTaskTitle">—</div>
+          <div class="tkm-confirm-sub" id="tkmSubmitTaskUnit">—</div>
+        </div>
+      </div>
+      <form id="tkmSubmitForm" novalidate>
+        <div class="si-form-grid si-form-grid-1">
+          <div class="si-field">
+            <label>Deskripsi Hasil Pekerjaan<span class="si-req">*</span></label>
+            <textarea name="resultDescription" id="tkmSubmitDesc" placeholder="Jelaskan pekerjaan yang telah dilakukan, kondisi akhir unit, dsb."></textarea>
+            <span class="si-field-error">Deskripsi hasil pekerjaan wajib diisi.</span>
+          </div>
+          <div class="si-field">
+            <label>Foto Dokumentasi<span class="si-req">*</span></label>
+            <div class="tm-photo-upload" id="tkmPhotoUpload">
+              <button type="button" class="tm-photo-add-btn" id="tkmPhotoAddBtn">
+                <i class="fa-solid fa-camera"></i>
+                <span>Tambah Foto</span>
+              </button>
+            </div>
+            <input type="file" id="tkmPhotoInput" accept="image/*" multiple hidden>
+            <span class="si-field-hint">Unggah minimal 1 foto sebagai bukti hasil pekerjaan.</span>
+            <span class="si-field-error" id="tkmPhotoError">Minimal 1 foto dokumentasi wajib diunggah.</span>
+          </div>
+          <div class="si-field">
+            <label>Items Purchased (opsional)</label>
+            <textarea name="itemsPurchased" id="tkmSubmitItems" placeholder="Contoh: 2x MC4 Connector, 1x Kabel NYAF 4mm, 1x Fuse 10A"></textarea>
+          </div>
+        </div>
+      </form>
+      <div class="tkm-submit-info">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>Progress akan otomatis menjadi <b>100%</b> dan tugas berpindah ke tab <b>Selesai</b> setelah laporan dikirim.</span>
+      </div>
+    </div>
+    <div class="si-modal-foot">
+      <button class="si-btn si-btn-ghost" id="tkmSubmitCancelBtn" type="button">Batal</button>
+      <div class="si-modal-foot-right">
+        <button class="si-btn si-btn-primary" id="tkmSubmitSaveBtn" type="button">
+          <i class="fa-solid fa-paper-plane"></i> Kirim Laporan
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="si-toast" id="tkmToast">
+  <i class="fa-solid fa-circle-check"></i>
+  <span id="tkmToastMsg">Saved.</span>
+</div>
+
+<!-- Lightbox — lihat foto dokumentasi ukuran penuh -->
+<div class="tm-lightbox-overlay" id="tkmLightboxOverlay">
+  <button class="tm-lightbox-close" id="tkmLightboxCloseBtn" type="button" aria-label="Tutup">
+    <i class="fa-solid fa-xmark"></i>
+  </button>
+  <img id="tkmLightboxImg" src="" alt="Foto dokumentasi">
+</div>

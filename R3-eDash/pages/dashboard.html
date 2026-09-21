@@ -1,0 +1,165 @@
+<!-- ============================================================
+     Page: Dashboard — 360eDash
+     Fragment loaded into #page-root for the default Dashboard
+     route (pages/dashboard.html).
+============================================================= -->
+<div class="po-page">
+
+  <div class="po-head">
+    <div class="po-head-text">
+      <h1 class="po-title">Dashboard</h1>
+      <p class="po-subtitle">Monitor solar project status and performance.</p>
+    </div>
+    <button type="button" class="po-refresh-btn" id="poRefreshBtn" title="Refresh data">
+      <i class="fa-solid fa-rotate-right"></i>
+      <span>Refresh</span>
+    </button>
+  </div>
+
+  <!-- Row 1: Map overview + Category legend -->
+  <div class="po-row po-row-top">
+
+    <div class="po-card po-map-card">
+      <div id="poMap" class="po-map"></div>
+      <div class="po-map-fade"></div>
+
+      <div class="po-map-stat">
+        <div class="po-map-stat-value" id="poMapCount">0</div>
+        <div class="po-map-stat-label">Projects</div>
+        <div class="po-map-stat-metrics">
+          <div class="po-map-stat-metric">
+            <i class="fa-solid fa-bolt"></i>
+            <span><b id="poMapMWh">0</b> MWh Generated</span>
+          </div>
+          <div class="po-map-stat-metric">
+            <i class="fa-solid fa-solar-panel"></i>
+            <span><b id="poMapMWp">0</b> MWp Installed</span>
+          </div>
+          <div class="po-map-stat-metric">
+            <i class="fa-solid fa-leaf"></i>
+            <span><b id="poMapCO2">0</b> Ton CO2 Avoided</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="po-card po-legend-card">
+
+      <!-- Project Summary (disamakan dengan Project Selector: All Projects / Online / Offline / Active Alerts) -->
+      <div class="po-summary">
+        <div class="po-summary-item">
+          <span class="po-summary-icon po-summary-icon-all"><i class="fa-solid fa-layer-group"></i></span>
+          <span class="po-summary-value" id="poSummaryAll">0</span>
+          <span class="po-summary-label">All Projects</span>
+        </div>
+        <div class="po-summary-item">
+          <span class="po-summary-icon po-summary-icon-online"><i class="fa-solid fa-circle-check"></i></span>
+          <span class="po-summary-value" id="poSummaryOnline">0</span>
+          <span class="po-summary-label">Online</span>
+        </div>
+        <div class="po-summary-item">
+          <span class="po-summary-icon po-summary-icon-offline"><i class="fa-solid fa-circle-xmark"></i></span>
+          <span class="po-summary-value" id="poSummaryOffline">0</span>
+          <span class="po-summary-label">Offline</span>
+        </div>
+        <div class="po-summary-item">
+          <span class="po-summary-icon po-summary-icon-alerts"><i class="fa-solid fa-triangle-exclamation"></i></span>
+          <span class="po-summary-value" id="poSummaryAlerts">0</span>
+          <span class="po-summary-label">Active Alerts</span>
+        </div>
+      </div>
+
+      <div class="po-legend-title-row">
+        <div class="po-legend-title">Category</div>
+        <label class="po-legend-show-all">
+          <input type="checkbox" id="poShowAllCategories">
+          <span>Show all</span>
+        </label>
+      </div>
+      <div class="po-legend-list" id="poLegendList"></div>
+    </div>
+
+  </div>
+
+  <!-- Row 2: Today + Weekly Analysis -->
+  <div class="po-row po-row-charts">
+
+    <div class="po-card po-today-card">
+      <div class="po-card-head">
+        <div>
+          <div class="po-card-eyebrow">Today</div>
+          <div class="po-card-value" id="poTodayValue">0<span>MWh</span></div>
+          <div class="po-card-target" id="poTodayTarget"></div>
+        </div>
+        <div class="po-chart-legend">
+          <span class="po-chart-legend-item"><span class="po-legend-dash is-projected"></span>Projected</span>
+          <span class="po-chart-legend-item"><span class="po-legend-dash is-realized"></span>Realized</span>
+        </div>
+      </div>
+      <div class="po-chart-wrap" id="poTodayChartWrap"></div>
+    </div>
+
+    <div class="po-card po-weekly-card">
+      <div class="po-card-head">
+        <div>
+          <div class="po-card-eyebrow">Weekly Analysis</div>
+          <div class="po-card-value" id="poWeeklyValue">0<span>MWh</span></div>
+          <div class="po-card-target" id="poWeeklyDelta"></div>
+        </div>
+        <div class="po-chart-legend">
+          <span class="po-chart-legend-item"><span class="po-legend-dot is-this-week"></span>This Week</span>
+          <span class="po-chart-legend-item"><span class="po-legend-dot is-last-week"></span>Last Week</span>
+        </div>
+      </div>
+      <div class="po-chart-wrap" id="poWeeklyChartWrap"></div>
+    </div>
+
+  </div>
+
+  <!-- Row 3: Top Performing Sites + Points of Interest -->
+  <div class="po-row po-row-lists">
+
+    <div class="po-card po-sites-card">
+      <div class="po-card-head">
+        <div class="po-card-eyebrow">Top Performing Sites</div>
+      </div>
+      <div class="po-sites-list" id="poSitesList"></div>
+    </div>
+
+    <div class="po-card po-poi-card">
+      <div class="po-card-head">
+        <div class="po-card-eyebrow">Points of Interest</div>
+      </div>
+      <div class="po-poi-list" id="poPoiList"></div>
+    </div>
+
+  </div>
+
+  <!-- Row 4: Installed Capacity + Emissions Avoided -->
+  <div class="po-row po-row-trends">
+
+    <div class="po-card po-trend-card">
+      <div class="po-card-head">
+        <div class="po-card-eyebrow">Installed Capacity</div>
+        <button type="button" class="po-download-btn" id="poCapacityDownload" title="Download data">
+          <i class="fa-solid fa-download"></i>
+        </button>
+      </div>
+      <div class="po-trend-legend" id="poCapacityLegend"></div>
+      <div class="po-chart-wrap po-trend-chart-wrap" id="poCapacityChartWrap"></div>
+    </div>
+
+    <div class="po-card po-trend-card">
+      <div class="po-card-head">
+        <div class="po-card-eyebrow">Emissions Avoided</div>
+        <button type="button" class="po-download-btn" id="poEmissionsDownload" title="Download data">
+          <i class="fa-solid fa-download"></i>
+        </button>
+      </div>
+      <div class="po-trend-legend" id="poEmissionsLegend"></div>
+      <div class="po-chart-wrap po-trend-chart-wrap" id="poEmissionsChartWrap"></div>
+    </div>
+
+  </div>
+
+</div>

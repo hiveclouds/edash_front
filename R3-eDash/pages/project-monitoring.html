@@ -1,0 +1,69 @@
+<!-- ============================================================
+     Page: Project Monitoring — 360eDash
+     Shell dengan 4 tab:
+       1. Project Overview   -> pages/project-detail.html
+       2. System Information -> pages/system-information.html
+       3. Battery Station    -> placeholder (belum ada data)
+       4. Task Management    -> pages/task-management.html
+     Setiap tab di-lazy-load (hanya fetch sekali) oleh
+     js/project-monitoring.js.
+============================================================= -->
+<div class="pm-page" id="pmRoot">
+
+  <div class="pm-page-head">
+    <div>
+      <h1>Project Monitoring</h1>
+      <p>Pantau overview proyek, informasi system, battery station, dan task maintenance dalam satu halaman.</p>
+    </div>
+  </div>
+
+  <!-- ---------- Tab bar ---------- -->
+  <nav class="pm-tabs" id="pmTabs" aria-label="Project Monitoring sections">
+    <button class="pm-tab is-active" type="button" data-tab="overview">
+      <span class="pm-tab-icon"><i class="fa-solid fa-chart-line"></i></span>
+      <span>Project Overview</span>
+    </button>
+    <button class="pm-tab" type="button" data-tab="system">
+      <span class="pm-tab-icon"><i class="fa-solid fa-table-cells-large"></i></span>
+      <span>System Information</span>
+    </button>
+    <button class="pm-tab" type="button" data-tab="battery">
+      <span class="pm-tab-icon"><i class="fa-solid fa-car-battery"></i></span>
+      <span>Battery Station</span>
+    </button>
+    <button class="pm-tab" type="button" data-tab="task">
+      <span class="pm-tab-icon"><i class="fa-solid fa-list-check"></i></span>
+      <span>Task Management</span>
+    </button>
+  </nav>
+
+  <!-- ---------- Panels ---------- -->
+  <div class="pm-tab-panels">
+
+    <!-- TAB 1: Project Overview -->
+    <div class="pm-tab-panel is-active" id="pmPanel-overview" data-panel="overview">
+      <div class="pm-loading"><i class="fa-solid fa-spinner fa-spin"></i> Memuat Project Overview...</div>
+    </div>
+
+    <!-- TAB 2: System Information -->
+    <div class="pm-tab-panel" id="pmPanel-system" data-panel="system">
+      <div class="pm-loading"><i class="fa-solid fa-spinner fa-spin"></i> Memuat System Information...</div>
+    </div>
+
+    <!-- TAB 3: Battery Station (belum ada data — skip dulu) -->
+    <div class="pm-tab-panel" id="pmPanel-battery" data-panel="battery">
+      <div class="pm-empty-state">
+        <i class="fa-solid fa-car-battery"></i>
+        <h3>Battery Station</h3>
+        <p>Belum ada data untuk ditampilkan. Modul monitoring Battery Station akan hadir pada update berikutnya.</p>
+      </div>
+    </div>
+
+    <!-- TAB 4: Task Management -->
+    <div class="pm-tab-panel" id="pmPanel-task" data-panel="task">
+      <div class="pm-loading"><i class="fa-solid fa-spinner fa-spin"></i> Memuat Task Management...</div>
+    </div>
+
+  </div>
+
+</div>

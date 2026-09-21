@@ -1,0 +1,407 @@
+<!-- ============================================================
+     Page: Alert Diagnosis — 360eDash
+     Fragment di-inject lewat loadPage() di js/main.js ke #page-root --
+     TIDAK boleh punya <!DOCTYPE>, <html>, <head>, <body>, atau wrapper
+     .edash-layout/#sidebar-root/#header-root/.edash-content sendiri
+     (pola sama seperti pages/ticketing.html).
+
+     GANTI TOTAL dari alert.html versi lama (CRUD alert manual, 100%
+     data lokal window.__alertData, tidak pernah terhubung ke API apa
+     pun) -- sekarang terhubung ke sistem diagnosis 4-layer yang
+     sebenarnya (lihat PLTS-Alert-Diagnosis-Context.md). Stage 5 baru
+     mengerjakan Tab 1 (Live Alerts); Tab 2/3/4 sengaja masih
+     placeholder/disabled -- itu Stage 6 & 7.
+============================================================= -->
+<div class="adx-wrap">
+
+  <div class="adx-head">
+    <div>
+      <h1 data-i18n="alert.title">Alert Diagnosis</h1>
+      <p data-i18n="alert.subtitle">Live device alerts with transparent, ranked fault diagnosis — not just a threshold ping.</p>
+    </div>
+  </div>
+
+  <!-- ---------- Sub-tabs ---------- -->
+  <div class="adx-tabs" id="adxTabs" role="tablist">
+    <button type="button" class="adx-tab is-active" data-tab="live" role="tab" data-i18n="alert.tabs.live">Live Alerts</button>
+    <button type="button" class="adx-tab" data-tab="classifiers" role="tab" data-i18n="alert.tabs.classifiers">Classifiers</button>
+    <button type="button" class="adx-tab" data-tab="matrix" role="tab" data-i18n="alert.tabs.matrix">Fault Encoding Matrix</button>
+    <button type="button" class="adx-tab" data-tab="versions" role="tab" data-i18n="alert.tabs.versions">Versions</button>
+  </div>
+
+  <!-- ================= TAB: LIVE ALERTS ================= -->
+  <div class="adx-tab-panel" id="adxTabLive">
+
+    <!-- ---------- Stat cards ---------- -->
+    <div class="adx-stats" id="adxStats">
+      <div class="adx-stat-card">
+        <div class="adx-stat-icon is-danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div>
+          <div class="adx-stat-label" data-i18n="alert.stats.active">Active</div>
+          <div class="adx-stat-value" id="adxStatActive">0</div>
+        </div>
+      </div>
+      <div class="adx-stat-card">
+        <div class="adx-stat-icon is-warning"><i class="fa-solid fa-eye"></i></div>
+        <div>
+          <div class="adx-stat-label" data-i18n="alert.stats.acknowledged">Acknowledged</div>
+          <div class="adx-stat-value" id="adxStatAcknowledged">0</div>
+        </div>
+      </div>
+      <div class="adx-stat-card">
+        <div class="adx-stat-icon is-success"><i class="fa-solid fa-circle-check"></i></div>
+        <div>
+          <div class="adx-stat-label" data-i18n="alert.stats.resolved">Resolved</div>
+          <div class="adx-stat-value" id="adxStatResolved">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- Toolbar ---------- -->
+    <div class="adx-toolbar">
+      <select id="adxDeviceFilter">
+        <option value="" data-i18n="alert.filters.allDevices">All Devices</option>
+      </select>
+      <select id="adxStatusFilter">
+        <option value="" data-i18n="alert.filters.allStatus">All Status</option>
+        <option value="active" data-i18n="alert.status.active">Active</option>
+        <option value="acknowledged" data-i18n="alert.status.acknowledged">Acknowledged</option>
+        <option value="resolved" data-i18n="alert.status.resolved">Resolved</option>
+      </select>
+      <button type="button" class="adx-btn adx-btn-secondary" id="adxRefreshBtn">
+        <i class="fa-solid fa-arrows-rotate"></i>
+        <span data-i18n="alert.toolbar.refresh">Refresh</span>
+      </button>
+    </div>
+
+    <!-- ---------- Table ---------- -->
+    <div class="adx-table-card">
+      <div class="adx-table-scroll">
+        <table class="adx-table">
+          <thead>
+            <tr>
+              <th data-i18n="alert.table.device">Device</th>
+              <th data-i18n="alert.table.triggeredBy">Triggered By</th>
+              <th data-i18n="alert.table.status">Status</th>
+              <th data-i18n="alert.table.triggeredAt">Triggered At</th>
+              <th data-i18n="alert.table.actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adxTableBody"></tbody>
+        </table>
+      </div>
+      <div class="adx-empty hidden" id="adxEmpty">
+        <i class="fa-solid fa-shield-halved"></i>
+        <p data-i18n="alert.emptyState">No alerts match this filter.</p>
+      </div>
+      <div class="adx-table-footer">
+        <span id="adxCount">Showing 0 of 0 alerts</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= TAB: CLASSIFIERS ================= -->
+  <div class="adx-tab-panel hidden" id="adxTabClassifiers">
+
+    <div class="adx-toolbar">
+      <button type="button" class="adx-btn adx-btn-primary" id="adxAddClassifierBtn">
+        <i class="fa-solid fa-plus"></i>
+        <span data-i18n="alert.classifiers.add">Add Classifier</span>
+      </button>
+    </div>
+
+    <div class="adx-table-card">
+      <div class="adx-table-scroll">
+        <table class="adx-table">
+          <thead>
+            <tr>
+              <th data-i18n="alert.classifiers.table.name">Name</th>
+              <th data-i18n="alert.classifiers.table.stream">Data Stream</th>
+              <th data-i18n="alert.classifiers.table.condition">Condition</th>
+              <th data-i18n="alert.classifiers.table.type">Type</th>
+              <th data-i18n="alert.classifiers.table.status">Status</th>
+              <th data-i18n="alert.classifiers.table.actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adxClassifiersTableBody"></tbody>
+        </table>
+      </div>
+      <div class="adx-empty hidden" id="adxClassifiersEmpty">
+        <i class="fa-solid fa-diagram-project"></i>
+        <p data-i18n="alert.classifiers.emptyState">No classifiers yet — add one to start detecting symptoms.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= TAB: FAULT ENCODING MATRIX ================= -->
+  <div class="adx-tab-panel hidden" id="adxTabMatrix">
+
+    <div class="adx-qa-banner hidden" id="adxQaBanner">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span id="adxQaBannerText"></span>
+      <button type="button" class="adx-qa-banner-toggle" id="adxQaBannerToggleBtn" data-i18n="alert.matrix.qa.details">Show details</button>
+    </div>
+    <div class="adx-qa-details hidden" id="adxQaDetails"></div>
+
+    <div class="adx-matrix-layout">
+
+      <div class="adx-matrix-card">
+        <div class="adx-matrix-legend">
+          <span class="adx-matrix-legend-item"><span class="adx-cell-dot is-present"></span> <span data-i18n="alert.matrix.legend.present">Present</span></span>
+          <span class="adx-matrix-legend-item"><span class="adx-cell-dot is-absent"></span> <span data-i18n="alert.matrix.legend.absent">Absent</span></span>
+          <span class="adx-matrix-legend-item"><span class="adx-cell-dot is-unknown"></span> <span data-i18n="alert.matrix.legend.unknown">Unknown</span></span>
+        </div>
+        <div class="adx-matrix-scroll">
+          <table class="adx-matrix-table" id="adxMatrixTable"></table>
+        </div>
+        <p class="adx-hint" data-i18n="alert.matrix.hint">Click a cell to cycle Present → Absent → Unknown.</p>
+      </div>
+
+      <div class="adx-ai-panel">
+        <h5 data-i18n="alert.matrix.aiPanel.title">AI Review Queue</h5>
+        <p class="adx-hint" data-i18n="alert.matrix.aiPanel.hint">Draft suggestions — nothing applies live until you Submit Changes below.</p>
+        <div class="adx-ai-suggestion-list" id="adxAiSuggestionList"></div>
+        <p class="adx-hint hidden" id="adxAiSuggestionEmpty" data-i18n="alert.matrix.aiPanel.empty">No pending suggestions.</p>
+      </div>
+
+    </div>
+
+    <div class="adx-matrix-submit-bar hidden" id="adxMatrixSubmitBar">
+      <span id="adxMatrixPendingCount"></span>
+      <button type="button" class="adx-btn adx-btn-secondary" id="adxMatrixDiscardBtn" data-i18n="alert.matrix.discard">Discard</button>
+      <button type="button" class="adx-btn adx-btn-primary" id="adxMatrixSubmitBtn" data-i18n="alert.matrix.submit">Submit Changes</button>
+    </div>
+
+  </div>
+
+  <!-- ================= TAB: VERSIONS ================= -->
+  <div class="adx-tab-panel hidden" id="adxTabVersions">
+
+    <div class="adx-toolbar">
+      <input type="text" id="adxVersionNotes" placeholder="Notes for this snapshot (optional)" data-i18n-placeholder="alert.versions.notesPlaceholder">
+      <button type="button" class="adx-btn adx-btn-primary" id="adxSaveVersionBtn">
+        <i class="fa-solid fa-camera"></i>
+        <span data-i18n="alert.versions.saveCurrent">Save Current as Version</span>
+      </button>
+    </div>
+
+    <div class="adx-table-card">
+      <div class="adx-table-scroll">
+        <table class="adx-table">
+          <thead>
+            <tr>
+              <th data-i18n="alert.versions.table.savedAt">Saved At</th>
+              <th data-i18n="alert.versions.table.savedBy">Saved By</th>
+              <th data-i18n="alert.versions.table.notes">Notes</th>
+              <th data-i18n="alert.versions.table.actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adxVersionsTableBody"></tbody>
+        </table>
+      </div>
+      <div class="adx-empty hidden" id="adxVersionsEmpty">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        <p data-i18n="alert.versions.emptyState">No saved versions yet.</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ============================================================
+     MODAL — Diagnosis breakdown + expert validation
+============================================================= -->
+<div class="adx-modal-overlay" id="adxDiagnosisOverlay">
+  <div class="adx-modal adx-modal-lg">
+    <div class="adx-modal-head">
+      <h3><i class="fa-solid fa-stethoscope"></i> <span data-i18n="alert.diagnosisModal.title">Diagnosis</span></h3>
+      <button type="button" class="adx-modal-close" id="adxDiagnosisCloseBtn" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="adx-modal-body">
+
+      <div class="adx-alert-summary" id="adxAlertSummary">
+        <!-- Diisi JS: device, classifier pemicu, waktu trigger, status -->
+      </div>
+
+      <div class="adx-divider"></div>
+
+      <!-- ---------- Ranked fault list (posterior Bayesian) ---------- -->
+      <h5 data-i18n="alert.diagnosisModal.rankedFaults">Ranked Fault Diagnosis</h5>
+      <p class="adx-hint" id="adxNoDiagnosisHint" data-i18n="alert.diagnosisModal.noDiagnosisYet">Diagnosis for this alert is not available yet.</p>
+      <div class="adx-fault-list" id="adxFaultList">
+        <!-- Diisi JS: 1 .adx-fault-card per fault class, expandable -->
+      </div>
+
+      <div class="adx-divider"></div>
+
+      <!-- ---------- Expert validation ---------- -->
+      <div class="adx-validation-section">
+        <h5 data-i18n="alert.validation.title">Expert Validation</h5>
+        <p class="adx-hint" data-i18n="alert.validation.hint">Confirm whether this diagnosis looks right — this feeds the prior probabilities for future alerts.</p>
+
+        <div class="adx-validation-buttons">
+          <button type="button" class="adx-verdict-btn is-accurate" id="adxVerdictAccurateBtn" data-verdict="accurate">
+            <i class="fa-solid fa-thumbs-up"></i>
+            <span data-i18n="alert.validation.accurate">Seems Accurate</span>
+          </button>
+          <button type="button" class="adx-verdict-btn is-wrong" id="adxVerdictWrongBtn" data-verdict="wrong">
+            <i class="fa-solid fa-thumbs-down"></i>
+            <span data-i18n="alert.validation.wrong">Seems Wrong</span>
+          </button>
+        </div>
+
+        <div class="adx-field">
+          <label for="adxResolvedFaultSelect" data-i18n="alert.validation.resolvedFaultLabel">Confirmed fault (optional)</label>
+          <select id="adxResolvedFaultSelect">
+            <option value="" data-i18n="alert.validation.resolvedFaultNone">— None / false alarm —</option>
+          </select>
+        </div>
+
+        <div class="adx-field">
+          <label for="adxValidationNotes" data-i18n="alert.validation.notesLabel">Notes</label>
+          <textarea id="adxValidationNotes" rows="3" data-i18n-placeholder="alert.validation.notesPlaceholder" placeholder="Optional — what did you actually find?"></textarea>
+        </div>
+
+        <button type="button" class="adx-btn adx-btn-primary" id="adxSubmitValidationBtn">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span data-i18n="alert.validation.submit">Submit Validation</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Add/Edit Classifier (Tab 2, dropdown builder, bukan
+     textbox rule-language)
+============================================================= -->
+<div class="adx-modal-overlay" id="adxClassifierModalOverlay">
+  <div class="adx-modal">
+    <div class="adx-modal-head">
+      <h3><i class="fa-solid fa-diagram-project"></i> <span id="adxClassifierModalTitle" data-i18n="alert.classifierModal.titleAdd">Add Classifier</span></h3>
+      <button type="button" class="adx-modal-close" id="adxClassifierModalCloseBtn" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="adx-modal-body">
+
+      <div class="adx-field">
+        <label for="adxClfName" data-i18n="alert.classifierModal.name">Name</label>
+        <input type="text" id="adxClfName" maxlength="150" placeholder="e.g. Low Battery SoC">
+        <span class="adx-field-error" id="adxClfNameError" data-i18n="alert.classifierModal.nameError">Name is required.</span>
+      </div>
+
+      <div class="adx-field-row">
+        <div class="adx-field">
+          <label for="adxClfMode" data-i18n="alert.classifierModal.mode">Mode</label>
+          <select id="adxClfMode">
+            <option value="THRESHOLD" data-i18n="alert.classifierModal.modeThreshold">Threshold</option>
+            <option value="RATE_OF_CHANGE" data-i18n="alert.classifierModal.modeRateOfChange">Rate of Change</option>
+          </select>
+        </div>
+        <div class="adx-field">
+          <label for="adxClfType" data-i18n="alert.classifierModal.type">Type</label>
+          <select id="adxClfType">
+            <option value="rule_based" data-i18n="alert.classifierModal.typeRuleBased">Rule-based</option>
+            <option value="ml_based" disabled data-i18n="alert.classifierModal.typeMlBased">ML-based (coming soon)</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="adx-modal-section-label" data-i18n="alert.classifierModal.ifSection">IF</p>
+      <div class="adx-field">
+        <label for="adxClfStream" data-i18n="alert.classifierModal.stream">Data stream</label>
+        <select id="adxClfStream"></select>
+      </div>
+
+      <div class="adx-field-row">
+        <div class="adx-field">
+          <label for="adxClfOperator" data-i18n="alert.classifierModal.operator">Operator</label>
+          <select id="adxClfOperator">
+            <option value="<">&lt; (less than)</option>
+            <option value=">">&gt; (greater than)</option>
+            <option value="<=">&lt;= (less than or equal)</option>
+            <option value=">=">&gt;= (greater than or equal)</option>
+            <option value="==">== (equal to)</option>
+          </select>
+        </div>
+        <div class="adx-field">
+          <label for="adxClfCompareToType" data-i18n="alert.classifierModal.compareTo">Relative to</label>
+          <select id="adxClfCompareToType">
+            <option value="static_value" data-i18n="alert.classifierModal.compareStatic">A static value</option>
+            <option value="stream" data-i18n="alert.classifierModal.compareStream">Another data stream</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="adx-field" id="adxClfCompareValueField">
+        <label for="adxClfCompareValue" data-i18n="alert.classifierModal.compareValue">Value</label>
+        <input type="number" step="any" id="adxClfCompareValue" placeholder="e.g. 20">
+        <span class="adx-field-error" id="adxClfCompareValueError" data-i18n="alert.classifierModal.compareValueError">A numeric value is required.</span>
+      </div>
+      <div class="adx-field hidden" id="adxClfCompareStreamField">
+        <label for="adxClfCompareStream" data-i18n="alert.classifierModal.compareStreamSelect">Compare to stream</label>
+        <select id="adxClfCompareStream"></select>
+      </div>
+
+      <p class="adx-modal-section-label" data-i18n="alert.classifierModal.forSection">FOR</p>
+      <div class="adx-field-row">
+        <div class="adx-field">
+          <label for="adxClfDuration" data-i18n="alert.classifierModal.duration">Duration (minutes)</label>
+          <input type="number" min="1" step="1" id="adxClfDuration" value="5">
+        </div>
+        <div class="adx-field">
+          <label for="adxClfMinTrue" data-i18n="alert.classifierModal.minTrue">
+            Min. true
+            <i class="fa-solid fa-circle-info adx-info-icon" tabindex="0" data-tooltip="Percentage of data points within the duration window that must satisfy the condition for this classifier to be considered Present — not 100% of points, to tolerate brief telemetry noise/dropout."></i>
+          </label>
+          <div class="adx-input-suffix-wrap">
+            <input type="number" min="0" max="100" step="1" id="adxClfMinTrue" value="80">
+            <span class="adx-input-suffix">%</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="adx-modal-foot">
+      <button type="button" class="adx-btn adx-btn-secondary" id="adxClassifierCancelBtn" data-i18n="alert.classifierModal.cancel">Cancel</button>
+      <button type="button" class="adx-btn adx-btn-primary" id="adxClassifierSaveBtn">
+        <i class="fa-solid fa-check"></i>
+        <span data-i18n="alert.classifierModal.save">Save Classifier</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Generic confirm (dipakai buat "Load this version" /
+     rollback, sama persis pola tkConfirm() di js/ticketing.js -- isi
+     icon/title/text/tombol di-set dinamis dari JS sebelum overlay
+     dibuka, lihat adxConfirm() di alert.js).
+============================================================= -->
+<div class="adx-modal-overlay" id="adxConfirmOverlay">
+  <div class="adx-modal adx-modal-confirm">
+    <button type="button" class="adx-modal-close" id="adxConfirmCancelX" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    <div class="adx-confirm-body">
+      <span class="adx-confirm-icon" id="adxConfirmIcon"><i class="fa-solid fa-circle-question"></i></span>
+      <h2 class="adx-confirm-title" id="adxConfirmTitle">Are you sure?</h2>
+      <p class="adx-confirm-text" id="adxConfirmText">Please confirm this action.</p>
+      <div class="adx-confirm-actions">
+        <button type="button" class="adx-btn adx-btn-secondary" id="adxConfirmCancelBtn" data-i18n="alert.confirm.cancel">Cancel</button>
+        <button type="button" class="adx-btn adx-btn-danger" id="adxConfirmActionBtn" data-i18n="alert.confirm.confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast (save / success feedback) -->
+<div class="adx-toast" id="adxToast" role="status" aria-live="polite">
+  <i class="fa-solid fa-circle-check"></i>
+  <span id="adxToastMsg">Saved</span>
+</div>

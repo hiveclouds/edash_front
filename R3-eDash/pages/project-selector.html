@@ -1,0 +1,212 @@
+<!-- ============================================================
+     Page: Project Selector — 360eDash
+     Fragment loaded into #page-root for the "Project Selector"
+     route. Adjust the file location if your project structure
+     differs (e.g. pages/project-selector.html).
+============================================================= -->
+<div class="ps-page">
+  <div class="ps-map-wrap">
+
+    <!-- Fallback visual behind the MapLibre map -->
+    <div class="demo-map-card"></div>
+    <div id="psMap" class="ps-map"></div>
+
+    <!-- Locate-me button -->
+    <button type="button" class="ps-locate-btn" id="psLocateBtn" title="Go to my location">
+      <i class="fa-solid fa-location-crosshairs"></i>
+    </button>
+
+    <!-- Left stack (bottom-left): detail card (only in detail mode) +
+         Today chart (always visible). Stacked together so the detail
+         card sits flush above Today with no big gap. -->
+    <div class="ps-left-stack" id="psLeftStack">
+
+      <div class="ps-detail-stack" id="psDetailStack">
+
+        <div class="ps-detail-panel" id="psDetailPanel">
+          <button type="button" class="ps-detail-close" id="psDetailClose" title="Back to overview">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+
+          <div class="ps-detail-output" id="psDetailOutput">0<span>kWh</span></div>
+          <div class="ps-detail-target" id="psDetailTarget"></div>
+
+          <div class="ps-detail-title">
+            <i class="fa-solid fa-location-dot"></i>
+            <div>
+              <div class="ps-detail-name" id="psDetailName">-</div>
+              <div class="ps-detail-location" id="psDetailLocation">-</div>
+            </div>
+          </div>
+
+          <div class="ps-detail-actions">
+            <button type="button" class="ps-detail-tech-btn" id="psDetailTechBtn">
+              <i class="fa-solid fa-chart-simple"></i>
+              Technical Data
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Today chart -->
+      <div class="ps-today-float" id="psTodayFloat">
+        <div class="ps-today-head">
+          <div>
+            <div class="ps-today-title">Today</div>
+            <div class="ps-today-value" id="psTodayValue">0<span>MWh</span></div>
+            <div class="ps-today-target" id="psTodayTarget"></div>
+          </div>
+          <div class="ps-today-legend ps-today-legend-line">
+            <span class="ps-today-legend-item"><span class="ps-today-legend-swatch is-projected"></span>Projected</span>
+            <span class="ps-today-legend-item"><span class="ps-today-legend-swatch is-realized"></span>Realized</span>
+          </div>
+        </div>
+        <div class="ps-today-chart-wrap" id="psTodayChartWrap"></div>
+      </div>
+
+    </div>
+
+    <!-- Right stack (top-right, detail mode): Power Output + Upcoming Schedule.
+         Each card manages its own height independently, so Power Output
+         always stays fully visible — only the schedule list scrolls
+         internally, and the whole schedule card can be collapsed. -->
+    <div class="ps-right-stack" id="psRightStack">
+
+      <div class="ps-power-panel" id="psPowerPanel">
+        <div class="ps-power-head">
+          <div>
+            <div class="ps-power-eyebrow">Monitoring</div>
+            <div class="ps-power-title">Power Output</div>
+          </div>
+          <div class="ps-power-controls">
+            <div class="ps-power-toggle" id="psPowerToggle">
+              <button type="button" class="ps-power-toggle-btn is-active" data-range="24h">24 Hours</button>
+              <button type="button" class="ps-power-toggle-btn" data-range="7d">7 Days</button>
+            </div>
+            <button type="button" class="ps-power-refresh" id="psPowerRefresh" title="Refresh data">
+              <i class="fa-solid fa-rotate-right"></i>
+            </button>
+          </div>
+        </div>
+        <div class="ps-power-chart-wrap" id="psPowerChartWrap"></div>
+      </div>
+
+      <div class="ps-history-panel is-open" id="psHistoryPanel">
+        <button type="button" class="ps-history-toggle" id="psHistoryToggle">
+          <i class="fa-solid fa-calendar-check"></i>
+          <span>Upcoming Schedule</span>
+          <span class="ps-history-count" id="psHistoryCount">(0)</span>
+          <i class="fa-solid fa-chevron-down ps-history-toggle-chevron"></i>
+        </button>
+        <div class="ps-history-content" id="psHistoryContent">
+          <div class="ps-history-list" id="psHistoryList"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Floating "Project Locations" panel -->
+    <div class="ps-panel" id="psPanel">
+
+      <button type="button" class="ps-panel-toggle" id="psPanelToggle">
+        <i class="fa-solid fa-map-location-dot"></i>
+        <span>Project Locations</span>
+        <i class="fa-solid fa-chevron-down ps-panel-toggle-chevron"></i>
+      </button>
+
+      <div class="ps-panel-body" id="psPanelBody">
+
+        <!-- Project Summary -->
+        <div class="ps-summary">
+          <div class="ps-summary-item">
+            <span class="ps-summary-icon ps-summary-icon-all"><i class="fa-solid fa-layer-group"></i></span>
+            <span class="ps-summary-value" id="psSummaryAll">0</span>
+            <span class="ps-summary-label">All Projects</span>
+          </div>
+          <div class="ps-summary-item">
+            <span class="ps-summary-icon ps-summary-icon-online"><i class="fa-solid fa-circle-check"></i></span>
+            <span class="ps-summary-value" id="psSummaryOnline">0</span>
+            <span class="ps-summary-label">Online</span>
+          </div>
+          <div class="ps-summary-item">
+            <span class="ps-summary-icon ps-summary-icon-offline"><i class="fa-solid fa-circle-xmark"></i></span>
+            <span class="ps-summary-value" id="psSummaryOffline">0</span>
+            <span class="ps-summary-label">Offline</span>
+          </div>
+          <div class="ps-summary-item">
+            <span class="ps-summary-icon ps-summary-icon-alerts"><i class="fa-solid fa-triangle-exclamation"></i></span>
+            <span class="ps-summary-value" id="psSummaryAlerts">0</span>
+            <span class="ps-summary-label">Active Alerts</span>
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div class="ps-section">
+          <div class="ps-section-title-row">
+            <div class="ps-section-title">Category</div>
+            <label class="ps-category-show-all">
+              <input type="checkbox" id="psShowAllCategories">
+              <span>Show all</span>
+            </label>
+          </div>
+          <div class="ps-category-grid" id="psLegend"></div>
+        </div>
+
+        <!-- Generation stats -->
+        <div class="ps-section">
+          <div class="ps-section-title">Today's Generation</div>
+          <div class="ps-gen-stats">
+            <div class="ps-gen-item">
+              <span class="ps-gen-value" id="psGenMWh">0</span>
+              <span class="ps-gen-unit">MWh</span>
+              <span class="ps-gen-label">Generated</span>
+            </div>
+            <div class="ps-gen-item">
+              <span class="ps-gen-value" id="psGenMWp">0</span>
+              <span class="ps-gen-unit">MWp</span>
+              <span class="ps-gen-label">Installed</span>
+            </div>
+            <div class="ps-gen-item">
+              <span class="ps-gen-value" id="psGenCO2">0</span>
+              <span class="ps-gen-unit">Ton</span>
+              <span class="ps-gen-label">CO2 Avoided</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Saved Projects -->
+        <div class="ps-section">
+          <div class="ps-section-title">Saved Projects</div>
+          <div class="ps-table">
+            <div class="ps-table-head">
+              <span class="ps-table-head-name">Name</span>
+              <span class="ps-table-head-location">Location</span>
+              <span class="ps-table-head-actions">Action</span>
+            </div>
+            <div class="ps-table-rows" id="psSavedRows"></div>
+          </div>
+        </div>
+
+        <!-- All Projects -->
+        <div class="ps-section ps-section-grow">
+          <div class="ps-section-title">All Projects</div>
+          <div class="ps-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="psSearchInput" placeholder="Search project...">
+          </div>
+          <div class="ps-table ps-table-scroll">
+            <div class="ps-table-head">
+              <span class="ps-table-head-name">Name</span>
+              <span class="ps-table-head-location">Location</span>
+              <span class="ps-table-head-actions">Action</span>
+            </div>
+            <div class="ps-table-rows" id="psAllRows"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

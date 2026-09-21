@@ -1,0 +1,515 @@
+<!-- ============================================================
+     Tab: Project Overview (detail) — inside Project Monitoring
+     360eDash
+
+     This is the DETAIL view for ONE selected project (not the
+     global Dashboard — that stays on pages/dashboard.html,
+     untouched). Loaded lazily by js/project-monitoring.js into
+     #pmPanel-overview, initialized by initProjectDetail() in
+     js/project-detail.js.
+
+     Uses the same --si-* design tokens as System Information so
+     every tab inside Project Monitoring feels visually unified
+     (see css/project-monitoring.css comment).
+============================================================= -->
+<div class="pd" id="pdRoot">
+
+  <!-- ---------- Loading state ----------
+       Shown only on the FIRST visit to this tab in the session,
+       while window.initProjectDetail() awaits pdLoadRealTawabiProject()
+       (Core API analytics + telemetry). Toggled purely via
+       #pdLoadingState / #pdContent display in js/project-detail.js —
+       no extra JS needed here. Hidden again (and #pdContent shown)
+       once the real data has loaded once; kept in the DOM afterwards
+       so switching tabs and coming back doesn't re-trigger it. ---------- -->
+  <div class="pd-loading-state" id="pdLoadingState" aria-hidden="true">
+    <div class="pd-skel-info-card">
+      <div class="pd-skel-bar" style="width:200px;height:15px;"></div>
+      <div class="pd-skel-row-inline">
+        <div class="pd-skel-bar" style="width:120px;height:32px;"></div>
+        <div class="pd-skel-bar" style="width:90px;height:32px;"></div>
+        <div class="pd-skel-bar" style="width:150px;height:32px;"></div>
+        <div class="pd-skel-bar" style="width:110px;height:32px;"></div>
+      </div>
+    </div>
+    <div class="pd-skel-stat-grid">
+      <div class="pd-skel-card"></div>
+      <div class="pd-skel-card"></div>
+      <div class="pd-skel-card"></div>
+      <div class="pd-skel-card"></div>
+    </div>
+    <div class="pd-skel-main-grid">
+      <div class="pd-skel-card pd-skel-card-tall"></div>
+      <div class="pd-skel-card pd-skel-card-tall"></div>
+    </div>
+    <div class="pd-skel-card pd-skel-card-wide"></div>
+    <p class="pd-loading-caption"><i class="fa-solid fa-circle-notch fa-spin"></i> Memuat data proyek&hellip;</p>
+  </div>
+
+  <!-- ---------- Real content ----------
+       Hidden (display:none) until the first real-data load finishes,
+       see #pdLoadingState above. ---------- -->
+  <div class="pd-content" id="pdContent" style="display:none;">
+
+  <!-- ---------- Project information ---------- -->
+  <section class="pd-info-card">
+    <div class="pd-info-heading">
+      <div class="pd-info-project-controls">
+        <!-- ---------- Project picker ----------
+             Was a native <select> (couldn't be styled — no icons, no
+             custom hover, and the open list looked like a plain OS
+             menu) plus a separate magnifier button opening its own
+             popover. Merged into ONE always-visible search pill, same
+             component/behavior as the Operator dashboard's
+             .opd-search + #opdProjectDropdown (js/operator/
+             operator-dashboard.js, css/operator/operator-dashboard.css):
+             the input is pre-filled with the active project's name;
+             focusing it selects that text and opens the dropdown below
+             so the user can either keep typing to filter, or click an
+             entry to switch — see bindProjectSearch() in
+             js/project-detail.js. ---------- -->
+        <div class="pd-project-picker" id="pdProjectPicker">
+          <i class="fa-solid fa-magnifying-glass pd-project-picker-icon"></i>
+          <input type="text" id="pdProjectSearchInput" class="pd-project-picker-input" placeholder="Cari proyek" autocomplete="off" aria-label="Pilih proyek" aria-expanded="false" role="combobox" aria-controls="pdProjectSearchResults">
+          <div class="pd-project-search-popover" id="pdProjectSearchPopover" hidden>
+            <div class="pd-project-search-results" id="pdProjectSearchResults" role="listbox" aria-label="Hasil pencarian proyek"></div>
+          </div>
+        </div>
+        <span class="pd-status-pill" id="pdStatusPill"><i class="fa-solid fa-circle"></i> <span>Online</span></span>
+      </div>
+      <div class="pd-live-controls">
+        <span class="pd-live-updated"><i class="fa-solid fa-clock-rotate-left"></i> Diperbarui <b id="pdLiveUpdated">2 menit lalu</b></span>
+        <button class="pd-refresh-btn" type="button" id="pdRefreshBtn" aria-label="Refresh data">
+          <i class="fa-solid fa-rotate"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="pd-summary-strip" id="pdSummaryStrip">
+      <div class="pd-summary-field">
+        <span><i class="fa-solid fa-location-dot"></i> Location</span>
+        <strong id="pdProjectLocation">-</strong>
+      </div>
+      <div class="pd-summary-field">
+        <span><i class="fa-solid fa-solar-panel"></i> Capacity</span>
+        <strong id="pdProjectCapacity">-</strong>
+      </div>
+      <div class="pd-summary-field">
+        <span><i class="fa-solid fa-table-cells"></i> PV Panels</span>
+        <strong id="pdProjectPanelCount">-</strong>
+      </div>
+      <div class="pd-summary-field">
+        <span><i class="fa-solid fa-calendar-check"></i> Commission Date</span>
+        <strong id="pdProjectCommissioned">-</strong>
+      </div>
+      <div class="pd-summary-field pd-summary-owner">
+        <span><i class="fa-solid fa-building-user"></i> Owner</span>
+        <strong id="pdProjectOwner">-</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- Key stats strip ---------- -->
+  <div class="pd-stat-grid">
+
+    <div class="pd-stat-card">
+      <div class="pd-stat-top">
+        <span class="pd-stat-icon pd-stat-icon-primary"><i class="fa-solid fa-bolt"></i></span>
+        <span class="pd-trend pd-trend-up" id="pdPowerTrend"><i class="fa-solid fa-arrow-trend-up"></i> 4.2%</span>
+      </div>
+      <div class="pd-stat-value"><span id="pdPowerNow">86.4</span> <small>kW</small></div>
+      <div class="pd-stat-label">Current Power</div>
+    </div>
+
+    <div class="pd-stat-card">
+      <div class="pd-stat-top">
+        <span class="pd-stat-icon pd-stat-icon-success"><i class="fa-solid fa-sun"></i></span>
+      </div>
+      <div class="pd-stat-value"><span id="pdEnergyToday">412</span> <small>kWh</small></div>
+      <div class="pd-stat-label">Today's Energy <span class="pd-stat-sub" id="pdEnergyTodayPct">(91% dari target)</span></div>
+    </div>
+
+    <div class="pd-stat-card pd-stat-card-gauge">
+      <div class="pd-gauge" id="pdHealthGauge">
+        <div class="pd-gauge-inner"><b id="pdHealthPct">94%</b><span>Health</span></div>
+      </div>
+      <div class="pd-gauge-meta">
+        <span class="pd-gauge-label">PV Health</span>
+        <span class="pill pill-success" id="pdHealthStatus">Healthy</span>
+      </div>
+    </div>
+
+    <div class="pd-stat-card pd-stat-card-gauge">
+      <div class="pd-gauge" id="pdPerfGauge">
+        <div class="pd-gauge-inner"><b id="pdPerfPct">91%</b><span>PR</span></div>
+      </div>
+      <div class="pd-gauge-meta">
+        <span class="pd-gauge-label">Performance Ratio</span>
+        <span class="pd-stat-sub">Efisiensi <b id="pdEfficiency">96%</b></span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ---------- Main grid: environmental impact + weather ---------- -->
+  <div class="pd-grid pd-grid-main">
+
+    <!-- Environmental Impact (moved here, replacing Energy Production) -->
+    <div class="pd-card pd-card-chart pd-card-environmental">
+      <div class="pd-card-head">
+        <div>
+          <h2><i class="fa-solid fa-leaf"></i> Environmental Impact</h2>
+          <p>Benefit generated since commissioning</p>
+        </div>
+        <button class="btn btn-secondary pd-env-settings-btn" type="button" id="pdEnvSettingsBtn">
+          <i class="fa-solid fa-gear"></i> <span>Settings</span>
+        </button>
+      </div>
+      <div class="pd-env-grid">
+        <div class="pd-env-card is-energy">
+          <span class="pd-env-icon"><i class="fa-solid fa-bolt"></i></span>
+          <div class="pd-env-value"><span id="pdEnvEnergy">12.4</span> <small id="pdEnvEnergyUnit">MWh</small></div>
+          <div class="pd-env-label">Energy Saved</div>
+        </div>
+        <div class="pd-env-arrow"><i class="fa-solid fa-arrow-right-long"></i></div>
+        <div class="pd-env-card is-savings">
+          <span class="pd-env-icon"><i class="fa-solid fa-sack-dollar"></i></span>
+          <div class="pd-env-value"><span id="pdEnvBillSavings">Rp 0</span></div>
+          <div class="pd-env-label">Bill Savings</div>
+          <div class="pd-env-sub" id="pdEnvBillSavingsSource">Based on PLN Tariff</div>
+        </div>
+        <div class="pd-env-arrow"><i class="fa-solid fa-arrow-right-long"></i></div>
+        <div class="pd-env-card is-co2">
+          <span class="pd-env-icon"><i class="fa-solid fa-cloud"></i></span>
+          <div class="pd-env-value"><span id="pdEnvCo2">10.5</span> <small>ton CO₂</small></div>
+          <div class="pd-env-label">CO₂ Emissions Saved</div>
+          <div class="pd-env-sub" id="pdEnvCo2Sub">vs. grid electricity generation</div>
+        </div>
+        <div class="pd-env-arrow"><i class="fa-solid fa-arrow-right-long"></i></div>
+        <div class="pd-env-card is-trees">
+          <span class="pd-env-icon"><i class="fa-solid fa-tree"></i></span>
+          <div class="pd-env-value"><span id="pdEnvTrees">497</span> <small>trees</small></div>
+          <div class="pd-env-label">Trees Equivalent</div>
+          <div class="pd-env-sub">CO₂ absorption per year, if planted</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right column: Weather -->
+    <div class="pd-side-col">
+
+      <div class="pd-card pd-card-weather">
+        <div class="pd-card-head">
+          <div><h2><i class="fa-solid fa-cloud-sun"></i> Weather</h2></div>
+        </div>
+        <div class="pd-weather-location" id="pdWeatherLocation">
+          <i class="fa-solid fa-location-dot"></i> <span id="pdWeatherLocationText">—</span>
+        </div>
+        <div class="pd-weather-main">
+          <i class="fa-solid fa-cloud-sun pd-weather-icon" id="pdWeatherIcon"></i>
+          <div>
+            <div class="pd-weather-temp"><span id="pdWeatherTemp">31</span>°C</div>
+            <div class="pd-weather-desc" id="pdWeatherDesc">Cerah Berawan</div>
+          </div>
+        </div>
+        <div class="pd-weather-grid">
+          <div class="pd-weather-item">
+            <i class="fa-solid fa-droplet"></i>
+            <div><b id="pdWeatherHumidity">62%</b><span>Kelembapan</span></div>
+          </div>
+          <div class="pd-weather-item">
+            <i class="fa-solid fa-wind"></i>
+            <div><b id="pdWeatherWind">8 km/j</b><span>Kec. Angin</span></div>
+          </div>
+          <div class="pd-weather-item">
+            <i class="fa-solid fa-sun"></i>
+            <div><b id="pdWeatherIrradiance">810 W/m²</b><span>Iradiasi</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ---------- Performance Analytics ----------
+       Same "select which graphs to show" feature as the Operator
+       dashboard's Project Overview grid: starts with the 6 default
+       system variables, but each card can be removed (hover -> the
+       x button, top-right) and the dashed "+" tile / "Add Graph"
+       button opens the same "Create graph" picker (real PLTS TAWABI
+       logger variables, grouped by category) to add more. Selection
+       is remembered per project (see PD_PERF_CFG_KEY in
+       js/project-detail.js). ---------- -->
+  <section class="pd-card pd-performance-section">
+    <div class="pd-card-head pd-performance-head">
+      <div>
+        <h2><i class="fa-solid fa-chart-line"></i> Performance Analytics</h2>
+        <p>Detailed operating variables for the selected PV system.</p>
+      </div>
+      <button type="button" class="opd-btn opd-btn-primary" id="pdAddGraphBtn">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Add Graph</span>
+      </button>
+    </div>
+    <div class="pd-performance-grid" id="pdPerformanceGrid"></div>
+  </section>
+
+  </div>
+  <!-- /#pdContent -->
+
+  <!-- ---------- "Create graph" modal (same component as the Operator
+       dashboard's "Add Graph" modal, see js/operator/operator-
+       dashboard.js — IDs prefixed "pd" instead of "opd" here, wired
+       separately in js/project-detail.js) ---------- -->
+  <div class="modal-backdrop opd-graph-modal" id="pdGraphModal" aria-hidden="true">
+    <div class="modal-card opd-graph-modal-card" role="dialog" aria-modal="true" aria-labelledby="pdGraphModalTitle">
+      <div class="modal-scroll opd-graph-modal-scroll">
+
+        <div class="modal-header">
+          <span class="modal-title" id="pdGraphModalTitle">Create graph</span>
+          <button type="button" class="modal-close" id="pdGraphCloseBtn" aria-label="Close">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <p class="opd-graph-subtitle" id="pdGraphSubtitle">Variables recorded on this device.</p>
+
+        <div class="opd-graph-device-switch" id="pdGraphDeviceSwitch">
+          <span class="opd-graph-device-label">Device:</span>
+          <div class="opd-graph-segmented" id="pdGraphDeviceToggle"></div>
+        </div>
+
+        <div class="opd-graph-divider"></div>
+
+        <!-- Skeleton shown while pdEnsureGraphCatalog() is fetching Tawabi
+             telemetry/history for the first time. Swapped for #pdGraphBody
+             once the catalog promise resolves (see openPdGraphModal()). -->
+        <div class="opd-graph-loading" id="pdGraphLoading" aria-hidden="true">
+          <div class="opd-graph-skel-col opd-graph-skel-col-left">
+            <div class="opd-graph-skel-bar" style="width:55%;height:10px;margin-bottom:14px;"></div>
+            <div class="opd-graph-skel-row"></div>
+            <div class="opd-graph-skel-row"></div>
+            <div class="opd-graph-skel-row"></div>
+            <div class="opd-graph-skel-bar" style="width:40%;height:10px;margin:18px 0 14px;"></div>
+            <div class="opd-graph-skel-row"></div>
+            <div class="opd-graph-skel-row"></div>
+          </div>
+          <div class="opd-graph-skel-col opd-graph-skel-col-right">
+            <div class="opd-graph-skel-bar" style="width:100%;height:34px;border-radius:8px;margin-bottom:16px;"></div>
+            <div class="opd-graph-skel-bar" style="width:30%;height:10px;margin-bottom:10px;"></div>
+            <div class="opd-graph-skel-box"></div>
+          </div>
+          <p class="opd-graph-loading-caption"><i class="fa-solid fa-circle-notch fa-spin"></i> Memuat variabel grafik &hellip;</p>
+        </div>
+
+        <!-- Error state shown if pdEnsureGraphCatalog() rejects (fetch/network
+             failure). Offers a retry without needing to close the modal. -->
+        <div class="opd-graph-error" id="pdGraphError" aria-hidden="true">
+          <div class="opd-graph-empty-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <p><strong>Gagal memuat daftar variabel grafik</strong></p>
+          <p class="opd-graph-empty-sub" id="pdGraphErrorMsg">Periksa koneksi Anda lalu coba lagi.</p>
+          <button type="button" class="modal-btn modal-btn-secondary" id="pdGraphRetryBtn">
+            <i class="fa-solid fa-rotate-right"></i> Coba lagi
+          </button>
+        </div>
+
+        <div class="opd-graph-body" id="pdGraphBody">
+
+          <!-- LEFT: variable picker (categories injected by JS) -->
+          <div class="opd-graph-var-panel" id="pdGraphVarPanel"></div>
+
+          <!-- RIGHT: chart builder -->
+          <div class="opd-graph-chart-panel" id="pdGraphChartPanel">
+
+            <div class="opd-graph-field-row">
+              <div class="opd-graph-field opd-graph-field-title">
+                <label for="pdGraphTitleInput">Graph title</label>
+                <input type="text" id="pdGraphTitleInput" class="modal-input" placeholder="Select a variable on the left…">
+              </div>
+              <div class="opd-graph-field-chart-type" id="pdGraphTypeField" style="display:none;">
+                <label>Graph type</label>
+                <div class="opd-graph-segmented" id="pdGraphTypeToggle">
+                  <button type="button" class="opd-graph-seg-btn is-active" data-type="line">Line</button>
+                  <button type="button" class="opd-graph-seg-btn" data-type="bar">Bar</button>
+                  <!-- "Compare" (atas-bawah/mirror) -- HIDDEN (bukan cuma
+                       disabled) secara default; cuma dimunculkan oleh JS
+                       (lihat updatePdGraphCompareAvailability() di
+                       project-detail.js) kalau tepat 2 variabel yang dicentang
+                       dan pasangannya ada di whitelist PD_GRAPH_COMPARE_PAIRS
+                       (mis. Daily Production vs Daily Consumption). `disabled`
+                       tetap dipasang sebagai jaga-jaga (a11y/keyboard nav),
+                       tapi yang benar-benar menyembunyikan tombolnya adalah
+                       class "is-hidden" (display:none). -->
+                  <button type="button" class="opd-graph-seg-btn is-hidden" data-type="compare" id="pdGraphCompareBtn" disabled title="Hanya tersedia untuk pasangan variabel tertentu, mis. Produksi vs Konsumsi Energi">Compare</button>
+                  <!-- "Stack" -- pecah SATU variabel "Daily Consumption" jadi
+                       kurva tumpukan (stacked area) sumber energi (PV / Baterai /
+                       PLN) per hari. HIDDEN secara default, sama seperti
+                       "Compare" di atas -- cuma dimunculkan oleh JS (lihat
+                       updatePdGraphStackAvailability() di project-detail.js)
+                       kalau tepat 1 variabel yang dicentang dan variabel itu
+                       "Daily Consumption" (load.dailyConsumption). -->
+                  <button type="button" class="opd-graph-seg-btn is-hidden" data-type="stack" id="pdGraphStackBtn" disabled title="Only available for the Daily Consumption variable, split into PV / Battery / PLN">Stack</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="opd-graph-preview-label">Preview</div>
+
+            <div class="opd-graph-stats-row" id="pdGraphStatsRow"></div>
+
+            <div class="opd-graph-preview-box" id="pdGraphPreviewBox">
+              <div class="opd-graph-empty-state" id="pdGraphEmptyState">
+                <div class="opd-graph-empty-icon"><i class="fa-solid fa-chart-line"></i></div>
+                <p><strong>No variable selected yet</strong></p>
+                <p class="opd-graph-empty-sub">Check one or more variables on the left to preview the graph here. The data used is actual data from the PLTS TAWABI logger (daily average).</p>
+              </div>
+              <canvas id="pdGraphPreviewCanvas" style="display:none;"></canvas>
+            </div>
+
+            <div class="opd-graph-legend" id="pdGraphLegend"></div>
+
+            <p class="opd-graph-preview-caption" id="pdGraphPreviewCaption"></p>
+
+          </div>
+
+        </div>
+
+        <div class="modal-actions opd-graph-actions">
+          <button type="button" class="modal-btn modal-btn-secondary" id="pdGraphCancelBtn">Cancel</button>
+          <div class="modal-actions-right">
+            <button type="button" class="modal-btn modal-btn-primary" id="pdGraphAddBtn" disabled>Add graph</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- Performance Report modal ---------- -->
+  <div class="pd-report-modal-backdrop" id="pdReportModal" aria-hidden="true">
+    <div class="pd-report-modal" role="dialog" aria-modal="true" aria-labelledby="pdReportTitle">
+      <div class="pd-report-modal-head">
+        <div>
+          <span class="pd-report-eyebrow">Performance Report</span>
+          <h3 id="pdReportTitle">-</h3>
+        </div>
+        <button class="pd-report-close-btn" type="button" id="pdReportCloseBtn" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="pd-report-modal-body" id="pdReportPrintArea">
+
+        <div class="pd-report-period">
+          <span class="pd-report-period-label">Reporting Period</span>
+          <div class="pd-report-period-chips" id="pdReportPeriodChips">
+            <button type="button" class="is-active" data-period="7d">7 Days</button>
+            <button type="button" data-period="30d">30 Days</button>
+            <button type="button" data-period="month">This Month</button>
+          </div>
+          <span class="pd-report-period-range" id="pdReportRange">-</span>
+        </div>
+
+        <div class="pd-report-section">
+          <div class="pd-report-section-title">Project Information</div>
+          <div class="pd-report-grid pd-report-grid-4">
+            <div><span>Project Name</span><b id="pdRepName">-</b></div>
+            <div><span>Location</span><b id="pdRepLocation">-</b></div>
+            <div><span>Owner</span><b id="pdRepOwner">-</b></div>
+            <div><span>Commissioned</span><b id="pdRepCommissioned">-</b></div>
+            <div><span>Installed Capacity</span><b id="pdRepCapacity">-</b></div>
+            <div><span>PV Panels</span><b id="pdRepPanels">-</b></div>
+          </div>
+        </div>
+
+        <div class="pd-report-section">
+          <div class="pd-report-section-title">Production Summary</div>
+          <div class="pd-report-grid pd-report-grid-4">
+            <div><span>Energy Generated</span><b id="pdRepGenerated">-</b></div>
+            <div><span>Expected Production</span><b id="pdRepExpected">-</b></div>
+            <div><span>Performance Ratio</span><b id="pdRepPr">-</b></div>
+            <div><span>Efficiency</span><b id="pdRepEfficiency">-</b></div>
+          </div>
+          <div class="pd-report-trend" id="pdRepTrend">-</div>
+        </div>
+
+        <div class="pd-report-section">
+          <div class="pd-report-section-title">PV Health &amp; Key Metrics</div>
+          <div class="pd-report-grid pd-report-grid-4">
+            <div><span>PV Health</span><b id="pdRepHealth">-</b></div>
+            <div><span>Current Power</span><b id="pdRepPower">-</b></div>
+            <div><span>Battery SOC</span><b id="pdRepBattery">-</b></div>
+            <div><span>Inverter Online</span><b id="pdRepInverter">-</b></div>
+          </div>
+        </div>
+
+        <div class="pd-report-section">
+          <div class="pd-report-section-title">Anomalies &amp; Alerts Summary</div>
+          <ul class="pd-report-alert-list" id="pdRepAlerts"></ul>
+        </div>
+
+      </div>
+
+      <div class="pd-report-modal-actions">
+        <button class="btn btn-secondary" type="button" id="pdReportExportCsvBtn">
+          <i class="fa-solid fa-file-csv"></i> Export CSV
+        </button>
+        <button class="btn btn-primary" type="button" id="pdReportExportPdfBtn">
+          <i class="fa-solid fa-file-pdf"></i> Export PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- Bill Savings settings modal ---------- -->
+  <div class="pd-env-settings-modal-backdrop" id="pdEnvSettingsModal" aria-hidden="true">
+    <div class="pd-env-settings-modal" role="dialog" aria-modal="true" aria-labelledby="pdEnvSettingsTitle">
+      <div class="pd-env-settings-modal-head">
+        <div>
+          <span class="pd-report-eyebrow">Environmental Impact</span>
+          <h3 id="pdEnvSettingsTitle">Bill Savings Settings</h3>
+        </div>
+        <button class="pd-report-close-btn" type="button" id="pdEnvSettingsCloseBtn" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="pd-env-settings-modal-body">
+        <p class="pd-env-settings-desc">Choose how the electricity cost basis is calculated for the Bill Savings figure.</p>
+
+        <div class="pd-env-settings-source-toggle" id="pdEnvSourceToggle">
+          <label class="pd-env-source-option">
+            <input type="radio" name="pdEnvSource" value="pln" id="pdEnvSourcePln" checked>
+            <span><i class="fa-solid fa-bolt"></i> PLN Tariff</span>
+          </label>
+          <label class="pd-env-source-option">
+            <input type="radio" name="pdEnvSource" value="manual" id="pdEnvSourceManual">
+            <span><i class="fa-solid fa-gas-pump"></i> Diesel Fuel Cost</span>
+          </label>
+        </div>
+
+        <div class="pd-env-settings-field" id="pdEnvPlnField">
+          <label for="pdEnvPlnSelect">PLN Tariff Category</label>
+          <select id="pdEnvPlnSelect"></select>
+        </div>
+
+        <div class="pd-env-settings-field" id="pdEnvManualField" hidden>
+          <label for="pdEnvManualInput">Diesel Fuel Cost (Rp / kWh)</label>
+          <div class="pd-env-manual-input-wrap">
+            <span class="pd-env-manual-prefix">Rp</span>
+            <input type="text" inputmode="numeric" autocomplete="off" id="pdEnvManualInput" placeholder="3.500">
+          </div>
+          <span class="pd-env-settings-hint">Enter your generator's estimated cost per kWh produced.</span>
+        </div>
+      </div>
+
+      <div class="pd-env-settings-modal-actions">
+        <button class="btn btn-secondary" type="button" id="pdEnvSettingsCancelBtn">Cancel</button>
+        <button class="btn btn-primary" type="button" id="pdEnvSettingsSaveBtn">
+          <i class="fa-solid fa-check"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

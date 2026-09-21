@@ -1,0 +1,383 @@
+<!-- ============================================================
+     Page: Operator Dashboard — 360eDash
+     Fragment loaded into #page-root for the Operator role's
+     Dashboard route (pages/operator/operator-dashboard.html).
+
+     Layout (per wireframe): title, with the search bar + "Add Graph"
+     button aligned on the same row to its right -> Environmental
+     Impact summary (same block as Project Overview's, values pulled
+     from the same real Tawabi energy-production log) -> sub-tabs
+     (Project Overview — leftmost, open by default — then System
+     Information / Battery Station / Task Management, same tab
+     component used by Project Monitoring's .pm-tabs) -> a card
+     grid per tab, starting empty (just the dashed "+" add tile).
+     Clicking a grid's own "+" tile appends a graph card to THAT
+     tab; the "Add Graph" button always adds to Project Overview
+     regardless of the active tab — the other sub-tabs are left
+     empty for now. Generated chart cards render larger than the
+     blank/add tiles (see .opd-card-chart in css/operator/operator-
+     dashboard.css). A floating icon-only button
+     pinned bottom-right fullscreens just the page content, no
+     header/sidebar (see js/operator/operator-dashboard.js and
+     css/operator/operator-dashboard.css).
+============================================================= -->
+<div class="opd-page">
+
+  <!-- ---------- Fullscreen toggle ----------
+       Icon-only floating button, pinned bottom-right. Fullscreens
+       ONLY the page content (.edash-content) — no header, no
+       sidebar — via the native Fullscreen API (see js/operator/
+       operator-dashboard.js + css/operator/operator-dashboard.css).
+  ---------- -->
+  <button type="button" class="opd-fullscreen-fab" id="opdFullscreenBtn" title="Fullscreen" aria-label="Toggle fullscreen">
+    <i class="fa-solid fa-expand"></i>
+  </button>
+
+  <!-- ---------- Header row: title left, search + Add Graph right,
+       aligned on the same line ---------- -->
+  <div class="opd-head-row">
+    <div class="opd-head-text">
+      <h1 class="opd-title" data-i18n="sidebar.dashboard">Dashboard</h1>
+      <div class="opd-date-badge" id="opdDateBadge">
+        <i class="fa-solid fa-calendar-days"></i>
+        <span id="opdDateBadgeText">—</span>
+      </div>
+    </div>
+
+    <div class="opd-search-row">
+      <div class="opd-search">
+        <i class="fa-solid fa-magnifying-glass opd-search-icon"></i>
+        <input type="text" id="opdSearchInput" placeholder="Search Project" autocomplete="off">
+
+        <!-- ---------- Project dropdown ----------
+             Rendered/populated by js/operator/operator-dashboard.js
+             right after opdEnsureActiveProject() resolves which
+             project(s) 360master/Admin assigned to this Operator's
+             account. The search input itself is pre-filled with the
+             active project's name (see opd-search-project-prefill in
+             js/operator/operator-dashboard.js); focusing the input
+             selects that text and opens this dropdown so the
+             Operator can either keep typing to search graphs on the
+             Project Overview tab, or click an entry here to switch
+             active project — which calls window.PC_setActiveProject
+             so System Information / Battery Station / Task
+             Management below all follow automatically. Hidden
+             entirely until a project resolves, and stays hidden if
+             this account isn't an Operator or has no assignment at
+             all (see #opdNoProjectState instead). ---------- -->
+        <div class="opd-project-dropdown" id="opdProjectDropdown" style="display:none;"></div>
+      </div>
+      <button type="button" class="opd-btn opd-btn-primary" id="opdAddGraphBtn">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Add Graph</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ---------- No-project state ----------
+       Shown instead of everything else's usual content when
+       opdEnsureActiveProject() in js/operator/operator-dashboard.js resolves that this
+       Operator account has NOT been assigned any project yet (see
+       "Manage Projects" in Admin View). System Information / Battery
+       Station / Task Management tabs also each show their own short
+       version of this message instead of silently falling back to
+       Tawabi's data (see switchTab() in js/operator/operator-
+       dashboard.js). ---------- -->
+  <div class="opd-no-project-state" id="opdNoProjectState" style="display:none;">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <p>Anda belum memiliki project yang ditugaskan. Hubungi 360master/Admin untuk mendapatkan akses project.</p>
+  </div>
+
+  <!-- ---------- Bill Savings settings modal (operator's own instance —
+       reuses the SAME .pd-env-settings-modal-* classes from
+       css/project-detail.css, loaded globally, so no extra CSS is
+       needed here. Shares the SAME localStorage config key/project id
+       as Project Overview's modal (see OPD_ENV_TARIFF_CFG_KEY in
+       js/operator/operator-dashboard.js) so both pages always agree
+       on the same Bill Savings basis. ---------- -->
+  <div class="pd-env-settings-modal-backdrop" id="opdEnvSettingsModal" aria-hidden="true">
+    <div class="pd-env-settings-modal" role="dialog" aria-modal="true" aria-labelledby="opdEnvSettingsTitle">
+      <div class="pd-env-settings-modal-head">
+        <div>
+          <span class="pd-report-eyebrow">Environmental Impact</span>
+          <h3 id="opdEnvSettingsTitle">Bill Savings Settings</h3>
+        </div>
+        <button class="pd-report-close-btn" type="button" id="opdEnvSettingsCloseBtn" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="pd-env-settings-modal-body">
+        <p class="pd-env-settings-desc">Choose how the electricity cost basis is calculated for the Bill Savings figure.</p>
+
+        <div class="pd-env-settings-source-toggle" id="opdEnvSourceToggle">
+          <label class="pd-env-source-option">
+            <input type="radio" name="opdEnvSource" value="pln" id="opdEnvSourcePln" checked>
+            <span><i class="fa-solid fa-bolt"></i> PLN Tariff</span>
+          </label>
+          <label class="pd-env-source-option">
+            <input type="radio" name="opdEnvSource" value="manual" id="opdEnvSourceManual">
+            <span><i class="fa-solid fa-gas-pump"></i> Diesel Fuel Cost</span>
+          </label>
+        </div>
+
+        <div class="pd-env-settings-field" id="opdEnvPlnField">
+          <label for="opdEnvPlnSelect">PLN Tariff Category</label>
+          <select id="opdEnvPlnSelect"></select>
+        </div>
+
+        <div class="pd-env-settings-field" id="opdEnvManualField" hidden>
+          <label for="opdEnvManualInput">Diesel Fuel Cost (Rp / kWh)</label>
+          <div class="pd-env-manual-input-wrap">
+            <span class="pd-env-manual-prefix">Rp</span>
+            <input type="text" inputmode="numeric" autocomplete="off" id="opdEnvManualInput" placeholder="3.500">
+          </div>
+          <span class="pd-env-settings-hint">Enter your generator's estimated cost per kWh produced.</span>
+        </div>
+      </div>
+
+      <div class="pd-env-settings-modal-actions">
+        <button class="btn btn-secondary" type="button" id="opdEnvSettingsCancelBtn">Cancel</button>
+        <button class="btn btn-primary" type="button" id="opdEnvSettingsSaveBtn">
+          <i class="fa-solid fa-check"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- Search bar + Add Graph now live in .opd-head-row,
+       next to the title (see above). ---------- -->
+
+  <!-- ---------- Tab bar (same component/classes as Project Monitoring) ----------
+       Project Overview sits leftmost and is the tab open by default;
+       System Information / Battery Station / Task Management follow. ---------- -->
+  <nav class="pm-tabs" id="opdTabs" aria-label="Operator dashboard sections">
+    <button class="pm-tab is-active" type="button" data-tab="project">
+      <span class="pm-tab-icon"><i class="fa-solid fa-chart-line"></i></span>
+      <span>Project Overview</span>
+    </button>
+    <button class="pm-tab" type="button" data-tab="system">
+      <span class="pm-tab-icon"><i class="fa-solid fa-table-cells-large"></i></span>
+      <span>System Information</span>
+    </button>
+    <button class="pm-tab" type="button" data-tab="battery">
+      <span class="pm-tab-icon"><i class="fa-solid fa-car-battery"></i></span>
+      <span>Battery Station</span>
+    </button>
+    <button class="pm-tab" type="button" data-tab="task">
+      <span class="pm-tab-icon"><i class="fa-solid fa-list-check"></i></span>
+      <span>Task Management</span>
+    </button>
+  </nav>
+
+  <!-- ---------- Panels ----------
+       Project Overview stays exactly as before (in-page card/graph
+       grid, js/operator/operator-dashboard.js). System Information /
+       Battery Station / Task Management now behave like Admin 360's
+       Project Monitoring tabs (pages/project-monitoring.html +
+       js/project-monitoring.js): each is lazy-fetched once from its
+       real page (pages/system-information.html, pages/battery-
+       station.html, pages/task-management.html) and rendered with
+       that page's own initializer, instead of the empty opd-grid
+       placeholder. ---------- -->
+  <div class="pm-tab-panels">
+    <div class="pm-tab-panel is-active" data-panel="project">
+      <!-- ---------- Environmental Impact (same block as Project
+           Overview Admin 360's, kept compact here — .opd-env-compact
+           shrinks the text so the icons stay the visual focus — see
+           css/operator/operator-dashboard.css). Each mini-card is
+           tinted with a transparent version of its own icon color.
+           Lives inside the Project Overview tab panel only, so it
+           doesn't show on System Information / Battery Station /
+           Task Management. ---------- -->
+      <div class="pd-card pd-card-environmental opd-env-compact" id="opdEnvCard">
+        <div class="pd-card-head">
+          <div>
+            <h2><i class="fa-solid fa-leaf"></i> Environmental Impact</h2>
+            <p>Benefit generated since commissioning</p>
+          </div>
+          <button class="btn btn-secondary pd-env-settings-btn" type="button" id="opdEnvSettingsBtn">
+            <i class="fa-solid fa-gear"></i> <span>Settings</span>
+          </button>
+        </div>
+        <div class="pd-env-grid">
+          <div class="pd-env-card is-energy">
+            <span class="pd-env-icon"><i class="fa-solid fa-bolt"></i></span>
+            <div class="pd-env-value"><span id="opdEnvEnergy">0.0</span> <small id="opdEnvEnergyUnit">MWh</small></div>
+            <div class="pd-env-label">Energy Saved</div>
+          </div>
+          <div class="pd-env-arrow"><i class="fa-solid fa-arrow-right-long"></i></div>
+          <div class="pd-env-card is-savings">
+            <span class="pd-env-icon"><i class="fa-solid fa-sack-dollar"></i></span>
+            <div class="pd-env-value"><span id="opdEnvBillSavings">Rp 0</span></div>
+            <div class="pd-env-label">Bill Savings</div>
+            <div class="pd-env-sub" id="opdEnvBillSavingsSource">Based on PLN Tariff</div>
+          </div>
+          <div class="pd-env-arrow"><i class="fa-solid fa-arrow-right-long"></i></div>
+          <div class="pd-env-card is-co2">
+            <span class="pd-env-icon"><i class="fa-solid fa-cloud"></i></span>
+            <div class="pd-env-value"><span id="opdEnvCo2">0.0</span> <small>ton CO₂</small></div>
+            <div class="pd-env-label">CO₂ Emissions Saved</div>
+            <div class="pd-env-sub">vs. grid electricity generation</div>
+          </div>
+          <div class="pd-env-arrow"><i class="fa-solid fa-arrow-right-long"></i></div>
+          <div class="pd-env-card is-trees">
+            <span class="pd-env-icon"><i class="fa-solid fa-tree"></i></span>
+            <div class="pd-env-value"><span id="opdEnvTrees">0</span> <small>trees</small></div>
+            <div class="pd-env-label">Trees Equivalent</div>
+            <div class="pd-env-sub">CO₂ absorption per year, if planted</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opd-grid" id="opdGrid-project"></div>
+    </div>
+    <div class="pm-tab-panel" id="opdPanel-system" data-panel="system">
+      <div class="pm-loading"><i class="fa-solid fa-spinner fa-spin"></i> Memuat System Information...</div>
+    </div>
+    <div class="pm-tab-panel" id="opdPanel-battery" data-panel="battery">
+      <div class="pm-loading"><i class="fa-solid fa-spinner fa-spin"></i> Memuat Battery Station...</div>
+    </div>
+    <div class="pm-tab-panel" id="opdPanel-task" data-panel="task">
+      <div class="pm-loading"><i class="fa-solid fa-spinner fa-spin"></i> Memuat Task Management...</div>
+    </div>
+  </div>
+
+  <!-- ---------- "Create graph" modal ----------
+       Opened by the "Add Graph" button and by the Project Overview
+       grid's dashed "+" tile. Left pane = variable checklist grouped
+       by category, right pane = live Chart.js preview + title/type
+       controls. Variables and their real daily series come from
+       server/data/tawabi-graph-variables.json (same PLTS TAWABI
+       Solarman logger export used elsewhere in eDash) — fetched by
+       js/operator/operator-dashboard.js, not hardcoded here. Reuses
+       the shared .modal-backdrop/.modal-card/.modal-btn/.modal-input
+       components (see css/alert.css); layout-specific parts are the
+       .opd-graph-* classes in css/operator/operator-dashboard.css. -->
+  <div class="modal-backdrop opd-graph-modal" id="opdGraphModal" aria-hidden="true">
+    <div class="modal-card opd-graph-modal-card" role="dialog" aria-modal="true" aria-labelledby="opdGraphModalTitle">
+      <div class="modal-scroll opd-graph-modal-scroll">
+
+        <div class="modal-header">
+          <span class="modal-title" id="opdGraphModalTitle">Create graph</span>
+          <button type="button" class="modal-close" id="opdGraphCloseBtn" aria-label="Close">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <p class="opd-graph-subtitle" id="opdGraphSubtitle">Variables recorded on this device.</p>
+
+        <div class="opd-graph-device-switch" id="opdGraphDeviceSwitch">
+          <span class="opd-graph-device-label">Device:</span>
+          <div class="opd-graph-segmented" id="opdGraphDeviceToggle"></div>
+        </div>
+
+        <div class="opd-graph-divider"></div>
+
+        <!-- Skeleton shown while ensureGraphCatalog() is fetching this
+             project's telemetry/history for the first time. Swapped for
+             #opdGraphBody once the catalog promise resolves (see
+             openGraphModal() in js/operator/operator-dashboard.js). -->
+        <div class="opd-graph-loading" id="opdGraphLoading" aria-hidden="true">
+          <div class="opd-graph-skel-col opd-graph-skel-col-left">
+            <div class="opd-graph-skel-bar" style="width:55%;height:10px;margin-bottom:14px;"></div>
+            <div class="opd-graph-skel-row"></div>
+            <div class="opd-graph-skel-row"></div>
+            <div class="opd-graph-skel-row"></div>
+            <div class="opd-graph-skel-bar" style="width:40%;height:10px;margin:18px 0 14px;"></div>
+            <div class="opd-graph-skel-row"></div>
+            <div class="opd-graph-skel-row"></div>
+          </div>
+          <div class="opd-graph-skel-col opd-graph-skel-col-right">
+            <div class="opd-graph-skel-bar" style="width:100%;height:34px;border-radius:8px;margin-bottom:16px;"></div>
+            <div class="opd-graph-skel-bar" style="width:30%;height:10px;margin-bottom:10px;"></div>
+            <div class="opd-graph-skel-box"></div>
+          </div>
+          <p class="opd-graph-loading-caption"><i class="fa-solid fa-circle-notch fa-spin"></i> Memuat variabel grafik &hellip;</p>
+        </div>
+
+        <!-- Error state shown if ensureGraphCatalog() rejects (fetch/
+             network failure, or a project with no telemetry-enabled
+             devices yet). Offers a retry without needing to close the
+             modal. -->
+        <div class="opd-graph-error" id="opdGraphError" aria-hidden="true">
+          <div class="opd-graph-empty-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <p><strong>Gagal memuat daftar variabel grafik</strong></p>
+          <p class="opd-graph-empty-sub" id="opdGraphErrorMsg">Periksa koneksi Anda lalu coba lagi.</p>
+          <button type="button" class="modal-btn modal-btn-secondary" id="opdGraphRetryBtn">
+            <i class="fa-solid fa-rotate-right"></i> Coba lagi
+          </button>
+        </div>
+
+        <div class="opd-graph-body" id="opdGraphBody">
+
+          <!-- LEFT: variable picker (categories injected by JS) -->
+          <div class="opd-graph-var-panel" id="opdGraphVarPanel"></div>
+
+          <!-- RIGHT: chart builder -->
+          <div class="opd-graph-chart-panel" id="opdGraphChartPanel">
+
+            <div class="opd-graph-field-row">
+              <div class="opd-graph-field opd-graph-field-title">
+                <label for="opdGraphTitleInput">Graph title</label>
+                <input type="text" id="opdGraphTitleInput" class="modal-input" placeholder="Select a variable on the left…">
+              </div>
+              <div class="opd-graph-field-chart-type" id="opdGraphTypeField" style="display:none;">
+                <label>Graph type</label>
+                <div class="opd-graph-segmented" id="opdGraphTypeToggle">
+                  <button type="button" class="opd-graph-seg-btn is-active" data-type="line">Line</button>
+                  <button type="button" class="opd-graph-seg-btn" data-type="bar">Bar</button>
+                  <!-- "Compare" (atas-bawah/mirror) -- HIDDEN (bukan cuma
+                       disabled) secara default; cuma dimunculkan oleh JS
+                       (lihat updateGraphCompareAvailability() di
+                       js/operator/operator-dashboard.js) kalau tepat 2
+                       variabel yang dicentang dan pasangannya ada di
+                       whitelist GRAPH_COMPARE_PAIRS (mis. Daily Production
+                       vs Daily Consumption). -->
+                  <button type="button" class="opd-graph-seg-btn is-hidden" data-type="compare" id="opdGraphCompareBtn" disabled title="Hanya tersedia untuk pasangan variabel tertentu, mis. Produksi vs Konsumsi Energi">Compare</button>
+                  <!-- "Stack" -- pecah SATU variabel "Daily Consumption"/
+                       "Daily Production" jadi kurva tumpukan (stacked area)
+                       sumber energi (PV / Baterai / PLN) per hari. HIDDEN
+                       secara default, sama seperti "Compare" -- cuma
+                       dimunculkan oleh JS (lihat updateGraphStackAvailability())
+                       kalau tepat 1 variabel yang dicentang dan variabel itu
+                       salah satu trigger GRAPH_STACK_CONFIGS. -->
+                  <button type="button" class="opd-graph-seg-btn is-hidden" data-type="stack" id="opdGraphStackBtn" disabled title="Only available for Daily Consumption or Daily Production, split into their derived components">Stack</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="opd-graph-preview-label">Preview</div>
+
+            <div class="opd-graph-stats-row" id="opdGraphStatsRow"></div>
+
+            <div class="opd-graph-preview-box" id="opdGraphPreviewBox">
+              <div class="opd-graph-empty-state" id="opdGraphEmptyState">
+                <div class="opd-graph-empty-icon"><i class="fa-solid fa-chart-line"></i></div>
+                <p><strong>No variable selected yet</strong></p>
+                <p class="opd-graph-empty-sub">Check one or more variables on the left to preview the graph here. The data used is actual data from the PLTS TAWABI logger (daily average).</p>
+              </div>
+              <canvas id="opdGraphPreviewCanvas" style="display:none;"></canvas>
+            </div>
+
+            <div class="opd-graph-legend" id="opdGraphLegend"></div>
+
+            <p class="opd-graph-preview-caption" id="opdGraphPreviewCaption"></p>
+
+          </div>
+
+        </div>
+
+        <div class="modal-actions opd-graph-actions">
+          <button t
+          
+          ype="button" class="modal-btn modal-btn-secondary" id="opdGraphCancelBtn">Cancel</button>
+          <div class="modal-actions-right">
+            <button type="button" class="modal-btn modal-btn-primary" id="opdGraphAddBtn" disabled>Add graph</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

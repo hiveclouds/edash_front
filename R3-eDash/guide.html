@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>360eDash — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #0f6a71;
+    --primary-dark: #0b4f54;
+    --primary-header: #6DC3BB;
+    --primary-soft: #e4f1f1;
+    --accent: #FA891A;
+    --success: #2F9E6E;
+    --success-soft: #E4F5EC;
+    --warning: #E3A21A;
+    --warning-soft: #FBF1DE;
+    --danger: #D64545;
+    --danger-soft: #FBE8E8;
+    --info: #3E7CB1;
+    --info-soft: #E7F0F8;
+    --ink: #25343F;
+    --muted: #7C8B8D;
+    --border: #E7EDEE;
+    --surface: #FFFFFF;
+    --page-bg: #F4F7F7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--page-bg);
+    color: var(--ink);
+    padding: 40px 24px 80px;
+  }
+
+  .wrap {
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  header.page-head {
+    margin-bottom: 44px;
+  }
+  header.page-head .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 8px;
+  }
+  header.page-head h1 {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  header.page-head p {
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.6;
+  }
+
+  section {
+    margin-bottom: 52px;
+  }
+
+  .section-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ---------- Color swatches ---------- */
+  .swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+  }
+
+  .swatch {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .swatch-color {
+    height: 64px;
+  }
+  .swatch-meta {
+    padding: 10px 12px 12px;
+  }
+  .swatch-name {
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  .swatch-hex {
+    font-size: 11.5px;
+    color: var(--muted);
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    margin-top: 2px;
+  }
+  .swatch-use {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  .group-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 28px 0 12px;
+  }
+  .group-label:first-child { margin-top: 0; }
+
+  /* ---------- Typography specimen ---------- */
+  .type-row {
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .type-row:last-child { border-bottom: none; }
+  .type-tag {
+    flex: 0 0 150px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'SFMono-Regular', Consolas, monospace;
+    line-height: 1.6;
+  }
+  .type-tag b {
+    display: block;
+    color: var(--ink);
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .type-sample {
+    flex: 1;
+    min-width: 0;
+    color: var(--ink);
+  }
+
+  .h1-sample { font-size: 30px; font-weight: 700; letter-spacing: -0.01em; }
+  .h2-sample { font-size: 20px; font-weight: 600; }
+  .h3-sample { font-size: 16px; font-weight: 600; }
+  .body-sample { font-size: 14px; font-weight: 400; line-height: 1.6; }
+  .label-sample { font-size: 13.5px; font-weight: 500; }
+  .eyebrow-sample { font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  .caption-sample { font-size: 11.5px; font-weight: 400; color: var(--muted); }
+  .stat-sample { font-size: 32px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* ---------- Rules list ---------- */
+  .rules {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .rules ol {
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .rules li {
+    font-size: 13.5px;
+    line-height: 1.65;
+  }
+  .rules li b { font-weight: 600; }
+  .rules code {
+    background: var(--primary-soft);
+    color: var(--primary-dark);
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-family: 'SFMono-Regular', Consolas, monospace;
+  }
+
+  /* ---------- Usage preview ---------- */
+  .preview-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .btn {
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: default;
+    border: 1px solid transparent;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-secondary { background: var(--surface); color: var(--ink); border-color: var(--border); }
+  .pill { font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: 999px; }
+  .pill-success { background: var(--success-soft); color: var(--success); }
+  .pill-warning { background: var(--warning-soft); color: var(--warning); }
+  .pill-danger { background: var(--danger-soft); color: var(--danger); }
+  .pill-info { background: var(--info-soft); color: var(--info); }
+
+  /* ---------- Save as PDF button ---------- */
+  .pdf-btn {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: 11px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(11, 79, 84, 0.22);
+    transition: background 0.15s ease, transform 0.15s ease;
+    z-index: 100;
+  }
+  .pdf-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+  }
+  .pdf-btn svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+  }
+
+  /* ---------- Print / Save as PDF ---------- */
+  @media print {
+    .pdf-btn { display: none; }
+
+    * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    body {
+      background: #fff;
+      padding: 0;
+    }
+
+    .wrap {
+      max-width: 100%;
+    }
+
+    section {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .swatch {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    header.page-head {
+      margin-bottom: 28px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<button class="pdf-btn" id="pdfBtn" type="button" onclick="window.print()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 15V3"/>
+    <path d="M6 9l6 6 6-6"/>
+    <path d="M4 21h16"/>
+  </svg>
+  <span>Save as PDF</span>
+</button>
+
+<div class="wrap">
+
+  <header class="page-head">
+    <div class="eyebrow">360eDash · Design System</div>
+    <h1>Color palette &amp; typography</h1>
+    <p>Guide Theme Web EDash.</p>
+  </header>
+
+  <!-- ============ COLOR ============ -->
+  <section>
+    <div class="section-title">Warna</div>
+
+    <div class="group-label">Brand</div>
+    <div class="swatch-grid">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#0f6a71"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Primary Teal</div>
+          <div class="swatch-hex">#0F6A71</div>
+          <div class="swatch-use">Tombol primary, active nav, ikon aksen, link</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#0b4f54"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Primary Dark</div>
+          <div class="swatch-hex">#0B4F54</div>
+          <div class="swatch-use">Hover / pressed state dari primary</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#6DC3BB"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Header Teal</div>
+          <div class="swatch-hex">#6DC3BB</div>
+          <div class="swatch-use">Background header, permukaan sekunder brand</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#e4f1f1"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Primary Soft</div>
+          <div class="swatch-hex">#E4F1F1</div>
+          <div class="swatch-use">Tint background untuk hover/active item</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#FA891A"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Accent Orange</div>
+          <div class="swatch-hex">#FA891A</div>
+          <div class="swatch-use">Greeting, sorotan personal, satu titik aksen — pakai sedikit</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="group-label">Status / semantik</div>
+    <div class="swatch-grid">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#2F9E6E"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Success</div>
+          <div class="swatch-hex">#2F9E6E</div>
+          <div class="swatch-use">Status online/normal, konfirmasi berhasil</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#E3A21A"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Warning</div>
+          <div class="swatch-hex">#E3A21A</div>
+          <div class="swatch-use">Sinyal lemah, ambang batas, perlu perhatian</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#D64545"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Danger</div>
+          <div class="swatch-hex">#D64545</div>
+          <div class="swatch-use">Error, offline, logout hover, hapus</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#3E7CB1"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Info</div>
+          <div class="swatch-hex">#3E7CB1</div>
+          <div class="swatch-use">Notifikasi netral, System Information</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="group-label">Netral &amp; permukaan</div>
+    <div class="swatch-grid">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#25343F"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Ink</div>
+          <div class="swatch-hex">#25343F</div>
+          <div class="swatch-use">Teks utama di seluruh dashboard</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#7C8B8D"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Muted</div>
+          <div class="swatch-hex">#7C8B8D</div>
+          <div class="swatch-use">Teks sekunder, ikon non-aktif, caption</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#E7EDEE"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Border</div>
+          <div class="swatch-hex">#E7EDEE</div>
+          <div class="swatch-use">Garis pembatas, divider antar section</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#FFFFFF; border-bottom:1px solid #eee"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Surface</div>
+          <div class="swatch-hex">#FFFFFF</div>
+          <div class="swatch-use">Background card, sidebar, tombol secondary</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#F4F7F7"></div>
+        <div class="swatch-meta">
+          <div class="swatch-name">Page BG</div>
+          <div class="swatch-hex">#F4F7F7</div>
+          <div class="swatch-use">Background halaman di belakang konten/peta</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ USAGE PREVIEW ============ -->
+  <section>
+    <div class="section-title">Contoh pemakaian</div>
+    <div class="preview-row">
+      <button class="btn btn-primary">Tombol Primary</button>
+      <button class="btn btn-secondary">Tombol Secondary</button>
+      <span class="pill pill-success">Online</span>
+      <span class="pill pill-warning">Sinyal Lemah</span>
+      <span class="pill pill-danger">Offline</span>
+      <span class="pill pill-info">Info</span>
+    </div>
+  </section>
+
+  <!-- ============ TYPOGRAPHY ============ -->
+  <section>
+    <div class="section-title">Tipografi — Poppins</div>
+
+    <div class="type-row">
+      <div class="type-tag"><b>Page title</b>30px / 700 / -0.01em</div>
+      <div class="type-sample h1-sample">Project Overview</div>
+    </div>
+    <div class="type-row">
+      <div class="type-tag"><b>Section title</b>20px / 600</div>
+      <div class="type-sample h2-sample">Ringkasan Armada</div>
+    </div>
+    <div class="type-row">
+      <div class="type-tag"><b>Card title</b>16px / 600</div>
+      <div class="type-sample h3-sample">Status Kendaraan</div>
+    </div>
+    <div class="type-row">
+      <div class="type-tag"><b>Body</b>14px / 400 / 1.6</div>
+      <div class="type-sample body-sample">Teks paragraf standar untuk deskripsi, tabel, dan konten panjang di seluruh dashboard.</div>
+    </div>
+    <div class="type-row">
+      <div class="type-tag"><b>Label / nav item</b>13.5px / 500</div>
+      <div class="type-sample label-sample">Project Selector</div>
+    </div>
+    <div class="type-row">
+      <div class="type-tag"><b>Eyebrow / group title</b>10.5px / 600 / uppercase</div>
+      <div class="type-sample eyebrow-sample">Monitoring</div>
+    </div>
+    <div class="type-row">
+      <div class="type-tag"><b>Caption</b>11.5px / 400</div>
+      <div class="type-sample caption-sample">Diperbarui 2 menit lalu</div>
+    </div>
+    <div class="type-row">
+      <div class="type-tag"><b>Angka statistik</b>32px / 700 / tabular-nums</div>
+      <div class="type-sample stat-sample">128</div>
+    </div>
+  </section>
+
+  <!-- ============ RULES ============ -->
+  <section>
+    <div class="section-title">Aturan pemakaian</div>
+    <div class="rules">
+      <ol>
+        <li><b>Satu keluarga font.</b> Pakai <code>Poppins</code> di semua elemen — jangan campur dengan font sistem, biar konsisten dengan sidebar &amp; header yang sudah ada.</li>
+        <li><b>Skala berat terbatas.</b> Cuma pakai 4 weight: <code>400</code> body, <code>500</code> label/tombol/nav, <code>600</code> heading/active state, <code>700</code> page title &amp; angka besar. Jangan pakai 300 atau 800+.</li>
+        <li><b>Eyebrow selalu uppercase + letter-spacing.</b> Judul grup section (mis. "Monitoring", "Tools") pakai <code>10.5px</code>, <code>600</code>, <code>letter-spacing: 0.06em</code>, warna <code>--muted</code> — jangan bikin size lebih besar dari body text.</li>
+        <li><b>Orange cuma untuk satu titik aksen.</b> <code>#FA891A</code> dipakai buat sapaan personal ("Halo, John!") — jangan dipakai di tombol atau elemen berulang, biar tetap terasa spesial.</li>
+        <li><b>Warna status dari palet semantik saja.</b> Success/warning/danger/info punya versi solid dan versi soft (tint background). Gunakan versi soft untuk background pill/badge, versi solid untuk teks atau ikon di atasnya.</li>
+        <li><b>Kontras teks.</b> Teks utama selalu <code>--ink (#25343F)</code> di atas permukaan terang; teks putih hanya di atas warna solid brand/status yang cukup gelap (primary, danger, dsb).</li>
+        <li><b>Angka pakai tabular numerals.</b> Untuk statistik dashboard (jumlah kendaraan, skor performa, dsb), tambahkan <code>font-variant-numeric: tabular-nums</code> supaya digit sejajar rapi saat berubah.</li>
+        <li><b>Radius &amp; border konsisten.</b> Card/section besar radius <code>12–16px</code>, tombol &amp; nav item <code>9–10px</code>, badge/pill selalu <code>999px</code> (full round). Border tipis <code>1px solid #E7EDEE</code> untuk semua pemisah.</li>
+      </ol>
+    </div>
+  </section>
+
+</div>
+
+</body>
+</html>

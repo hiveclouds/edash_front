@@ -1,0 +1,428 @@
+<!-- ============================================================
+     Page: Settings — 360eDash
+     Fragment ini dimuat ke #page-root untuk route "Setting".
+     4 kategori: Appearance, Language, Profile, Account.
+     + Role Access (kategori ke-5, khusus role "admin360" — lihat
+       stRoleAccessSetup() di js/project-selector.js).
+============================================================= -->
+<div class="st-page">
+
+  <!-- ---------- Page head ---------- -->
+  <header class="st-head">
+    <h1 class="st-title" data-i18n="settings.title">Settings</h1>
+  </header>
+
+  <div class="st-layout">
+
+    <!-- ---------- Quick jump tabs (sticky) ---------- -->
+    <nav class="st-tabs" id="stTabs" aria-label="Settings sections">
+      <button class="st-tab is-active" type="button" data-target="stAppearance">
+        <span class="st-tab-icon"><i class="fa-solid fa-swatchbook"></i></span>
+        <span data-i18n="settings.tabs.appearance">Appearance</span>
+      </button>
+      <button class="st-tab" type="button" data-target="stLanguage">
+        <span class="st-tab-icon"><i class="fa-solid fa-globe"></i></span>
+        <span data-i18n="settings.tabs.language">Language</span>
+      </button>
+      <button class="st-tab" type="button" data-target="stProfile">
+        <span class="st-tab-icon"><i class="fa-solid fa-user"></i></span>
+        <span data-i18n="settings.tabs.profile">Profile</span>
+      </button>
+      <button class="st-tab" type="button" data-target="stAccount">
+        <span class="st-tab-icon"><i class="fa-solid fa-shield-halved"></i></span>
+        <span data-i18n="settings.tabs.account">Account</span>
+      </button>
+      <!-- Admin 360 only — removed from the DOM entirely for any other
+           role by stRoleAccessSetup() in js/project-selector.js before the tab
+           scroller initializes, so it never appears for non-admins. -->
+      <button class="st-tab" type="button" data-target="stRoleAccess" id="stRoleAccessTab" hidden>
+        <span class="st-tab-icon"><i class="fa-solid fa-user-shield"></i></span>
+        <span data-i18n="settings.tabs.roleAccess">Role Access</span>
+      </button>
+    </nav>
+
+    <!-- ---------- Sections ---------- -->
+    <div class="st-sections">
+
+      <!-- ============ 1. APPEARANCE ============ -->
+      <section class="st-card st-panel is-active-panel" id="stAppearance">
+
+        <div class="st-card-head">
+          <div>
+            <h2 data-i18n="settings.appearance.title">Appearance</h2>
+            <p data-i18n="settings.appearance.desc">Pilih tema tampilan yang paling nyaman di mata kamu.</p>
+          </div>
+        </div>
+
+        <div class="st-card-body">
+
+          <div class="st-theme-grid" id="stThemeGrid" role="radiogroup" aria-label="Theme">
+
+            <!-- Light -->
+            <button class="st-theme-option is-selected" type="button" data-theme="light" role="radio" aria-checked="true">
+              <span class="st-theme-preview st-theme-preview-light" aria-hidden="true">
+                <span class="st-theme-preview-bar"></span>
+                <span class="st-theme-preview-side"></span>
+                <span class="st-theme-preview-card"></span>
+                <span class="st-theme-preview-card st-theme-preview-card-sm"></span>
+              </span>
+              <span class="st-theme-option-meta">
+                <span class="st-theme-radio"></span>
+                <span class="st-theme-option-label" data-i18n="settings.appearance.light">Light Mode</span>
+              </span>
+            </button>
+
+            <!-- Dark -->
+            <button class="st-theme-option" type="button" data-theme="dark" role="radio" aria-checked="false">
+              <span class="st-theme-preview st-theme-preview-dark" aria-hidden="true">
+                <span class="st-theme-preview-bar"></span>
+                <span class="st-theme-preview-side"></span>
+                <span class="st-theme-preview-card"></span>
+                <span class="st-theme-preview-card st-theme-preview-card-sm"></span>
+              </span>
+              <span class="st-theme-option-meta">
+                <span class="st-theme-radio"></span>
+                <span class="st-theme-option-label" data-i18n="settings.appearance.dark">Dark Mode</span>
+              </span>
+            </button>
+
+
+          </div>
+
+          <p class="st-hint">
+            <i class="fa-solid fa-circle-info"></i>
+            <span data-i18n="settings.appearance.hint">Mode gelap disimpan sebagai preferensi kamu dan akan diterapkan ke seluruh dashboard secara bertahap.</span>
+          </p>
+
+        </div>
+
+      </section>
+
+      <!-- ============ 2. LANGUAGE ============ -->
+      <section class="st-card st-panel" id="stLanguage">
+
+        <div class="st-card-head">
+          <div>
+            <h2 data-i18n="settings.language.title">Language</h2>
+            <p data-i18n="settings.language.desc">Atur bahasa tampilan untuk seluruh menu dan label dashboard.</p>
+          </div>
+        </div>
+
+        <div class="st-card-body">
+
+          <div class="st-field st-field-inline">
+            <label for="stLanguageSelect" data-i18n="settings.language.label">Display language</label>
+
+            <div class="st-select-wrap">
+              <i class="fa-solid fa-globe st-select-icon"></i>
+              <select id="stLanguageSelect" class="st-select">
+                <option value="id">Bahasa Indonesia</option>
+                <option value="en">English</option>
+              </select>
+              <i class="fa-solid fa-chevron-down st-select-caret"></i>
+            </div>
+          </div>
+
+          <p class="st-hint">
+            <i class="fa-solid fa-circle-info"></i>
+            <span data-i18n="settings.language.hint">Bahasa lain akan segera ditambahkan di update berikutnya.</span>
+          </p>
+
+        </div>
+
+      </section>
+
+      <!-- ============ 3. PROFILE ============ -->
+      <section class="st-card st-panel" id="stProfile">
+
+        <div class="st-card-head">
+          <div>
+            <h2 data-i18n="settings.profile.title">Profile</h2>
+            <p data-i18n="settings.profile.desc">Perbarui informasi profil dan kontak yang tampil di akun kamu.</p>
+          </div>
+        </div>
+
+        <form class="st-card-body" id="stProfileForm" novalidate>
+
+          <!-- Photo -->
+          <div class="st-photo-row">
+            <span class="st-avatar" id="stAvatarPreview">
+              <i class="fa-solid fa-user"></i>
+            </span>
+
+            <div class="st-photo-actions">
+              <label class="st-btn st-btn-secondary" for="stPhotoInput">
+                <i class="fa-solid fa-camera"></i>
+                <span data-i18n="settings.profile.changePhoto">Change Photo</span>
+              </label>
+              <input type="file" id="stPhotoInput" accept="image/png, image/jpeg" hidden>
+
+              <button type="button" class="st-btn st-btn-ghost" id="stPhotoRemove">
+                <i class="fa-solid fa-trash-can"></i>
+                <span data-i18n="settings.profile.removePhoto">Remove</span>
+              </button>
+
+              <p class="st-caption" data-i18n="settings.profile.photoHint">JPG atau PNG, maksimal 2MB.</p>
+            </div>
+          </div>
+
+          <!-- Fields -->
+          <div class="st-form-grid">
+
+            <div class="st-field">
+              <label for="stFullName" data-i18n="settings.profile.fullName">Full Name</label>
+              <input type="text" id="stFullName" name="fullName" value="" required>
+              <span class="st-error-msg" data-error="stFullName" data-i18n="settings.errors.required">This field is required.</span>
+            </div>
+
+            <div class="st-field">
+              <label for="stEmail" data-i18n="settings.profile.email">Email</label>
+              <input type="email" id="stEmail" name="email" value="" required>
+              <span class="st-error-msg" data-error="stEmail" data-i18n="settings.errors.email">Enter a valid email address.</span>
+            </div>
+
+            <div class="st-field">
+              <label for="stPhone" data-i18n="settings.profile.phone">Phone Number</label>
+              <input type="tel" id="stPhone" name="phone" value="" required>
+              <span class="st-error-msg" data-error="stPhone" data-i18n="settings.errors.phone">Enter a valid phone number.</span>
+            </div>
+
+            <div class="st-field">
+              <label for="stPosition" data-i18n="settings.profile.position">Job Position</label>
+              <input type="text" id="stPosition" name="position" value="" required>
+              <span class="st-error-msg" data-error="stPosition" data-i18n="settings.errors.required">This field is required.</span>
+            </div>
+
+          </div>
+
+          <div class="st-card-actions">
+            <span class="st-save-state" id="stProfileSaveState"></span>
+            <button type="button" class="st-btn st-btn-secondary" id="stProfileReset" data-i18n="settings.profile.discard">Discard</button>
+            <button type="submit" class="st-btn st-btn-primary" id="stProfileSave" disabled>
+              <i class="fa-solid fa-check"></i>
+              <span data-i18n="settings.profile.save">Save Changes</span>
+            </button>
+          </div>
+
+        </form>
+
+      </section>
+
+      <!-- ============ 4. ACCOUNT ============ -->
+      <section class="st-card st-panel" id="stAccount">
+
+        <div class="st-card-head">
+          <div>
+            <h2 data-i18n="settings.account.title">Account</h2>
+            <p data-i18n="settings.account.desc">Kelola username dan kata sandi untuk menjaga keamanan akun kamu.</p>
+          </div>
+        </div>
+
+        <form class="st-card-body" id="stAccountForm" novalidate>
+
+          <div class="st-form-grid">
+
+            <div class="st-field st-field-full">
+              <label for="stUsername" data-i18n="settings.account.username">Username</label>
+              <input type="text" id="stUsername" name="username" value="" required>
+              <span class="st-error-msg" data-error="stUsername" data-i18n="settings.errors.required">This field is required.</span>
+            </div>
+
+            <div class="st-field st-field-full">
+              <label for="stCurrentPassword" data-i18n="settings.account.currentPassword">Current Password</label>
+              <div class="st-password-wrap">
+                <input type="password" id="stCurrentPassword" name="currentPassword" placeholder="••••••••" autocomplete="current-password">
+                <button type="button" class="st-password-toggle" data-target="stCurrentPassword" aria-label="Show password">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+              </div>
+              <span class="st-error-msg" data-error="stCurrentPassword" data-i18n="settings.errors.required">This field is required.</span>
+            </div>
+
+            <div class="st-field">
+              <label for="stNewPassword" data-i18n="settings.account.newPassword">New Password</label>
+              <div class="st-password-wrap">
+                <input type="password" id="stNewPassword" name="newPassword" placeholder="••••••••" autocomplete="new-password" minlength="8">
+                <button type="button" class="st-password-toggle" data-target="stNewPassword" aria-label="Show password">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+              </div>
+              <span class="st-error-msg" data-error="stNewPassword" data-i18n="settings.errors.password">Minimum 8 characters.</span>
+            </div>
+
+            <div class="st-field">
+              <label for="stConfirmPassword" data-i18n="settings.account.confirmPassword">Confirm Password</label>
+              <div class="st-password-wrap">
+                <input type="password" id="stConfirmPassword" name="confirmPassword" placeholder="••••••••" autocomplete="new-password" minlength="8">
+                <button type="button" class="st-password-toggle" data-target="stConfirmPassword" aria-label="Show password">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+              </div>
+              <span class="st-error-msg" data-error="stConfirmPassword" data-i18n="settings.errors.confirmPassword">Passwords do not match.</span>
+            </div>
+
+            <div class="st-field st-field-full">
+              <div class="st-strength" id="stPasswordStrength" aria-hidden="true">
+                <span class="st-strength-bar"><i></i></span>
+                <span class="st-strength-label" data-i18n="settings.account.strength">Password strength</span>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="st-card-actions">
+            <span class="st-save-state" id="stAccountSaveState"></span>
+            <button type="button" class="st-btn st-btn-secondary" id="stAccountReset" data-i18n="settings.account.discard">Discard</button>
+            <button type="submit" class="st-btn st-btn-primary" id="stAccountSave" disabled>
+              <i class="fa-solid fa-lock"></i>
+              <span data-i18n="settings.account.update">Update Password</span>
+            </button>
+          </div>
+
+        </form>
+
+      </section>
+
+      <!-- ============ 5. ROLE ACCESS (Admin 360 only) ============ -->
+      <!-- Hidden by default; only shown/kept in the DOM when
+           sessionStorage "edash-role" === "admin360". See
+           stRoleAccessSetup() in js/project-selector.js. -->
+      <section class="st-card st-panel" id="stRoleAccess" hidden>
+
+        <div class="st-card-head">
+          <div>
+            <h2 data-i18n="settings.roleAccess.title">Role Access</h2>
+          </div>
+          <div class="st-ra-head-actions">
+            <button type="button" class="st-btn st-btn-secondary" id="stRoleAccessDeleteRole">
+              <i class="fa-solid fa-trash-can"></i>
+              <span data-i18n="settings.roleAccess.deleteRole">Delete Role</span>
+            </button>
+            <button type="button" class="st-btn st-btn-primary" id="stRoleAccessAddRole">
+              <i class="fa-solid fa-user-plus"></i>
+              <span data-i18n="settings.roleAccess.addRole">Add New Role</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="st-card-body">
+
+          <p class="st-hint">
+            <i class="fa-solid fa-circle-info"></i>
+            <span data-i18n="settings.roleAccess.hint">Setiap kolom adalah satu role. Aktifkan kapabilitas yang ingin diberikan ke role tersebut.</span>
+          </p>
+
+          <div class="st-ra-table-wrap" id="stRoleAccessTableWrap">
+            <!-- Table injected by stRoleAccessRenderTable() in js/project-selector.js -->
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </div>
+
+  <!-- ---------- Add New Role modal ---------- -->
+  <div class="st-modal-overlay" id="stAddRoleOverlay" aria-hidden="true">
+    <div class="st-modal" role="dialog" aria-modal="true" aria-labelledby="stAddRoleTitle" id="stAddRoleModal">
+
+      <span class="st-modal-icon st-modal-icon-primary">
+        <i class="fa-solid fa-user-plus"></i>
+      </span>
+
+      <h2 class="st-modal-title" id="stAddRoleTitle" data-i18n="settings.roleAccess.addRoleModal.title">Add New Role</h2>
+      <p class="st-modal-desc" data-i18n="settings.roleAccess.addRoleModal.desc">Beri nama role baru. Kamu bisa atur kapabilitasnya langsung dari matriks setelah dibuat.</p>
+
+      <div class="st-modal-field" id="stNewRoleField">
+        <label for="stNewRoleName" data-i18n="settings.roleAccess.addRoleModal.label">Role name</label>
+        <input type="text" id="stNewRoleName" maxlength="40" autocomplete="off">
+        <span class="st-modal-error" id="stNewRoleError" data-i18n="settings.roleAccess.addRoleModal.error">Nama role wajib diisi dan belum dipakai.</span>
+      </div>
+
+      <div class="st-modal-field st-modal-field-color" id="stNewRoleColorField">
+        <label for="stNewRoleColor" data-i18n="settings.roleAccess.addRoleModal.colorLabel">Role color</label>
+        <div class="st-color-picker">
+          <input type="color" id="stNewRoleColor" value="#0F6A71">
+          <span class="st-color-picker-value" id="stNewRoleColorValue">#0F6A71</span>
+        </div>
+      </div>
+
+      <div class="st-modal-actions">
+        <button type="button" class="st-btn st-btn-secondary" id="stAddRoleCancel" data-i18n="settings.roleAccess.modalCancel">Cancel</button>
+        <button type="button" class="st-btn st-btn-primary" id="stAddRoleConfirm" data-i18n="settings.roleAccess.addRoleModal.confirm">
+          <i class="fa-solid fa-plus"></i>
+          <span data-i18n="settings.roleAccess.addRoleModal.confirm">Add Role</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ---------- Edit Role (rename) modal ---------- -->
+  <div class="st-modal-overlay" id="stEditRoleOverlay" aria-hidden="true">
+    <div class="st-modal" role="dialog" aria-modal="true" aria-labelledby="stEditRoleTitle" id="stEditRoleModal">
+
+      <span class="st-modal-icon st-modal-icon-primary">
+        <i class="fa-solid fa-pen"></i>
+      </span>
+
+      <h2 class="st-modal-title" id="stEditRoleTitle" data-i18n="settings.roleAccess.editRoleModal.title">Rename Role</h2>
+      <p class="st-modal-desc" data-i18n="settings.roleAccess.editRoleModal.desc">Give this role a different display name. It only changes the label, not its capabilities.</p>
+
+      <div class="st-modal-field" id="stEditRoleField">
+        <label for="stEditRoleName" data-i18n="settings.roleAccess.editRoleModal.label">Role name</label>
+        <input type="text" id="stEditRoleName" maxlength="40" autocomplete="off">
+        <span class="st-modal-error" id="stEditRoleError" data-i18n="settings.roleAccess.editRoleModal.error">Enter a role name that isn't already in use.</span>
+      </div>
+
+      <div class="st-modal-actions">
+        <button type="button" class="st-btn st-btn-secondary" id="stEditRoleCancel" data-i18n="settings.roleAccess.modalCancel">Cancel</button>
+        <button type="button" class="st-btn st-btn-primary" id="stEditRoleConfirm" data-i18n="settings.roleAccess.editRoleModal.confirm">
+          <i class="fa-solid fa-check"></i>
+          <span data-i18n="settings.roleAccess.editRoleModal.confirm">Save Name</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ---------- Delete Role modal (permanent — confirmation alert) ---------- -->
+  <div class="st-modal-overlay" id="stDeleteRoleOverlay" aria-hidden="true">
+    <div class="st-modal" role="alertdialog" aria-modal="true" aria-labelledby="stDeleteRoleTitle" aria-describedby="stDeleteRoleWarning" id="stDeleteRoleModal">
+
+      <span class="st-modal-icon st-modal-icon-danger">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </span>
+
+      <h2 class="st-modal-title" id="stDeleteRoleTitle" data-i18n="settings.roleAccess.deleteRoleModal.title">Delete Role</h2>
+
+      <div class="st-modal-field">
+        <label for="stDeleteRoleSelect" data-i18n="settings.roleAccess.deleteRoleModal.label">Select role to delete</label>
+        <select id="stDeleteRoleSelect"></select>
+      </div>
+
+      <p class="st-modal-warning" id="stDeleteRoleWarning">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span data-i18n="settings.roleAccess.deleteRoleModal.warning">Role dan seluruh izinnya akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.</span>
+      </p>
+
+      <div class="st-modal-actions">
+        <button type="button" class="st-btn st-btn-secondary" id="stDeleteRoleCancel" data-i18n="settings.roleAccess.modalCancel">Cancel</button>
+        <button type="button" class="st-btn st-btn-danger" id="stDeleteRoleConfirm">
+          <i class="fa-solid fa-trash-can"></i>
+          <span data-i18n="settings.roleAccess.deleteRoleModal.confirm">Delete Permanently</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast (save / success feedback) -->
+<div class="st-toast" id="stToast" role="status" aria-live="polite">
+  <i class="fa-solid fa-circle-check"></i>
+  <span id="stToastMsg">Saved</span>
+</div>

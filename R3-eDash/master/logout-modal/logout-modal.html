@@ -1,0 +1,38 @@
+<!-- ============================================================
+  Master Logout Modal Component — 360eDash
+  Mounted once in index.html (#logout-modal-root), reused across
+  every page. Opened by clicking the sidebar "Logout" item.
+============================================================= -->
+<div class="lg-overlay" id="lgOverlay" aria-hidden="true">
+
+  <div
+    class="lg-modal"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="lgTitle"
+    aria-describedby="lgDesc"
+    id="lgModal"
+  >
+
+    <span class="lg-icon">
+      <i class="fa-solid fa-right-from-bracket"></i>
+    </span>
+
+    <h2 class="lg-title" id="lgTitle" data-i18n="logout.title">Log Out</h2>
+
+    <p class="lg-desc" id="lgDesc" data-i18n="logout.desc">
+      Are you sure you want to log out from your account?
+    </p>
+
+    <div class="lg-actions">
+      <button type="button" class="lg-btn lg-btn-secondary" id="lgCancelBtn" data-i18n="logout.cancel">
+        Cancel
+      </button>
+      <button type="button" class="lg-btn lg-btn-danger" id="lgConfirmBtn" data-i18n="logout.confirm">
+        Log Out
+      </button>
+    </div>
+
+  </div>
+
+</div>

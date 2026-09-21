@@ -1,0 +1,169 @@
+<!-- ============================================================
+     Page: Catalog — 360eDash
+     Catatan penting: file ini di-load sebagai FRAGMENT lewat
+     loadPage() di js/main.js, lalu di-inject ke dalam #page-root
+     yang sudah berada di dalam shell utama (index.html) — yaitu
+     .edash-layout > .edash-main > .edash-content.
+     Karena itu file ini TIDAK BOLEH punya <!DOCTYPE>, <html>,
+     <head>, <body>, ataupun wrapper .edash-layout/#sidebar-root/
+     #header-root/.edash-content sendiri. Kalau ditambahkan lagi,
+     itu akan membuat wrapper tsb NESTED di dalam punya index.html
+     yang asli → hasilnya 2 scrollbar bertumpuk.
+     CSS & script yang dibutuhkan (catalog.css, sidebar.css,
+     header.css, Poppins, Font Awesome, PapaParse) semuanya sudah
+     di-load sekali di index.html, jadi tidak perlu diulang di sini.
+     Bandingkan pola ini dengan pages/alert.html atau
+     pages/admin-calculator.html yang sudah benar.
+============================================================= -->
+      <div class="sp-wrap" id="spCatalogWrap">
+
+        <div class="sp-csv-drop-overlay" id="spCsvDropOverlay" aria-hidden="true">
+          <div class="sp-csv-drop-card">
+            <i class="fa-solid fa-file-csv"></i>
+            <p>Lepaskan file CSV di sini untuk memperbarui Katalog</p>
+          </div>
+        </div>
+
+        <div class="sp-head">
+          <h1>Catalog</h1>
+          <p>Daftar Harga &amp; Spesifikasi Komponen PLTS</p>
+          <p class="sp-byline">by 360Energy (PT. Pionir Energi Hijau)</p>
+        </div>
+
+        <div class="sp-catalog-head">
+          <div>
+            <p class="sp-section-title" style="margin-bottom:2px;">Katalog</p>
+            <p class="sp-catalog-hint" id="spCatalogHint">edit sel · harga dalam IDR</p>
+          </div>
+          <div class="sp-catalog-actions">
+            <input type="file" id="spCsvUploadInput" accept=".csv" class="hidden">
+            <button type="button" class="sp-btn sp-btn-outline" id="spCsvUploadBtn">
+              <i class="fa-solid fa-upload"></i> Upload CSV
+            </button>
+            <button type="button" class="sp-btn sp-btn-outline" id="spCsvDownloadBtn">
+              <i class="fa-solid fa-download"></i> Unduh CSV
+            </button>
+            <button type="button" class="sp-btn sp-btn-outline" id="spSpecToggleBtn">
+              <i class="fa-solid fa-gear"></i> Tampilkan Spesifikasi Teknik
+            </button>
+            <button type="button" class="sp-btn sp-btn-danger-outline" id="spDeleteAllBtn">
+              <i class="fa-solid fa-trash-can"></i> Delete
+            </button>
+          </div>
+        </div>
+
+        <div class="sp-catalog-filters" id="spCatalogFilters">
+          <button type="button" class="sp-filter-chip is-active" data-category="Semua">Semua</button>
+          <button type="button" class="sp-filter-chip" data-category="Panel Surya">Panel Surya</button>
+          <button type="button" class="sp-filter-chip" data-category="Inverter On-Grid">Inverter On-Grid</button>
+          <button type="button" class="sp-filter-chip" data-category="Inverter Hybrid">Inverter Hybrid</button>
+          <button type="button" class="sp-filter-chip" data-category="Battery">Battery</button>
+          <button type="button" class="sp-filter-chip" data-category="Mounting">Mounting</button>
+          <button type="button" class="sp-filter-chip" data-category="Rack">Rack</button>
+          <button type="button" class="sp-filter-chip" data-category="PDI">PDI</button>
+          <button type="button" class="sp-filter-chip" data-category="PDDC">PDDC</button>
+          <button type="button" class="sp-filter-chip" data-category="PDC">PDC</button>
+          <button type="button" class="sp-filter-chip" data-category="Kabel DC">Kabel DC</button>
+          <button type="button" class="sp-filter-chip" data-category="Kabel AC">Kabel AC</button>
+          <button type="button" class="sp-filter-chip" data-category="Acc.">Acc.</button>
+          <button type="button" class="sp-filter-chip" data-category="Jasa">Jasa</button>
+          <button type="button" class="sp-filter-chip" data-category="SLO/NIDI">SLO/NIDI</button>
+        </div>
+
+        <div class="sp-table-wrap" id="spCatalogTableWrap">
+          <table class="sp-table" id="spCatalogTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Kategori</th>
+                <th>Nama</th>
+                <th>Satuan</th>
+                <th>Ukuran (kW)</th>
+                <th>HPP</th>
+                <th>Harga Terbaru (Live)</th>
+                <th>Update Terakhir</th>
+                <th>Des '25</th>
+                <th>Sep '25</th>
+                <th class="sp-col-tech">Kapasitas (kW/Wp/kWh)</th>
+                <th class="sp-col-tech">Voc (V)</th>
+                <th class="sp-col-tech">Vmpp (V)</th>
+                <th class="sp-col-tech">Impp (A)</th>
+                <th class="sp-col-tech">Isc (A)</th>
+                <th class="sp-col-tech">MPPT</th>
+                <th class="sp-col-tech">L (cm)</th>
+                <th class="sp-col-tech">W (cm)</th>
+                <th class="sp-col-tech">R (Ω/km)</th>
+                <th>Catatan</th>
+                <th class="sp-col-del"></th>
+              </tr>
+            </thead>
+            <tbody id="spCatalogTableBody">
+              <!-- Rows are rendered dynamically by js/catalog.js from localStorage -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="sp-add-row-bar" id="spAddRowBar">
+          <select id="spAddRowCategory" class="sp-add-row-select"></select>
+          <button type="button" class="sp-btn sp-btn-add" id="spAddRowBtn">
+            <i class="fa-solid fa-plus"></i> Tambah Baris
+          </button>
+          <span class="sp-add-row-count" id="spAddRowCount"></span>
+        </div>
+
+        <p class="sp-csv-hint" id="spCatalogCsvHint">
+          Format CSV upload: kolom <strong>ID, Kategori/Category, Nama/Name, Satuan/Unit, Ukuran (kW)/Size (kW), HPP, Des '25/Dec '25, Sep '25, Catatan/Notes</strong>
+          (wajib), plus kolom spesifikasi teknik opsional (<strong>Kapasitas kW/Wp/kWh, Voc, Vmpp, Impp, MPPT, L, W</strong>)
+          — hanya isi yang relevan untuk kategori tersebut, sisanya boleh kosong. Nilai Kategori boleh nama singkat
+          (mis. "PDI", "Kabel DC") atau nama panjangnya (mis. "Panel Distribusi Inverter", "Kabel PV (DC)") —
+          otomatis dicocokkan ke kategori yang sesuai. ID baru akan <strong>ditambahkan</strong> sebagai baris baru.
+          Untuk ID yang sudah ada di katalog, harga pada CSV yang baru diupload dianggap sebagai
+          <strong>harga terbaru dari vendor</strong>: nilai <strong>Harga Terbaru (Live)</strong> yang lama otomatis
+          bergeser jadi referensi <strong>Des '25</strong>, dan nilai Des '25 yang lama bergeser jadi
+          <strong>Sep '25</strong> — supaya histori pergerakan harga vendor selalu bisa dilihat.
+          Kolom <strong>Harga Terbaru (Live)</strong> juga bisa diedit <strong>langsung di tabel</strong> ini kapan
+          saja — sistem akan menampilkan konfirmasi sebelum menyimpan, lalu otomatis menggeser harga lama ke
+          Des '25/Sep '25 dan memperbarui tanggal pada kolom <strong>Update Terakhir</strong>. Kolom Harga Terbaru
+          (Live) dan Update Terakhir dikelola otomatis oleh sistem dan <strong>tidak perlu</strong> ada di file CSV.
+          Anda juga bisa langsung <strong>drag &amp; drop file CSV</strong> ke halaman ini — tidak perlu klik tombol
+          Upload CSV, data Katalog akan otomatis diperbarui.
+        </p>
+
+      </div>
+
+<!-- Live price update confirmation modal -->
+<div class="sp-modal-backdrop" id="spPriceConfirmModal" aria-hidden="true">
+  <div class="sp-confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="spPriceConfirmTitle">
+    <div class="sp-confirm-icon sp-confirm-icon-primary">
+      <i class="fa-solid fa-tag"></i>
+    </div>
+    <div class="sp-confirm-title" id="spPriceConfirmTitle">Perbarui harga terbaru?</div>
+    <p class="sp-confirm-text" id="spPriceConfirmDesc"></p>
+    <div class="sp-confirm-actions">
+      <button type="button" class="sp-modal-btn sp-modal-btn-secondary" id="spPriceConfirmCancelBtn">Batal</button>
+      <button type="button" class="sp-modal-btn sp-modal-btn-primary" id="spPriceConfirmOkBtn">
+        <i class="fa-solid fa-check"></i>
+        <span>Update Harga</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete row confirmation modal -->
+<div class="sp-modal-backdrop" id="spDeleteConfirmModal" aria-hidden="true">
+  <div class="sp-confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="spDeleteConfirmTitle">
+    <div class="sp-confirm-icon">
+      <i class="fa-solid fa-trash-can"></i>
+    </div>
+    <div class="sp-confirm-title" id="spDeleteConfirmTitle">Hapus baris ini?</div>
+    <p class="sp-confirm-text">Data berikut akan dihapus permanen:</p>
+    <p class="sp-confirm-text"><strong id="spDeleteConfirmDesc"></strong></p>
+    <div class="sp-confirm-actions">
+      <button type="button" class="sp-modal-btn sp-modal-btn-secondary" id="spDeleteCancelBtn">Batal</button>
+      <button type="button" class="sp-modal-btn sp-modal-btn-danger" id="spDeleteConfirmBtn">
+        <i class="fa-solid fa-trash-can"></i>
+        <span>Hapus</span>
+      </button>
+    </div>
+  </div>
+</div>
