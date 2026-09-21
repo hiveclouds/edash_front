@@ -1,0 +1,1240 @@
+/* ============================================================
+   Page: Operator Dashboard — 360eDash
+   Styles for pages/operator/operator-dashboard.html.
+   Reuses the shared design tokens (--primary, --border, --surface,
+   --ink, --muted, --page-bg) already defined globally by
+   css/admin-view.css and swapped for dark mode by
+   css/dark-mode-v8.css, and the .pm-tabs tab-bar component from
+   css/project-monitoring.css so this page matches Project
+   Monitoring's look.
+============================================================= */
+
+.opd-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-family: 'Poppins', sans-serif;
+  color: var(--ink, #25343F);
+}
+.opd-page * { box-sizing: border-box; }
+
+/* Title left, search + "Add Graph" right, aligned on the same row.
+   This was missing its layout rule (elements were falling back to
+   default block stacking), which is why the search bar / "Add
+   Graph" button appeared to "disappear" from their intended spot
+   next to the title. */
+.opd-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.opd-head-text {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.opd-head-text .opd-title {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink, #25343F);
+}
+
+/* ---------- Today's date badge (next to the "Dashboard" title) ---------- */
+.opd-date-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border: 1px solid var(--border, #e7edee);
+  border-radius: 10px;
+  background: var(--surface, #fff);
+  box-shadow: 0 1px 3px rgba(16, 24, 32, 0.05);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted, #7c8b8d);
+  white-space: nowrap;
+}
+.opd-date-badge i {
+  color: var(--primary, #0f6a71);
+  font-size: 13px;
+}
+
+/* ---------- Project dropdown (anchored under the search input) ----------
+   The search input itself is pre-filled with the active project's
+   name and doubles as the switcher trigger — see .opd-search-project-
+   prefill handling in js/operator/operator-dashboard.js. This panel
+   is what drops down from it: a floating white card, same corner
+   radius family as the app's other menus, listing every project
+   assigned to this Operator so they can click one to switch (or just
+   keep typing in the input above to search Project Overview's
+   graphs instead). */
+.opd-project-dropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 8px);
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e7edee);
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(16, 24, 32, 0.12);
+  padding: 6px;
+  z-index: 30;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.opd-project-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink, #25343f);
+  transition: background 0.12s ease;
+}
+.opd-project-dropdown-item i {
+  color: var(--primary, #0f6a71);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.opd-project-dropdown-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.opd-project-dropdown-item:hover,
+.opd-project-dropdown-item.is-active {
+  background: var(--primary-soft, #e4f1f1);
+}
+.opd-project-dropdown-empty {
+  padding: 10px;
+  font-size: 12.5px;
+  color: var(--muted, #7c8b8d);
+  text-align: center;
+}
+
+/* ---------- No-project state ----------
+   Shown when this Operator account has no project assignment at all
+   yet (see #opdNoProjectState in the markup + switchTab() in
+   js/operator/operator-dashboard.js). */
+.opd-no-project-state {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid #f0c987;
+  border-radius: 12px;
+  background: #fff8ec;
+  color: #8a5a00;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.opd-no-project-state i {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.opd-no-project-state p {
+  margin: 0;
+}
+[data-theme="dark"] .opd-no-project-state {
+  background: rgba(240, 201, 135, 0.08);
+  border-color: rgba(240, 201, 135, 0.35);
+  color: #f0c987;
+}
+
+/* ---------- Environmental Impact — compact variant ----------
+   Shrinks the text (title, labels, captions) and tightens spacing so
+   the colored icon becomes the strongest visual element in each
+   mini-card, instead of the numbers/copy competing for attention.
+   Scoped to this page only (.opd-env-compact) so the Project
+   Overview admin card, which reuses the same .pd-env-* classes,
+   keeps its original size. */
+.opd-env-compact {
+  padding: 14px 16px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e7edee);
+  box-shadow: 0 1px 3px rgba(16, 24, 32, 0.05);
+  margin-bottom: 16px; /* now lives inside .pm-tab-panel (Project
+    Overview tab only), which has no gap of its own between its
+    children like .opd-page did, so this keeps the same spacing
+    above the card grid. */
+}
+.opd-env-compact .pd-card-head {
+  margin-bottom: 8px;
+}
+.opd-env-compact .pd-card-head h2 {
+  font-size: 12.5px;
+  gap: 6px;
+  color: var(--ink, #25343f);
+}
+.opd-env-compact .pd-card-head h2 i {
+  font-size: 11px;
+  color: var(--primary, #0f6a71);
+}
+.opd-env-compact .pd-card-head p {
+  font-size: 10.5px;
+  margin-top: 1px;
+  color: var(--muted, #7c8b8d);
+}
+.opd-env-compact .pd-env-settings-btn {
+  padding: 5px 10px;
+  font-size: 11px;
+  gap: 5px;
+}
+.opd-env-compact .pd-env-settings-btn i {
+  font-size: 10px;
+}
+.opd-env-compact .pd-env-grid {
+  gap: 10px;
+  margin-top: 0;
+}
+.opd-env-compact .pd-env-card {
+  padding: 10px 8px;
+  border-radius: 10px;
+}
+.opd-env-compact .pd-env-icon {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 8px;
+  font-size: 14px;
+}
+.opd-env-compact .pd-env-value {
+  font-size: 16px;
+}
+.opd-env-compact .pd-env-value small {
+  font-size: 10px;
+}
+.opd-env-compact .pd-env-label {
+  font-size: 10px;
+  margin-top: 2px;
+}
+.opd-env-compact .pd-env-sub {
+  font-size: 9px;
+  margin-top: 2px;
+}
+.opd-env-compact .pd-env-arrow {
+  font-size: 12px;
+  color: var(--border, #e7edee);
+}
+
+/* Mini-cards now keep their per-type tint (amber/blue/green — see
+   css/project-detail.css .pd-env-card.is-*) against a plain white
+   outer card, instead of a single flat teal tone against a solid
+   teal card. Text stays the app's normal ink/muted tokens since the
+   background is light now, not a dark teal that needed light text. */
+.opd-env-compact .pd-env-value {
+  color: var(--ink, #25343f);
+}
+.opd-env-compact .pd-env-value small {
+  color: var(--muted, #7c8b8d);
+}
+.opd-env-compact .pd-env-label {
+  color: var(--ink, #25343f);
+}
+.opd-env-compact .pd-env-sub {
+  color: var(--muted, #7c8b8d);
+}
+
+/* ---------- Fullscreen toggle (page content only, no header/sidebar) ----------
+   Icon-only, pinned bottom-right, filled with the app's primary
+   teal so it reads as an action button. Targets `.edash-content` —
+   the scrollable main-content region, a sibling of #header-root and
+   outside #sidebar-root — with the native Fullscreen API (see
+   js/operator/operator-dashboard.js), so both the header and the
+   sidebar are naturally excluded. Rounded-square, not a circle. */
+.opd-fullscreen-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary, #0f6a71);
+  color: #fff;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(15, 106, 113, 0.35);
+  z-index: 40;
+  transition: background 0.15s ease;
+}
+.opd-fullscreen-fab:hover {
+  background: var(--primary-dark, #0b4f54);
+}
+
+/* While `.edash-content` is the fullscreen element, keep the page
+   background instead of the browser's default black backdrop. */
+.edash-content:fullscreen {
+  background: var(--page-bg, #f4f7f7);
+  padding: 24px;
+}
+html[data-theme="dark"] .edash-content:fullscreen {
+  background: #101b1f;
+}
+
+/* ---------- Search bar (also the project switcher) ----------
+   The pill itself carries the border/background/shadow and stretches
+   to fill the row, pushing "Add Graph" to the far right edge on the
+   same line. The input is pre-filled with the active project's name
+   (see js/operator/operator-dashboard.js); focusing it opens
+   .opd-project-dropdown below so the Operator can switch projects,
+   or just keep typing to search Project Overview's graphs instead. */
+.opd-search-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex: 1 1 460px;
+  max-width: 560px;
+  margin-left: auto;
+}
+.opd-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: 1 1 auto;
+  min-width: 220px;
+  border: 1px solid var(--border, #e7edee);
+  border-radius: 999px;
+  padding: 9px 16px;
+  background: var(--surface, #fff);
+  box-shadow: 0 1px 3px rgba(16, 24, 32, 0.05);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.opd-search:focus-within {
+  border-color: var(--primary, #0f6a71);
+  box-shadow: 0 0 0 3px var(--primary-soft, #e4f1f1);
+}
+.opd-search-icon {
+  font-size: 13px;
+  color: var(--muted, #7c8b8d);
+  flex-shrink: 0;
+}
+.opd-search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  font-family: inherit;
+  border: none;
+  padding: 0;
+  font-size: 13.5px;
+  color: var(--ink, #25343F);
+  background: transparent;
+  outline: none;
+}
+
+/* ---------- Shared button ---------- */
+.opd-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+.opd-btn-primary {
+  background: var(--primary, #0f6a71);
+  color: #fff;
+}
+.opd-btn-primary:hover {
+  background: var(--primary-dark, #0b4f54);
+}
+
+/* ---------- Card grid ----------
+   Flex-wrap instead of a fixed-column grid: cards keep a consistent
+   size and simply wrap to a new row once the current row runs out
+   of space, exactly like the wireframe. */
+.opd-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.opd-card,
+.opd-card-add {
+  width: 220px;
+  height: 150px;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.opd-card {
+  position: relative;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #e7edee);
+  box-shadow: 0 1px 3px rgba(16, 24, 32, 0.05);
+  padding: 12px;
+}
+.opd-card-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted, #7c8b8d);
+}
+.opd-card-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 7px;
+  background: var(--page-bg, #f4f7f7);
+  color: var(--muted, #7c8b8d);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.opd-card:hover .opd-card-remove {
+  opacity: 1;
+}
+.opd-card-remove:hover {
+  background: var(--danger-soft, #fbe9e9);
+  color: var(--danger, #d64545);
+}
+
+/* ===========================================================
+   Card drag-and-drop reordering + resize ("Lebarkan sebaris")
+   -- ported 1:1 from Project Detail's Performance Analytics cards
+   (css/project-detail.css / wirePerfCardDragAndDrop in
+   js/project-detail.js), which itself reused these same classes.
+   Grabbing a card's grip handle spawns a fully opaque floating
+   clone that tracks the pointer while the other cards live-shift
+   out of the way (see wireCardDragAndDrop() in js/operator/
+   operator-dashboard.js). The dashed "+" add tile has no
+   data-card-id and is never draggable.
+   =========================================================== */
+.opd-card-resize {
+  position: absolute;
+  top: 8px;
+  right: 40px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 7px;
+  background: var(--page-bg, #f4f7f7);
+  color: var(--muted, #7c8b8d);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.opd-card:hover .opd-card-resize {
+  opacity: 1;
+}
+.opd-card-resize:hover {
+  background: var(--primary-soft, #e4f1f1);
+  color: var(--primary-dark, #0b4f54);
+}
+/* Download PNG/CSV buttons — same look/size as .opd-card-resize, two
+   more slots pushed further left of it (resize at right:40px, remove
+   at right:8px). */
+.opd-card-download {
+  position: absolute;
+  top: 8px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 7px;
+  background: var(--page-bg, #f4f7f7);
+  color: var(--muted, #7c8b8d);
+  font-size: 10.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.opd-card:hover .opd-card-download {
+  opacity: 1;
+}
+.opd-card-download:hover {
+  background: var(--primary-soft, #e4f1f1);
+  color: var(--primary-dark, #0b4f54);
+}
+.opd-card-download-png { right: 70px; }
+.opd-card-download-csv { right: 100px; }
+.opd-card-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 12px;
+  font-size: 10px;
+  line-height: 1;
+  color: var(--muted, #7c8b8d);
+  opacity: 0.5;
+  cursor: grab;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+.opd-card-drag-handle:active {
+  cursor: grabbing;
+}
+.opd-card:hover .opd-card-drag-handle,
+.opd-card.is-dragging .opd-card-drag-handle {
+  opacity: 0.9;
+  color: var(--primary-dark, #0b4f54);
+}
+/* Dragging: hide the original card in place (the floating clone
+   above is what visually tracks the pointer). */
+.opd-card.is-dragging {
+  opacity: 0;
+}
+/* Fully opaque floating clone that follows the pointer while
+   dragging — spawned in startCardDrag(), appended to <body>. */
+.opd-card-drag-float {
+  z-index: 999;
+  box-shadow: 0 8px 24px rgba(16, 24, 32, 0.18);
+  pointer-events: none;
+}
+/* Expanded ("Lebarkan sebaris") state: chart card takes the full
+   row width instead of ~1/3 of it, with a taller chart body to
+   match the extra horizontal room. */
+.opd-card-chart.is-wide {
+  width: 100%;
+  height: 460px;
+}
+.opd-card-chart.is-wide .opd-card-chart-body {
+  min-height: 300px;
+}
+
+/* Empty add-card tile: dashed border, centered + icon */
+.opd-card-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1.5px dashed var(--border, #e7edee);
+  color: var(--muted, #7c8b8d);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.opd-card-add i {
+  font-size: 20px;
+}
+.opd-card-add:hover {
+  background: var(--primary-soft, #e4f1f1);
+  border-color: var(--primary, #0f6a71);
+  color: var(--primary-dark, #0b4f54);
+}
+
+/* ---------- Chart cards ----------
+   Sized so exactly 3 fit per row (grid gap is 16px, so each card
+   takes up the remaining space after 2 gaps, divided by 3). Taller
+   than the blank/add tiles too, so the Chart.js canvas has real
+   room to render in. Falls back to 2-per-row then 1-per-row on
+   narrower screens (see media queries below). */
+.opd-card-chart {
+  width: calc((100% - 32px) / 3);
+  min-width: 300px;
+  height: 430px;
+  display: flex;
+  flex-direction: column;
+}
+.opd-card-chart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-right: 66px; /* keep clear of the resize + remove (x) buttons */
+}
+.opd-card-chart-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+.opd-card-chart-head .opd-card-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink, #25343F);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.opd-card-chart-head .opd-card-label.opd-card-label-editable {
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 0.15s ease;
+}
+.opd-card-chart-head .opd-card-label.opd-card-label-editable:hover,
+.opd-card-chart-head .opd-card-label.opd-card-label-editable:focus-visible {
+  color: var(--primary, #0f6a71);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.opd-card-chart-meta {
+  font-size: 11px;
+  color: var(--muted, #7c8b8d);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.opd-card-chart-body {
+  flex: 1;
+  position: relative;
+  margin-top: 8px;
+  min-height: 0;
+}
+.opd-card-chart-body canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+.opd-card-chart-loading {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.72);
+  color: #5B6B6C; font-size: 12px; font-family: "Poppins", sans-serif;
+  pointer-events: none;
+}
+.opd-card-chart-loading.is-hidden { display: none; }
+.opd-card-chart-loading i { font-size: 12px; }
+.opd-card-chart-legend {
+  margin-top: 8px;
+}
+
+/* Period toggle (24 Hours / 7 Days / 30 Days / Custom) + refresh,
+   date-range fields and compact stat chips for saved chart cards —
+   mirrors the equivalent System Information chart widget (see
+   css/system-information.css .si-chart-toggle etc.) but sized to fit
+   inside the smaller dashboard card. */
+.opd-card-period-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 8px;
+}
+.opd-card-period-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  background: var(--page-bg, #f4f7f7);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+  min-width: 0;
+}
+.opd-card-period-toggle button {
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--muted, #7c8b8d);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.opd-card-period-toggle button.is-active {
+  background: var(--surface, #fff);
+  color: var(--primary-dark, #0b4f54);
+  box-shadow: 0 1px 4px rgba(15,106,113,0.18);
+}
+.opd-card-period-toggle button i {
+  margin-right: 2px;
+}
+
+/* ===========================================================
+   Below-chart range slider — mini navigator sparkline (drawn on
+   <canvas> by JS) with a draggable from/to selection window, so the
+   Operator can narrow a chart card's currently-displayed period
+   further without switching the 24H/7D/30D/Custom toggle itself. Same
+   component reused 1:1 by Project Detail's Performance Analytics
+   cards (css/project-detail.css) — see renderCardRangeSlider() /
+   wireCardRangeHandles() in js/operator/operator-dashboard.js.
+   =========================================================== */
+.opd-card-range { margin-top: 8px; }
+.opd-card-range-track {
+  position: relative;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--page-bg, #f4f7f7);
+  border: 1px solid var(--border, #e7edee);
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+.opd-card-range-spark {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none;
+  border-radius: inherit;
+}
+/* Dim the parts of the sparkline outside the selected from/to window. */
+.opd-card-range-mask-left,
+.opd-card-range-mask-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(244, 247, 247, 0.72);
+  pointer-events: none;
+  z-index: 1;
+}
+.opd-card-range-mask-left { left: 0; border-radius: 8px 0 0 8px; }
+.opd-card-range-mask-right { right: 0; border-radius: 0 8px 8px 0; }
+/* Selected window: draggable as a whole to shift both handles together. */
+.opd-card-range-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(15, 106, 113, 0.10);
+  border-top: 2px solid var(--primary, #0f6a71);
+  border-bottom: 2px solid var(--primary, #0f6a71);
+  cursor: grab;
+  z-index: 2;
+}
+.opd-card-range-fill:active { cursor: grabbing; }
+/* Individual from/to handles: bigger fully-rounded pill, standing a
+   little taller than the track (like a scrollbar thumb) so it reads
+   clearly even parked right at the very edge of the range. */
+.opd-card-range-handle {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 14px;
+  transform: translateX(-50%);
+  background: var(--primary, #0f6a71);
+  border: 2px solid #fff;
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgba(16, 24, 32, 0.35);
+  cursor: ew-resize;
+  z-index: 3;
+}
+/* Tiny grip mark (two short lines) centered in the pill, purely
+   decorative, signals "draggable" the way a scrollbar/modal grip does. */
+.opd-card-range-handle::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  border-left: 1.5px solid rgba(255, 255, 255, 0.75);
+  border-right: 1.5px solid rgba(255, 255, 255, 0.75);
+}
+.opd-card-range-handle:hover,
+.opd-card-range-handle:active {
+  background: var(--primary-dark, #0b4f54);
+}
+.opd-card-range-caption {
+  margin-top: 6px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--muted, #7c8b8d);
+  text-align: center;
+}
+
+.opd-card-daterange {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.opd-card-daterange-field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.opd-card-daterange-field label {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--muted, #7c8b8d);
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+.opd-card-daterange-field input[type="date"] {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink, #25343f);
+  border: 1px solid var(--border, #e7edee);
+  border-radius: 7px;
+  padding: 4px 6px;
+  background: var(--surface, #fff);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.opd-grid-empty-hint {
+  font-size: 12.5px;
+  color: var(--muted, #7c8b8d);
+  padding: 4px 2px;
+}
+
+@media (max-width: 480px) {
+  .opd-search {
+    flex: 1 1 100%;
+  }
+  .opd-search-project,
+  .opd-project-select {
+    max-width: 110px;
+  }
+  .opd-btn {
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 980px) {
+  .opd-card-chart {
+    width: calc((100% - 16px) / 2);
+    min-width: 260px;
+    height: 430px;
+  }
+}
+@media (max-width: 620px) {
+  .opd-card-chart {
+    width: 100%;
+    min-width: 0;
+    height: 380px;
+  }
+  .opd-card-period-toggle button {
+    font-size: 9px;
+    padding: 4px 5px;
+  }
+}
+
+/* ============================================================
+   "Buat grafik" modal (Add Graph)
+   Reuses the shared .modal-backdrop / .modal-card / .modal-btn /
+   .modal-input components from css/alert.css — only the two-pane
+   variable-picker + chart-builder layout below is page-specific.
+   All classes are prefixed .opd-graph- so nothing here leaks onto
+   other pages' cards/fields/buttons.
+============================================================= */
+.opd-graph-modal .modal-card {
+  max-width: 1120px;
+}
+.opd-graph-modal-scroll {
+  display: flex;
+  flex-direction: column;
+}
+
+.opd-graph-subtitle {
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  color: var(--muted, #7c8b8d);
+}
+
+.opd-graph-device-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.opd-graph-device-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--muted, #7c8b8d);
+}
+.opd-graph-divider {
+  height: 1px;
+  background: var(--border, #e7edee);
+  margin: 14px 0 16px;
+}
+
+.opd-graph-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  align-items: start;
+  gap: 22px;
+}
+
+/* ---- left: variable picker ----
+   Height is set inline (in JS, via syncVarPanelHeight) to match the
+   right column's actual rendered height — title through the caption
+   under the chart — every time that height changes (variables
+   toggled, chart type switched, device group changed). That keeps
+   the two panels flush with no blank gap at the bottom of either
+   side. align-items:start on the grid (instead of stretch) is what
+   lets the left column stop short at that JS-set height rather than
+   being pulled down to match the taller natural content of its own
+   long variable list. overflow-y:auto gives it its own independent
+   scrollbar for whatever doesn't fit — separate from the outer
+   .modal-scroll — so scrolling the list never scrolls the whole
+   modal. The px value below is just a same-as-before fallback for
+   the instant before JS runs. */
+.opd-graph-var-panel {
+  max-height: 460px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
+  padding-right: 8px;
+}
+.opd-graph-var-category {
+  margin-bottom: 16px;
+}
+.opd-graph-cat-title {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted, #7c8b8d);
+  margin: 0 0 8px 2px;
+}
+.opd-graph-var-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border, #e7edee);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  user-select: none;
+}
+.opd-graph-var-row:hover {
+  border-color: var(--primary-header, #6dc3bb);
+}
+.opd-graph-var-row.is-checked {
+  border-color: var(--primary, #0f6a71);
+  background: var(--primary-soft, #e4f1f1);
+}
+.opd-graph-var-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary, #0f6a71);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.opd-graph-var-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.opd-graph-var-label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink, #25343f);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.opd-graph-var-unit {
+  font-size: 11.5px;
+  color: var(--muted, #7c8b8d);
+  white-space: nowrap;
+}
+
+/* ---- right: chart builder ---- */
+.opd-graph-chart-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.opd-graph-field-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+.opd-graph-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.opd-graph-field-title {
+  flex: 1;
+  min-width: 0;
+}
+.opd-graph-field label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink, #25343f);
+}
+.opd-graph-field-chart-type {
+  flex: 0 0 auto;
+}
+
+.opd-graph-segmented {
+  display: inline-flex;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border, #e7edee);
+}
+.opd-graph-seg-btn {
+  border: none;
+  background: var(--surface, #fff);
+  padding: 8px 16px;
+  font-size: 13.5px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--muted, #7c8b8d);
+  cursor: pointer;
+}
+.opd-graph-seg-btn.is-active {
+  background: var(--primary, #0f6a71);
+  color: #fff;
+  font-weight: 600;
+}
+.opd-graph-seg-btn.is-hidden {
+  display: none;
+}
+
+/* ===========================================================
+   "Create graph" modal — skeleton / error state
+   Shown while ensureGraphCatalog() fetches this project's real
+   telemetry the first time the modal is opened for it (see
+   openGraphModal() in js/operator/operator-dashboard.js) — same
+   component as Project Detail's equivalent (css/project-detail.css).
+   =========================================================== */
+.opd-graph-loading {
+  display: none;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 22px;
+}
+.opd-graph-loading.is-visible {
+  display: grid;
+}
+.opd-graph-skel-col {
+  min-width: 0;
+}
+.opd-graph-skel-bar,
+.opd-graph-skel-row,
+.opd-graph-skel-box {
+  background: linear-gradient(
+    90deg,
+    var(--border, #e7edee) 25%,
+    var(--primary-soft, #e4f1f1) 37%,
+    var(--border, #e7edee) 63%
+  );
+  background-size: 400% 100%;
+  animation: opd-skel-shimmer 1.4s ease infinite;
+  border-radius: 6px;
+}
+.opd-graph-skel-row {
+  height: 38px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+.opd-graph-skel-box {
+  width: 100%;
+  height: 220px;
+  border-radius: 12px;
+}
+.opd-graph-loading-caption {
+  grid-column: 1 / -1;
+  margin: 18px 0 0;
+  font-size: 12.5px;
+  color: var(--muted, #7c8b8d);
+  text-align: center;
+}
+.opd-graph-loading-caption i {
+  margin-right: 6px;
+}
+@keyframes opd-skel-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+
+.opd-graph-error {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 36px 20px;
+}
+.opd-graph-error.is-visible {
+  display: flex;
+}
+.opd-graph-error .opd-graph-empty-icon {
+  font-size: 26px;
+  color: var(--muted, #7c8b8d);
+  margin-bottom: 10px;
+}
+.opd-graph-error #opdGraphRetryBtn {
+  margin-top: 14px;
+}
+
+@media (max-width: 760px) {
+  .opd-graph-loading {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.opd-graph-preview-label {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink, #25343f);
+  margin: 18px 0 8px;
+}
+
+.opd-graph-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 0;
+}
+.opd-graph-stat-chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--border, #e7edee);
+  background: var(--surface, #fff);
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+.opd-graph-stat-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.opd-graph-stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted, #7c8b8d);
+  white-space: nowrap;
+}
+.opd-graph-stat-now {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink, #25343f);
+  white-space: nowrap;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+.opd-graph-stat-minmax {
+  font-size: 10.5px;
+  color: var(--muted, #7c8b8d);
+  white-space: nowrap;
+  border-left: 1px solid var(--border, #e7edee);
+  padding-left: 7px;
+  margin-left: 1px;
+}
+
+.opd-graph-preview-box {
+  border: 1px solid var(--border, #e7edee);
+  border-radius: 14px;
+  padding: 18px 14px 10px;
+  min-height: 280px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface, #fff);
+  position: relative;
+  margin-top: 10px;
+}
+.opd-graph-preview-box canvas {
+  width: 100% !important;
+  height: 270px !important;
+}
+
+.opd-graph-empty-state {
+  text-align: center;
+  max-width: 340px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  color: var(--muted, #7c8b8d);
+  padding: 10px;
+}
+.opd-graph-empty-icon {
+  font-size: 30px;
+  margin-bottom: 6px;
+  opacity: 0.6;
+}
+.opd-graph-empty-state p {
+  margin: 4px 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink, #25343f);
+}
+.opd-graph-empty-sub {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--muted, #7c8b8d);
+  line-height: 1.6;
+}
+
+.opd-graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 10px;
+  min-height: 18px;
+}
+.opd-graph-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink, #25343f);
+}
+.opd-graph-legend-item .opd-graph-legend-ring {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2.5px solid;
+  background: var(--surface, #fff);
+}
+
+.opd-graph-preview-caption {
+  font-size: 11.5px;
+  color: var(--muted, #7c8b8d);
+  text-align: center;
+  margin: 10px 0 0;
+  line-height: 1.6;
+}
+
+.opd-graph-actions {
+  border-top: 1px solid var(--border, #e7edee);
+  padding-top: 14px;
+}
+
+.opd-graph-var-panel::-webkit-scrollbar {
+  width: 7px;
+}
+.opd-graph-var-panel::-webkit-scrollbar-thumb {
+  background: var(--border, #e7edee);
+  border-radius: 10px;
+}
+
+@media (max-width: 760px) {
+  .opd-graph-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .opd-graph-var-panel {
+    max-height: 220px;
+}
+}

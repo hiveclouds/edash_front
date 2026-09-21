@@ -1,0 +1,805 @@
+/* ============================================================
+   Solar Planning Tool — 360eDash
+   Design tokens sama persis dengan halaman lain (add-project,
+   admin-calculator, admin-view) supaya konsisten satu sistem.
+============================================================= */
+:root {
+  --primary: #0f6a71;
+  --primary-dark: #0b4f54;
+  --primary-soft: #e4f1f1;
+  --accent-orange: #FA891A;
+
+  --success: #2f9e6e;
+  --warning: #e3a21a;
+  --danger: #d64545;
+  --info: #3e7cb1;
+  --success-soft: #e6f5ef;
+  --warning-soft: #fbf1e0;
+  --danger-soft: #fbe9e9;
+  --info-soft: #e9f0f7;
+
+  --ink: #25343F;
+  --muted: #7c8b8d;
+  --border: #e7edee;
+  --surface: #ffffff;
+  --page-bg: #f4f7f7;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* Catatan: pages/admin-calculator.html sekarang di-load sebagai
+   FRAGMENT murni (lihat komentar di bagian atas file itu), jadi TIDAK
+   lagi punya wrapper .edash-layout/.edash-main/.edash-content/
+   #sidebar-root/#header-root sendiri — semua itu sudah didefinisikan
+   sekali oleh shell utama di index.html. Dulu file ini masih
+   mendefinisikan ulang class-class tsb (peninggalan dari versi
+   standalone-nya) yang berakibat wrapper ke-nested dobel di dalam
+   punya index.html → muncul 2 scrollbar bertumpuk. JANGAN tambahkan
+   lagi rule .edash-layout/.edash-main/.edash-content di sini.
+
+   Halaman ini juga TIDAK perlu mengunci scroll html/body: dengan
+   fragment yang bersih, satu-satunya elemen yang scroll ya
+   .edash-content milik index.html — sesuai pola halaman lain
+   (alert, system-information, dst). */
+
+.page-title { font-size: 13.5px; font-weight: 500; color: var(--ink); }
+
+.sp-wrap { max-width: 1440px; margin: 0 auto; }
+
+.hidden { display: none !important; }
+
+/* ---------- Page head ---------- */
+.sp-head { margin-bottom: 20px; }
+.sp-head h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
+.sp-head p { font-size: 14px; color: var(--muted); margin-top: 4px; }
+.sp-head .sp-byline { font-size: 12px; color: var(--muted); font-style: italic; margin-top: 2px; }
+
+/* ---------- Stepper ---------- */
+.sp-stepper {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(16,24,32,0.05);
+}
+.sp-step { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.sp-step-circle {
+  width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+  background: #e3e8e9; color: var(--muted);
+  transition: all 0.2s ease;
+}
+.sp-step-label { font-size: 13px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.sp-step.is-done .sp-step-circle { background: var(--primary-dark); color: #fff; }
+.sp-step.is-done .sp-step-label { color: var(--ink); }
+.sp-step-line { flex: 1; height: 2px; background: var(--border); margin: 0 16px; min-width: 24px; }
+.sp-step-line.is-done { background: var(--success); }
+
+/* ---------- Layout ---------- */
+.sp-layout {
+  display: grid;
+  grid-template-columns: 430px minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+}
+
+/* Panel hasil (kanan) nempel (sticky) di layar. Form (kiri) sekarang
+   punya scroll sendiri (internal), jadi pas form-nya panjang, yang
+   discroll cuma card kiri — panel kanan diam di tempat. */
+.sp-panel {
+  position: sticky;
+  top: 20px;
+}
+
+/* ---------- Left: form ---------- */
+.sp-form {
+  width: 100%;
+  max-width: 430px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 10px 16px 16px;
+  box-shadow: 0 1px 3px rgba(16,24,32,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  /* scroll sendiri, nempel di posisi yang sama kayak panel kanan */
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Scrollbar tipis khusus buat form kiri, biar rapi */
+.sp-form::-webkit-scrollbar { width: 6px; }
+.sp-form::-webkit-scrollbar-track { background: transparent; }
+.sp-form::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+.sp-form::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+.sp-form { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+
+.sp-accordion { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+
+.sp-accordion-btn {
+  width: 100%;
+  background: var(--page-bg);
+  border: none;
+  padding: 13px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+}
+.sp-accordion-btn i.sp-acc-icon { font-size: 13px; color: var(--primary); width: 16px; }
+.sp-accordion-btn i.sp-caret { margin-left: auto; font-size: 11px; color: var(--primary); transition: transform 0.18s ease; }
+.sp-accordion.is-open .sp-accordion-btn i.sp-caret { transform: rotate(90deg); }
+.sp-accordion.is-open .sp-accordion-btn { background: var(--primary-soft); color: var(--primary-dark); }
+
+.sp-accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
+.sp-accordion.is-open .sp-accordion-body { max-height: 1400px; }
+
+.sp-accordion-inner { padding: 16px 14px 18px; display: flex; flex-direction: column; gap: 14px; border-top: 1px solid var(--border); }
+.sp-accordion-inner h5 {
+  font-size: 15px; font-weight: 700; color: var(--ink); margin-top: 2px;
+}
+.sp-accordion-inner .sp-subtitle {
+  font-size: 11.5px; font-weight: 600; color: var(--primary-dark);
+  text-transform: uppercase; letter-spacing: 0.03em; margin-top: 6px;
+}
+
+.sp-field { display: flex; flex-direction: column; gap: 6px; }
+.sp-field label { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+
+.sp-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* Select styled as a "picker" row */
+.sp-select-wrap { position: relative; }
+.sp-select-wrap select {
+  width: 100%;
+  appearance: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 32px 10px 12px;
+  cursor: pointer;
+  outline: none;
+}
+.sp-select-wrap select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+.sp-select-wrap i {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  font-size: 11px; color: var(--muted); pointer-events: none;
+}
+
+/* Number input with stacked up/down arrows */
+.sp-number-wrap { position: relative; }
+.sp-number-wrap input[type="number"] {
+  width: 100%;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 32px 10px 12px;
+  outline: none;
+}
+.sp-number-wrap input[type="number"]::-webkit-inner-spin-button,
+.sp-number-wrap input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.sp-number-wrap input[type="number"] { -moz-appearance: textfield; }
+.sp-number-wrap input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+.sp-number-arrows {
+  position: absolute; right: 6px; top: 4px; bottom: 4px;
+  display: flex; flex-direction: column; justify-content: center;
+  border-left: 1px solid var(--border); padding-left: 6px; gap: 1px;
+}
+.sp-number-arrows button {
+  border: none; background: none; color: var(--muted);
+  font-size: 9px; line-height: 1; padding: 3px 2px; cursor: pointer;
+}
+.sp-number-arrows button:hover { color: var(--primary); }
+
+/* Checkbox row */
+.sp-checkbox-row { display: flex; align-items: center; gap: 8px; }
+.sp-checkbox-row input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--primary); cursor: pointer; }
+.sp-checkbox-row label { font-size: 12.5px; font-weight: 600; color: var(--ink); cursor: pointer; }
+
+/* Slider row */
+.sp-slider-row { display: flex; flex-direction: column; gap: 8px; }
+.sp-slider-head { display: flex; justify-content: space-between; align-items: center; }
+.sp-slider-badge {
+  font-size: 11px; font-weight: 700; color: var(--primary-dark);
+  background: var(--primary-soft); border-radius: 20px; padding: 2px 9px;
+}
+.sp-slider-row input[type="range"] { width: 100%; accent-color: var(--primary); }
+
+.sp-btn-calculate {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 13px 18px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+.sp-btn-calculate:hover { background: var(--primary-dark); }
+.sp-btn-calculate[disabled] { opacity: 0.65; cursor: not-allowed; }
+
+/* ---------- Right: results panel ---------- */
+.sp-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(16,24,32,0.05);
+  min-height: 560px;
+  overflow: hidden;
+}
+
+.sp-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* Sembunyikan scrollbar bawaan browser di baris tab — tab tetap bisa
+     digeser (swipe/drag) kalau kepanjangan di layar sempit, tapi tanpa
+     scrollbar/arrow yang mengganggu tampilan. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.sp-tabs::-webkit-scrollbar { display: none; }
+
+.sp-tab-btn {
+  background: none;
+  border: none;
+  padding: 16px 4px;
+  margin-right: 26px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+}
+.sp-tab-btn:last-child { margin-right: 0; }
+.sp-tab-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.sp-tab-btn.active { color: var(--primary-dark); }
+.sp-tab-btn.active::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--primary);
+}
+
+.sp-panel-body { padding: 22px 24px; }
+
+.sp-tab-pane { display: none; }
+.sp-tab-pane.active { display: block; }
+
+.sp-empty {
+  height: 460px;
+  display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px;
+  color: var(--muted); text-align: center; padding: 0 40px;
+}
+.sp-empty i { font-size: 30px; color: var(--primary-soft); }
+.sp-empty p { font-size: 13.5px; max-width: 340px; }
+
+.sp-soon {
+  height: 400px;
+  display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px;
+  color: var(--muted); text-align: center; padding: 0 40px;
+}
+.sp-soon i { font-size: 28px; color: var(--warning); opacity: 0.7; }
+.sp-soon p { font-size: 13.5px; max-width: 320px; }
+.sp-soon span.sp-tag-soon {
+  font-size: 10.5px; font-weight: 700; color: var(--warning); background: var(--warning-soft);
+  border-radius: 20px; padding: 3px 10px; text-transform: uppercase; letter-spacing: 0.04em;
+}
+
+/* Badges (generic) */
+.sp-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 700; border-radius: 20px; padding: 3px 10px; white-space: nowrap;
+}
+.sp-badge-muted { background: var(--page-bg); color: var(--muted); border: 1px solid var(--border); }
+.sp-badge-success { background: var(--success-soft); color: var(--success); }
+.sp-badge-warning { background: var(--warning-soft); color: var(--warning); }
+.sp-badge-info { background: var(--info-soft); color: var(--info); }
+.sp-badge-primary { background: var(--primary-soft); color: var(--primary-dark); }
+
+/* ---------- Design tab ---------- */
+.sp-active-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
+.sp-active-label b { color: var(--ink); }
+
+.sp-config-card {
+  border: 1px solid var(--primary-soft); background: var(--primary-soft); border-radius: 12px; padding: 16px 18px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin-bottom: 24px; flex-wrap: wrap;
+}
+.sp-config-card strong { font-size: 15px; color: var(--primary-dark); }
+
+.sp-section-title { font-size: 12.5px; font-weight: 700; color: var(--ink); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 12px; }
+
+.sp-metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+.sp-metric-card { border: 1px solid var(--border); border-left: 3px solid var(--primary); border-radius: 12px; padding: 14px 16px; background: var(--surface); }
+.sp-metric-card .sp-metric-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 6px; }
+.sp-metric-card .sp-metric-value { font-size: 19px; font-weight: 700; color: var(--primary-dark); }
+.sp-metric-card .sp-metric-sub { font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+
+.sp-table-wrap { border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+.sp-table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 12.5px; }.sp-table th, .sp-table td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--border); }
+.sp-table th { color: var(--primary-dark); font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; background: var(--primary-soft); }
+.sp-table tr:last-child td { border-bottom: none; }
+.sp-table td.sp-mono { font-size: 12px; color: var(--ink); }
+.sp-table td.sp-sub { font-size: 10.5px; color: var(--muted); display: block; margin-top: 2px; }
+.sp-table-section td {
+  background: var(--primary-dark); color: #fff; font-weight: 600; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.04em; padding: 9px 14px;
+}
+
+/* ---------- Visual tab ---------- */
+.sp-chart-card { border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 20px; }
+.sp-chart-card:last-child { margin-bottom: 0; }
+.sp-chart-title { font-size: 13px; font-weight: 700; margin-bottom: 16px; }
+
+.sp-bar-chart { display: flex; gap: 12px; height: 220px; }
+.sp-bar-yaxis { display: flex; flex-direction: column; justify-content: space-between; font-size: 10px; color: var(--muted); padding-bottom: 22px; text-align: right; }
+.sp-bar-plot { flex: 1; display: flex; align-items: flex-end; gap: 8px; border-left: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 0 6px 22px; position: relative; }
+.sp-bar { flex: 1; background: var(--primary); opacity: 0.85; border-radius: 4px 4px 0 0; position: relative; min-height: 4px; }
+.sp-bar-value { position: absolute; left: 50%; top: -18px; transform: translateX(-50%); white-space: nowrap; font-size: 9px; font-weight: 700; color: var(--ink); pointer-events: none; }
+.sp-bar-month { position: absolute; left: 0; right: 0; bottom: -20px; text-align: center; font-size: 9.5px; color: var(--muted); }
+
+.sp-flow { width:100%; overflow-x:auto; padding:6px 2px 10px; }
+.sp-flow-system { min-width:860px; display:flex; flex-direction:column; gap:14px; }
+.sp-flow-units { display:flex; flex-direction:column; gap:10px; }
+.sp-flow-unit-row { display:flex; align-items:center; gap:10px; min-width:max-content; }
+.sp-flow-node { width:154px; min-height:64px; border:1px solid var(--border); border-radius:10px; padding:10px 9px; text-align:center; background:var(--page-bg); display:flex; flex-direction:column; justify-content:center; }
+.sp-flow-node strong { display:block; font-size:12px; color:var(--ink); margin-bottom:3px; }
+.sp-flow-node span { font-size:10.5px; color:var(--muted); line-height:1.35; }
+.sp-flow-pv { border-color:rgba(29,78,216,.35); }
+.sp-flow-combiner { border-color:rgba(29,78,216,.28); }
+.sp-flow-inverter { border-color:rgba(5,150,105,.38); }
+.sp-flow-battery-node { border-color:rgba(217,119,6,.45); background:color-mix(in srgb, var(--page-bg) 88%, #d97706 12%); }
+.sp-flow-ac-node { border-color:rgba(124,58,237,.38); }
+.sp-flow-load { border-color:var(--border); }
+.sp-flow-arrow,.sp-flow-path-arrow { flex:0 0 auto; color:var(--primary); font-size:14px; display:flex; align-items:center; justify-content:center; }
+.sp-flow-path-arrow { gap:5px; min-width:72px; flex-direction:column; font-size:12px; }
+.sp-flow-path-arrow span { font-size:9.5px; line-height:1.2; color:var(--muted); white-space:nowrap; }
+.sp-flow-main-arrow { display:flex; align-items:center; justify-content:center; gap:7px; color:var(--primary); font-size:13px; padding:1px 0; }
+.sp-flow-main-arrow span { font-size:10px; color:var(--muted); }
+.sp-flow-path { display:flex; align-items:center; gap:10px; justify-content:center; }
+.sp-flow-offgrid-path .sp-flow-battery-node { min-width:184px; }
+.sp-flow-ongrid-path { justify-content:center; }
+.sp-flow-hybrid-topology { display:flex; align-items:flex-start; gap:18px; justify-content:center; }
+.sp-flow-inverter-spine { width:164px; flex:0 0 164px; align-self:center; }
+.sp-flow-hybrid-branches { display:flex; flex-direction:column; gap:12px; flex:0 0 auto; }
+.sp-flow-branch-row { display:flex; align-items:center; gap:10px; }
+.sp-flow-branch-row .sp-flow-node { width:174px; }
+@media (max-width:900px){
+  .sp-flow-system{min-width:760px;}
+  .sp-flow-node{width:142px;}
+  .sp-flow-branch-row .sp-flow-node{width:160px;}
+}
+
+
+.sp-string-row { display: flex; align-items: center; gap: 14px; padding: 10px 0; border-bottom: 1px dashed var(--border); }
+.sp-string-row:last-child { border-bottom: none; }
+.sp-string-label { width: 58px; flex-shrink: 0; font-size: 12px; font-weight: 700; color: var(--primary-dark); }
+.sp-string-dots { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; flex: 1; overflow-x: auto; }
+.sp-string-group { display: inline-flex; gap: 1px; flex-shrink: 0; }
+.sp-string-dot { width: 8px; height: 15px; border-radius: 1px; background: var(--primary); opacity: 0.85; flex-shrink: 0; }
+.sp-string-dot.is-short { background: #d97706; }
+.sp-string-meta { font-size: 10.5px; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+
+.sp-volt-gauge { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+.sp-volt-track { position: relative; height: 10px; border-radius: 5px; background: var(--border); overflow: visible; }
+.sp-volt-track-safe { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 5px; background: #b9ead0; }
+.sp-volt-marker { position: absolute; top: -4px; width: 2px; height: 18px; background: var(--danger); }
+.sp-volt-marker.is-vmp { background: var(--primary); }
+.sp-volt-labels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 10.5px; color: var(--muted); }
+.sp-volt-labels b { color: var(--ink); font-weight: 700; }
+.sp-string-summary { margin-top: 12px; font-size: 12px; font-weight: 700; color: var(--ink); }
+.sp-string-note { margin-top: 8px; font-size: 11.5px; line-height: 1.6; color: var(--muted); padding: 8px 10px; background: var(--page-bg); border-radius: 6px; border-left: 3px solid var(--primary); }
+
+.sp-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+.sp-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+.sp-legend-swatch { width: 14px; height: 3px; border-radius: 2px; }
+.sp-legend-caption { font-size: 11.5px; color: var(--muted); line-height: 1.6; margin-top: 12px; }
+
+/* ---------- Configuration tab ---------- */
+.sp-option-card { border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; margin-bottom: 16px; }
+.sp-option-card:last-child { margin-bottom: 0; }
+.sp-option-card.is-active { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+
+.sp-tag {
+  display: inline-block; font-size: 10px; font-weight: 700; color: #fff; background: var(--ink);
+  padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px;
+}
+.sp-option-card h4 { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.sp-option-desc { font-size: 12px; color: var(--muted); line-height: 1.55; max-width: 640px; }
+
+.sp-option-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0 10px; }
+.sp-option-stat label { display: block; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 3px; }
+.sp-option-stat strong { display: block; font-size: 14px; color: var(--ink); }
+.sp-option-stat span { font-size: 10.5px; color: var(--muted); }
+
+.sp-chip-row { display: flex; align-items: center; gap: 6px; margin: 10px 0; flex-wrap: wrap; }
+.sp-chip {
+  width: 22px; height: 22px; border-radius: 5px; background: var(--ink); color: #fff;
+  font-size: 10.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center;
+}
+.sp-chip-note { font-size: 11px; color: var(--muted); font-weight: 600; margin-left: 6px; }
+
+.sp-option-footer {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  margin-top: 12px; padding-top: 14px; border-top: 1px dashed var(--border);
+}
+.sp-pill-outline {
+  border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px; font-size: 10.5px;
+  color: var(--muted); font-weight: 700; white-space: nowrap;
+}
+.sp-option-footer .sp-desc { flex: 1; min-width: 220px; font-size: 11px; color: var(--muted); }
+
+.sp-btn { border: none; border-radius: 8px; padding: 8px 14px; font-family: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.sp-btn-active { background: var(--success-soft); color: var(--success); }
+.sp-btn-outline { background: var(--primary-soft); border: 1px solid var(--primary); color: var(--primary-dark); }
+.sp-btn-outline:hover { background: var(--primary); color: #fff; }
+.sp-btn-outline i { color: var(--primary-dark); }
+.sp-btn-outline:hover i { color: #fff; }
+
+/* ---------- RAB tab ---------- */
+.sp-rab-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.sp-rab-head-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.sp-rab-summary-row td { font-weight: 700; color: var(--ink); background: var(--page-bg); }
+.sp-rab-total-row td { background: var(--danger-soft); color: #d64545; font-size: 13.5px; }
+
+.sp-rab-mini-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+.sp-rab-mini-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.sp-rab-mini-card label { display: block; font-size: 10.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; }
+.sp-rab-mini-card strong { font-size: 16px; color: var(--ink); }
+
+/* ---------- Customer tab ---------- */
+.sp-customer-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 20px; align-items: start; margin-bottom: 20px; }
+.sp-customer-left { display: flex; flex-direction: column; gap: 14px; }
+/* min-width:0 stops this grid item from growing to fit the Proposal
+   Preview table's min-content width (the table itself has a fixed
+   min-width for readability) — without it, the item blows out past
+   the panel and gets clipped by .sp-panel's overflow:hidden instead
+   of letting .sp-table-wrap-mini's own horizontal scrollbar handle it. */
+.sp-customer-right { min-width: 0; }
+
+.sp-customer-card { border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+.sp-customer-card-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 10px; }
+.sp-customer-card input[type="range"] { width: 100%; accent-color: var(--primary); margin-bottom: 8px; }
+.sp-margin-readout { font-size: 12px; font-weight: 600; color: var(--ink); }
+.sp-margin-readout span { color: var(--primary-dark); font-weight: 700; }
+
+.sp-cost-row { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; padding: 6px 0; }
+.sp-cost-row span { color: var(--muted); font-weight: 600; }
+.sp-cost-row strong { color: var(--ink); font-size: 13px; }
+
+.sp-customer-card-highlight { background: var(--danger-soft); border-color: var(--primary-soft); }
+.sp-selling-price { font-size: 22px; font-weight: 700; color:#d64545; margin-top: 4px; }
+
+.sp-table-wrap-mini { max-height: 460px; overflow-y: auto; }
+.sp-table-mini th, .sp-table-mini td { padding: 8px 10px; font-size: 11px; }
+
+.sp-btn-export-offer { max-width: 320px; margin: 0 auto; }
+
+/* ---------- Summary tab ---------- */
+.sp-summary-head h3 { font-size: 18px; font-weight: 700; color: var(--ink); }
+.sp-summary-sub { font-size: 12px; color: var(--muted); margin-top: 3px; margin-bottom: 16px; }
+
+.sp-summary-text { border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-bottom: 22px; background: var(--page-bg); }
+.sp-summary-text p { font-size: 13px; color: var(--ink); line-height: 1.6; margin-bottom: 10px; }
+.sp-summary-text ul { padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.sp-summary-text li { font-size: 12.5px; color: var(--ink); line-height: 1.5; }
+
+.sp-summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+.sp-summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 10px 24px rgba(11, 79, 84, 0.16), 0 2px 6px rgba(11, 79, 84, 0.1);
+}
+.sp-summary-card:hover {
+  border-color: var(--primary-dark);
+  box-shadow: 0 12px 28px rgba(11, 79, 84, 0.22), 0 2px 6px rgba(11, 79, 84, 0.14);
+}
+
+.sp-summary-card-title { font-size: 11px; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--primary-soft); }
+.sp-summary-card-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed var(--border); font-size: 12px; }
+.sp-summary-card-row:last-child { border-bottom: none; }
+.sp-summary-card-row span:first-child { color: var(--muted); }
+.sp-summary-card-row span:last-child { color: var(--ink); font-weight: 600; }
+
+.sp-summary-card-row span.sp-val-success { color: var(--success); }
+.sp-summary-card-row span.sp-val-info { color: var(--info); }
+.sp-summary-card-row span.sp-val-warning { color: var(--warning); }
+.sp-summary-card-row span.sp-val-primary { color: var(--primary-dark); }
+.sp-summary-card-row span.sp-val-danger { color: var(--danger); }
+.sp-summary-actions { display: flex; gap: 10px; }
+
+/* ---------- Catalog tab ---------- */
+.sp-catalog-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.sp-catalog-hint { font-size: 11.5px; color: var(--muted); }
+
+.sp-catalog-filters {
+  display: flex; flex-wrap: nowrap; gap: 8px; margin-bottom: 16px;
+  overflow-x: auto; overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+}
+.sp-filter-chip {
+  border: 1px solid var(--border); background: #fff; color: var(--ink);
+  font-family: inherit; font-size: 11.5px; font-weight: 600; padding: 6px 13px;
+  border-radius: 20px; cursor: pointer; transition: all 0.15s ease;
+  flex-shrink: 0; white-space: nowrap;
+}
+.sp-filter-chip:hover { background: var(--page-bg); }
+.sp-filter-chip.is-active { background: var(--primary-soft); border-color: var(--primary); color: var(--primary-dark); }
+
+.sp-spec-note { font-size: 10.5px; color: var(--muted); margin-top: 2px; display: none; }
+.sp-catalog-filters.is-spec-mode ~ .sp-table-wrap .sp-spec-note,
+#spCatalogTableWrap.is-spec-mode .sp-spec-note { display: block; }
+
+.sp-editable-cell { cursor: text; border-radius: 6px; }
+.sp-editable-cell:hover { background: var(--primary-soft); }
+.sp-editable-cell:focus { outline: 2px solid var(--primary); outline-offset: -2px; background: #fff; }
+
+@media (max-width: 1100px) {
+  .sp-layout { grid-template-columns: 1fr; }
+  /* Kolom kiri/kanan jadi ditumpuk (bukan berdampingan) di layar sempit,
+     jadi panel kanan tidak perlu sticky supaya tidak tumpang tindih. */
+  .sp-panel { position: static; }
+  .sp-form { position: static; max-width: none; max-height: none; overflow-y: visible; }
+  .sp-metric-grid { grid-template-columns: repeat(2, 1fr); }
+  .sp-option-stats { grid-template-columns: repeat(2, 1fr); }
+  .sp-stepper { overflow-x: auto; }
+  .sp-customer-layout { grid-template-columns: minmax(0, 1fr); }
+  .sp-summary-grid { grid-template-columns: 1fr; }
+  .sp-rab-mini-cards { grid-template-columns: 1fr; }
+}
+/* Catalog-backed input helpers */
+.sp-catalog-source {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  padding: 2px 6px;
+  border: 1px solid var(--border, #d9dde5);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.2;
+  opacity: .72;
+  vertical-align: middle;
+}
+.sp-catalog-meta {
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-secondary, #6b7280);
+  min-height: 16px;
+}
+
+/* ---------- Package configuration + contextual help ---------- */
+.sp-label-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 17px;
+}
+.sp-label-row label { margin: 0; line-height: 1.35; }
+.sp-info-btn {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  border: 1px solid var(--border, #d9dde5);
+  background: var(--surface, #fff);
+  color: var(--primary-dark, #0b4f54);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 15px;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+.sp-info-btn:hover { background: var(--primary-soft, #e9f4f4); }
+.sp-info-popover {
+  position: fixed;
+  z-index: 10000;
+  margin: 0;
+  max-width: min(320px, calc(100vw - 24px));
+  box-sizing: border-box;
+  padding: 9px 11px;
+  border: 1px solid var(--border, #d9dde5);
+  border-radius: 9px;
+  background: var(--surface, #fff);
+  color: var(--ink, #1f2937);
+  box-shadow: 0 10px 24px rgba(0,0,0,.12);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.sp-label-row { position: relative; }
+
+.sp-package-field { margin-top: 4px; }
+.sp-package-summary {
+  margin-top: 7px;
+  padding: 10px 12px;
+  border: 1px solid var(--border, #d9dde5);
+  border-radius: 9px;
+  background: var(--page-bg, #f7f8fa);
+  color: var(--muted, #6b7280);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.sp-package-summary strong {
+  display: block;
+  color: var(--ink, #1f2937);
+  font-size: 11.5px;
+  margin-bottom: 2px;
+}
+.sp-package-summary span { display: block; }
+.sp-package-summary ul {
+  margin: 6px 0 0 17px;
+  padding: 0;
+  display: grid;
+  gap: 3px;
+}
+.sp-package-summary li { padding-left: 2px; }
+.sp-package-summary li::marker { color: var(--primary); }
+.sp-package-summary li strong {
+  display: inline;
+  font-size: inherit;
+  margin: 0;
+}
+
+.sp-customize-toggle {
+  width: 100%;
+  margin: 10px 0 3px;
+  padding: 8px 10px;
+  border: 1px solid var(--border, #d9dde5);
+  border-radius: 8px;
+  background: var(--surface, #fff);
+  color: var(--ink, #1f2937);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.sp-customize-toggle:hover { background: var(--page-bg, #f7f8fa); }
+.sp-customize-toggle > span { display: inline-flex; align-items: center; gap: 7px; }
+.sp-customize-toggle > i { transition: transform .18s ease; }
+.sp-customize-toggle.is-open > i { transform: rotate(180deg); }
+.sp-customize-note {
+  font-size: 10.5px;
+  color: var(--muted, #6b7280);
+  margin: 0 0 7px;
+}
+.sp-customizable-components {
+  display: none;
+}
+.sp-customizable-components.is-visible {
+  display: block;
+}
+@media (prefers-color-scheme: dark) {
+  .sp-info-popover { box-shadow: 0 12px 28px rgba(0,0,0,.3); }
+}
+
+/* Calculation validation feedback */
+.sp-calc-warning{margin:12px 0 0;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface-2,rgba(0,0,0,.02));font-size:13px;line-height:1.5;color:var(--text);}
+.sp-calc-warning strong{display:block;margin-bottom:4px;}
+.sp-calc-warning ul{margin:6px 0 0 18px;padding:0;}
+.sp-calc-warning.is-error{border-color:var(--danger);}
+
+/* Notice modal (validation popup) — pakai kerangka .sp-modal-backdrop /
+   .sp-confirm-card yang sudah didefinisikan di catalog.css (ke-load
+   global di semua halaman), cuma tambah varian icon & tombol di sini. */
+.sp-confirm-icon-warning {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+.sp-modal-btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.sp-modal-btn-primary:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+/* Hybrid battery planning */
+.sp-battery-plan-note{padding:10px 12px;border:1px dashed var(--border);border-radius:10px;background:var(--page-bg);color:var(--muted);font-size:11px;line-height:1.5;min-height:42px;display:flex;align-items:center}
+.sp-battery-visual-card{margin:0 0 14px;padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--surface);box-shadow:0 2px 8px rgba(16,24,32,.04)}
+.sp-battery-visual-card.hidden{display:none}
+.sp-battery-visual-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.sp-battery-visual-sub{margin:3px 0 0;color:var(--muted);font-size:11px}
+.sp-battery-visual-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.sp-battery-metric{border:1px solid var(--border);border-radius:10px;background:var(--page-bg);padding:11px}
+.sp-battery-metric label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.sp-battery-metric strong{display:block;font-size:16px;color:var(--ink)}
+.sp-battery-metric span{display:block;font-size:10px;color:var(--muted);margin-top:2px}
+.sp-battery-visual-note{margin-top:10px;padding:8px 10px;border-left:3px solid var(--primary);background:var(--page-bg);border-radius:6px;color:var(--muted);font-size:11px;line-height:1.55}
+.sp-config-method-note{margin:-6px 0 12px;padding:8px 10px;border-left:3px solid var(--primary);background:var(--primary-soft);border-radius:7px;color:var(--muted);font-size:11px;line-height:1.55}
+.sp-config-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px}
+.sp-config-tag{display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:999px;padding:3px 8px;font-size:10px;font-weight:700;background:var(--surface)}
+.sp-config-tag.rec{color:#047857;background:#ecfdf5;border-color:#a7f3d0}.sp-config-tag.price{color:#92400e;background:#fffbeb;border-color:#fde68a}.sp-config-tag.quality{color:#6d28d9;background:#f5f3ff;border-color:#ddd6fe}.sp-config-tag.alt{color:var(--muted)}
+.sp-option-card .sp-battery-inline{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:10.5px;color:var(--muted)}
+@media(max-width:800px){.sp-battery-visual-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.sp-battery-visual-grid{grid-template-columns:1fr}.sp-battery-visual-head{align-items:flex-start}}
+
+
+/* Solar production vs consumption visualization — ported from the public Solar Calculator chart styling. */
+.sp-solar-production-chart-card{margin:0 0 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
+.sp-solar-chart-head{display:block;margin-bottom:12px}
+.sp-solar-chart-head h3{display:flex;align-items:center;gap:8px;margin:0;color:var(--ink);font-size:13.5px;font-weight:600}
+.sp-solar-chart-head h3 i{color:var(--primary);font-size:12px}
+.sp-solar-chart-controls{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:14px;width:100%;margin-top:9px;min-width:0}
+.sp-solar-battery-toggle{position:relative;display:inline-flex;align-items:center;gap:7px;cursor:pointer;user-select:none;font-size:11px;color:var(--muted)}
+.sp-solar-battery-toggle>span:first-child{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.sp-solar-battery-toggle>span:first-child i{color:var(--primary)}
+.sp-solar-battery-toggle input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.sp-solar-battery-track{position:relative;width:30px;height:17px;border-radius:999px;background:var(--border);transition:background .18s ease}
+.sp-solar-battery-thumb{position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.18);transition:transform .18s ease}
+.sp-solar-battery-toggle input:checked + .sp-solar-battery-track{background:var(--primary)}
+.sp-solar-battery-toggle input:checked + .sp-solar-battery-track .sp-solar-battery-thumb{transform:translateX(13px)}
+.sp-solar-battery-toggle input:focus-visible + .sp-solar-battery-track{outline:2px solid var(--primary);outline-offset:2px}
+.sp-solar-chart-legend{display:flex;flex-wrap:wrap;gap:14px}
+.sp-solar-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.sp-solar-dot{width:9px;height:9px;border-radius:3px;display:inline-block}
+.sp-solar-dot-consumption{background:#2f80ed}.sp-solar-dot-solar{background:#e78a12}.sp-solar-dot-used{background:rgba(16,185,129,.55)}
+.sp-solar-dot-battery{background:rgba(139,92,246,.78)}.sp-solar-dot-discharge{background:rgba(139,92,246,.58)}
+.sp-solar-chart-box{width:100%;height:300px;overflow:hidden;padding:2px 0;display:flex;align-items:center;justify-content:center}
+.sp-solar-chart-box svg{display:block;width:100%;height:100%;max-width:100%}
+@media(max-width:760px){.sp-solar-chart-controls{align-items:center;justify-content:flex-start;gap:9px 12px}.sp-solar-chart-legend{gap:9px 12px}}
+
+
+/* Battery storage scenario summary — matches the visual style of the solar calculator. */
+.sp-battery-scenario-card{margin:0 0 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 14px;}
+.sp-battery-scenario-head{margin-bottom:12px;}
+.sp-battery-scenario-head .sp-chart-title{margin:0;color:var(--ink);font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:7px;}
+.sp-battery-scenario-head .sp-chart-title i{color:var(--primary);font-size:12px;}
+.sp-battery-scenario-head .sp-chart-title span{color:var(--muted);font-weight:500;}
+.sp-battery-scenario-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;}
+.sp-battery-scenario-metric{min-width:0;border:1px solid var(--border);border-radius:12px;padding:13px 12px;display:flex;align-items:center;gap:10px;background:var(--surface);box-shadow:0 1px 3px rgba(16,24,32,.05);}
+.sp-battery-scenario-metric>div:last-child{min-width:0;}
+.sp-battery-scenario-metric span{display:block;color:var(--muted);font-size:10.5px;line-height:1.35;margin-bottom:5px;}
+.sp-battery-scenario-metric strong{display:block;color:var(--ink);font-size:18px;line-height:1.1;font-weight:700;white-space:nowrap;}
+.sp-battery-scenario-icon{width:32px;height:32px;flex:0 0 32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.sp-battery-scenario-icon.is-green{background:#e6f5ef;color:var(--primary);}
+.sp-battery-scenario-icon.is-purple{background:#eee8ff;color:#8054f6;}
+.sp-battery-scenario-icon.is-blue{background:#e9f0f7;color:#4b78ef;}
+@media(max-width:1100px){.sp-battery-scenario-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media(max-width:700px){.sp-battery-scenario-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:480px){.sp-battery-scenario-grid{grid-template-columns:1fr;}}

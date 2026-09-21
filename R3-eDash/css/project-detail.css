@@ -1,0 +1,1867 @@
+/* ============================================================
+   Tab: Project Overview (detail) — inside Project Monitoring
+   360eDash
+
+   Reuses the same --si-* tokens as System Information (already
+   fully covered by css/dark-mode-v8.css) plus the shared .btn /
+   .pill atoms from css/global.css, so dark mode and button/badge
+   styling need zero extra work here.
+============================================================= */
+
+.pd {
+  font-family: 'Poppins', sans-serif;
+  color: var(--si-ink, #25343F);
+}
+.pd * { box-sizing: border-box; }
+
+/* ---------- Project picker ----------
+   Same combobox pattern as the Operator dashboard's .opd-search +
+   #opdProjectDropdown (css/operator/operator-dashboard.css): a single
+   rounded pill (icon + text input) that's both the current-project
+   label AND the search/switch trigger, with a floating results panel
+   anchored underneath it. Replaces the old plain <select> (which
+   couldn't be styled/iconified) + separate magnifier-button popover. */
+.pd-project-picker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: 1 1 460px;
+  min-width: 220px;
+  max-width: 520px;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--si-border, #E7EDEE);
+  border-radius: 999px;
+  background: var(--si-surface, #fff);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.pd-project-picker:focus-within {
+  border-color: var(--si-primary, #0f6a71);
+  box-shadow: 0 0 0 3px var(--si-primary-soft, #e4f1f1);
+}
+.pd-project-picker-icon {
+  font-size: 12.5px;
+  color: var(--si-muted, #7C8B8D);
+  flex-shrink: 0;
+}
+.pd-project-picker-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--si-ink, #25343F);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+}
+.pd-project-picker-input::placeholder { color: var(--si-muted, #7C8B8D); font-weight: 500; }
+.pd-project-picker.is-locked {
+  cursor: default;
+  background: var(--si-bg, #f6f8f8);
+}
+.pd-project-picker.is-locked .pd-project-picker-input { cursor: default; }
+
+/* Project search */
+.pd-project-search-popover {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  width: auto;
+  padding: 6px;
+  border: 1px solid var(--si-border, #E7EDEE);
+  border-radius: 14px;
+  background: var(--si-surface, #fff);
+  box-shadow: 0 10px 28px rgba(16, 24, 32, .12);
+  max-height: 260px;
+  overflow-y: auto;
+}
+.pd-project-search-results {
+  display: grid;
+  gap: 2px;
+}
+.pd-project-search-result {
+  width: 100%;
+  padding: 9px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--si-ink, #25343F);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background .12s ease;
+}
+.pd-project-search-result i.fa-diagram-project {
+  color: var(--si-primary, #0f6a71);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.pd-project-search-result span {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pd-project-search-result:hover,
+.pd-project-search-result.is-selected {
+  background: var(--si-primary-soft, #e4f1f1);
+  color: var(--si-primary, #0f6a71);
+}
+.pd-project-search-result.is-selected i.fa-diagram-project { color: var(--si-primary, #0f6a71); }
+.pd-project-search-empty {
+  padding: 10px;
+  color: var(--si-muted, #7C8B8D);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ---------- Project information ---------- */
+.pd-info-card {
+  background: var(--si-surface, #fff);
+  border: 1px solid var(--si-border, #E7EDEE);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.pd-info-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.pd-info-project-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.pd-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--si-success-soft, #E4F5EC);
+  color: var(--si-success, #2F9E6E);
+}
+.pd-status-pill i { font-size: 8px; }
+.pd-status-pill.is-offline {
+  background: var(--si-danger-soft, #FBE8E8);
+  color: var(--si-danger, #D64545);
+}
+.pd-status-pill.is-warning {
+  background: var(--si-warning-soft, #FBF1DE);
+  color: var(--si-warning, #E3A21A);
+}
+/* Refresh + last-updated control */
+.pd-live-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.pd-live-updated {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--si-muted, #7C8B8D);
+  white-space: nowrap;
+}
+.pd-live-updated i { font-size: 10px; }
+.pd-live-updated b { color: var(--si-ink, #25343F); font-weight: 600; }
+.pd-refresh-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  border: 1px solid var(--si-border, #E7EDEE);
+  background: var(--si-page-bg, #F4F7F7);
+  color: var(--si-primary, #0f6a71);
+  cursor: pointer;
+  font-size: 12px;
+  transition: transform .35s ease, background .15s ease;
+}
+.pd-refresh-btn:hover { background: var(--si-primary-soft, #e4f1f1); }
+.pd-refresh-btn.is-spinning i { animation: pdSpin .6s linear; }
+@keyframes pdSpin { to { transform: rotate(360deg); } }
+
+/* Project specification grid */
+.pd-summary-strip {
+  display: grid;
+  /* Location gets more room than Owner/Commission Date since addresses
+     tend to run much longer than an owner name or a date. */
+  grid-template-columns: minmax(0, 2.3fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1.1fr);
+  gap: 14px 24px;
+  margin-top: 16px;
+  padding-top: 15px;
+  border-top: 1px solid var(--si-border, #E7EDEE);
+}
+.pd-summary-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.pd-summary-field span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--si-muted, #7C8B8D);
+}
+.pd-summary-field span i { color: var(--si-primary, #0f6a71); font-size: 10.5px; }
+.pd-summary-field strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--si-ink, #25343F);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pd-summary-owner { min-width: 0; }
+.pd-summary-owner strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Location can be a long address (e.g. "Desa Tawabi, Kec. Bacan Barat,
+   Kab. Halmahera Selatan, Maluku Utara") -- let it wrap onto multiple
+   lines and read in full instead of truncating with an ellipsis. */
+#pdProjectLocation {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+/* ---------- Key stats strip ---------- */
+.pd-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.pd-stat-card {
+  background: var(--si-surface, #fff);
+  border: 1px solid var(--si-border, #E7EDEE);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.pd-stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.pd-stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.pd-stat-icon-primary { background: var(--si-primary-soft, #e4f1f1); color: var(--si-primary, #0f6a71); }
+.pd-stat-icon-success { background: var(--si-success-soft, #E4F5EC); color: var(--si-success, #2F9E6E); }
+.pd-stat-icon-info    { background: var(--si-info-soft, #E7F0F8); color: var(--si-info, #3E7CB1); }
+.pd-stat-icon-warning { background: var(--si-warning-soft, #FBF1DE); color: var(--si-warning, #E3A21A); }
+
+.pd-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.pd-trend-up { color: var(--si-success, #2F9E6E); }
+.pd-trend-down { color: var(--si-danger, #D64545); }
+
+.pd-stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.pd-stat-value small { font-size: 12px; font-weight: 600; color: var(--si-muted, #7C8B8D); }
+
+.pd-stat-label {
+  font-size: 12px;
+  color: var(--si-muted, #7C8B8D);
+}
+.pd-stat-sub { color: var(--si-muted, #7C8B8D); font-weight: 500; }
+.pd-stat-sub b { color: var(--si-ink, #25343F); font-weight: 600; }
+
+/* Gauge stat cards */
+.pd-stat-card-gauge {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.pd-gauge {
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.pd-gauge-inner {
+  width: 50px;
+  height: 50px;
+  border-radius: 999px;
+  background: var(--si-surface, #fff);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.pd-gauge-inner b { font-size: 12.5px; font-weight: 700; line-height: 1.1; }
+.pd-gauge-inner span { font-size: 7.5px; color: var(--si-muted, #7C8B8D); }
+.pd-gauge-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.pd-gauge-label { font-size: 12px; font-weight: 600; }
+
+/* ---------- Generic card ---------- */
+.pd-card {
+  background: var(--si-surface, #fff);
+  border: 1px solid var(--si-border, #E7EDEE);
+  border-radius: 14px;
+  padding: 18px;
+}
+.pd-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.pd-card-head h2 {
+  font-size: 14.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pd-card-head h2 i { color: var(--si-primary, #0f6a71); font-size: 13px; }
+.pd-card-head p {
+  font-size: 12px;
+  color: var(--si-muted, #7C8B8D);
+  margin-top: 3px;
+}
+
+/* ---------- Main grid (chart + side col) ---------- */
+.pd-grid-main {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.pd-card-chart { display: flex; flex-direction: column; }
+
+.pd-chart-filters {
+  display: flex;
+  gap: 4px;
+  background: var(--si-page-bg, #F4F7F7);
+  border-radius: 9px;
+  padding: 3px;
+}
+.pd-filter-btn {
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--si-muted, #7C8B8D);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.pd-filter-btn:hover { color: var(--si-primary-dark, #0b4f54); }
+.pd-filter-btn.is-active {
+  background: var(--si-surface, #fff);
+  color: var(--si-primary-dark, #0b4f54);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(15,106,113,0.14);
+}
+
+.pd-chart-custom-range {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: var(--si-muted, #7C8B8D);
+}
+.pd-chart-custom-range label { display: flex; align-items: center; gap: 6px; }
+.pd-chart-custom-range input {
+  font-family: inherit;
+  font-size: 12px;
+  padding: 6px 8px;
+  border: 1px solid var(--si-border, #E7EDEE);
+  border-radius: 7px;
+  background: var(--si-page-bg, #F4F7F7);
+  color: var(--si-ink, #25343F);
+}
+
+.pd-chart-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 11.5px;
+  color: var(--si-muted, #7C8B8D);
+  margin-bottom: 8px;
+}
+.pd-chart-legend-dots { display: flex; gap: 16px; }
+.pd-chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.pd-legend-dot { width: 8px; height: 8px; border-radius: 999px; display: inline-block; }
+.pd-legend-dot-actual { background: var(--si-primary, #0f6a71); }
+.pd-legend-dot-expected { background: var(--si-accent, #FA891A); }
+
+/* Performance Report entry point — sits right by the chart, near PR */
+.pd-report-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--si-border, #E7EDEE);
+  background: var(--si-primary-soft, #e4f1f1);
+  color: var(--si-primary-dark, #0b4f54);
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
+}
+.pd-report-btn:hover { background: var(--si-primary, #0f6a71); color: #fff; }
+.pd-report-btn i { font-size: 11px; }
+
+.pd-chart-wrap { flex: 1; min-height: 240px; position: relative; }
+
+/* Side column */
+.pd-side-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+}
+.pd-side-col .pd-card-weather {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.pd-card-weather .pd-weather-grid { margin-top: auto; }
+
+.pd-weather-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.pd-weather-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--si-muted, #7C8B8D);
+  margin-bottom: 10px;
+}
+.pd-weather-location i { color: var(--si-info, #3E7CB1); font-size: 11px; }
+.pd-weather-icon {
+  font-size: 30px;
+  color: var(--si-accent, #FA891A);
+}
+.pd-weather-temp { font-size: 22px; font-weight: 700; }
+.pd-weather-desc { font-size: 12px; color: var(--si-muted, #7C8B8D); }
+
+.pd-weather-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.pd-weather-grid .pd-weather-item:last-child { grid-column: 1 / -1; }
+.pd-weather-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--si-page-bg, #F4F7F7);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+.pd-weather-item i { color: var(--si-info, #3E7CB1); font-size: 13px; }
+.pd-weather-item b { display: block; font-size: 12.5px; font-weight: 700; }
+.pd-weather-item span { font-size: 10.5px; color: var(--si-muted, #7C8B8D); }
+
+.pd-summary-list { display: flex; flex-direction: column; }
+.pd-summary-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--si-border, #E7EDEE);
+  font-size: 12.5px;
+}
+.pd-summary-list li:last-child { border-bottom: none; }
+.pd-summary-list li span { color: var(--si-muted, #7C8B8D); }
+.pd-summary-list li b { font-weight: 700; }
+.pd-summary-total b { color: var(--si-primary, #0f6a71); font-size: 13.5px; }
+
+/* ---------- Secondary grid: Alerts / Notifications ---------- */
+.pd-grid-secondary {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+/* ---------- Status row: Battery / Inverter / System Health ----------
+   Grouped together (similar content density) so the grid's default
+   row-stretch doesn't leave one card with far more empty space than
+   its neighbors, which is what happened when these sat next to the
+   taller Alerts card. Compact spacing keeps the row tight. */
+.pd-grid-status {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.pd-card-compact { padding: 16px; display: flex; flex-direction: column; }
+.pd-card-compact .pd-card-head { margin-bottom: 12px; }
+.pd-card-compact .pd-battery-body,
+.pd-card-compact .pd-inverter-body { margin-bottom: 10px; flex: 1; }
+.pd-card-compact .pd-soc-bar-wrap { margin-bottom: 8px; }
+.pd-card-compact .pd-inverter-main { margin-bottom: 10px; }
+
+.pd-view-all-btn, .pd-battery-link-btn, .pd-inverter-link-btn { font-size: 12px; padding: 7px 12px; }
+
+/* Compact System Health list (replaces the old bulky icon-grid so it
+   matches the height of Battery Summary / Inverter Summary instead of
+   leaving unused vertical space). */
+.pd-health-score-badge {
+  font-size: 11px;
+  color: var(--si-muted, #7C8B8D);
+  font-weight: 600;
+}
+.pd-health-score-badge b { color: var(--si-success, #2F9E6E); font-size: 15px; }
+.pd-device-compact-list { display: flex; flex-direction: column; flex: 1; justify-content: center; }
+.pd-device-compact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--si-border, #E7EDEE);
+  font-size: 11.5px;
+}
+.pd-device-compact-row:last-child { border-bottom: none; }
+.pd-device-compact-row .pd-device-compact-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.pd-device-compact-row .pd-device-compact-name i {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10.5px;
+  background: var(--si-primary-soft, #e4f1f1);
+  color: var(--si-primary, #0f6a71);
+  flex-shrink: 0;
+}
+.pd-device-compact-row.has-issue .pd-device-compact-name i { background: var(--si-warning-soft, #FBF1DE); color: var(--si-warning, #E3A21A); }
+.pd-device-compact-row.has-fault .pd-device-compact-name i { background: var(--si-danger-soft, #FBE8E8); color: var(--si-danger, #D64545); }
+.pd-device-compact-row .pd-device-compact-count { color: var(--si-muted, #7C8B8D); font-size: 10.5px; }
+
+/* ---------- Environmental Impact / Savings ---------- */
+.pd-env-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: stretch;
+  /* Auto top/bottom margins center the card row in whatever vertical
+     space is left under the card head (the card stretches to match
+     the Weather card's height via .pd-card-chart's flex column), so
+     the row settles in the middle instead of leaving a big empty
+     gap underneath it. */
+  margin-top: auto;
+  margin-bottom: auto;
+}
+.pd-env-card {
+  min-width: 0;
+  text-align: center;
+  padding: 12px 8px;
+  border-radius: 12px;
+  background: var(--si-page-bg, #F4F7F7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Top-aligned (not centered) so the icon/value/label sit at the same
+     height on every card even when one card's label or sub-text wraps
+     to more lines than its neighbours -- keeps the whole row lined up. */
+  justify-content: flex-start;
+}
+/* Each mini-card gets its own soft tint (same hue family already used
+   for its icon) instead of a flat neutral gray, so Energy/Savings/CO2/Trees
+   read as distinct at a glance, not just via the icon color. */
+.pd-env-card.is-energy { background: var(--si-warning-soft, #FBF1DE); }
+.pd-env-card.is-savings { background: var(--si-primary-soft, #e4f1f1); }
+.pd-env-card.is-co2 { background: var(--si-info-soft, #E7F0F8); }
+.pd-env-card.is-trees { background: var(--si-success-soft, #E4F5EC); }
+.pd-env-icon {
+  width: 30px;
+  height: 30px;
+  margin: 0 auto 8px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+/* Icon circle stays a plain white disc now that the card body itself
+   carries the tint — keeps the icon legible instead of blending into
+   a same-color background. */
+.pd-env-card.is-energy .pd-env-icon { background: #fff; color: var(--si-warning, #E3A21A); }
+.pd-env-card.is-savings .pd-env-icon { background: #fff; color: var(--si-primary, #0f6a71); }
+.pd-env-card.is-co2 .pd-env-icon { background: #fff; color: var(--si-info, #3E7CB1); }
+.pd-env-card.is-trees .pd-env-icon { background: #fff; color: var(--si-success, #2F9E6E); }
+.pd-env-value {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pd-env-value small { font-size: 10px; font-weight: 600; color: var(--si-muted, #7C8B8D); }
+.pd-env-label { font-size: 10.5px; font-weight: 600; margin-top: 3px; line-height: 1.3; }
+.pd-env-sub { font-size: 9px; color: var(--si-muted, #7C8B8D); margin-top: 3px; line-height: 1.3; }
+.pd-env-arrow { display: flex; align-items: center; justify-content: center; color: var(--si-border, #E7EDEE); font-size: 13px; flex-shrink: 0; }
+
+/* Settings button, aligned with the "Environmental Impact" title */
+.pd-env-settings-btn {
+  padding: 7px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  gap: 6px;
+  align-self: flex-start;
+}
+.pd-env-settings-btn i { font-size: 12px; }
+
+/* ---------- Maintenance & Predictive summary ---------- */
+.pd-maintenance-rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.pd-maintenance-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--si-page-bg, #F4F7F7);
+  border-radius: 10px;
+  padding: 10px;
+}
+.pd-maintenance-row div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pd-maintenance-row b { font-size: 11.5px; font-weight: 600; }
+.pd-maintenance-row span { font-size: 11.5px; color: var(--si-muted, #7C8B8D); }
+.pd-maintenance-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.pd-maintenance-icon.is-next { background: var(--si-info-soft, #E7F0F8); color: var(--si-info, #3E7CB1); }
+.pd-maintenance-icon.is-done { background: var(--si-success-soft, #E4F5EC); color: var(--si-success, #2F9E6E); }
+.pd-maintenance-predictive-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--si-muted, #7C8B8D);
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  padding-top: 10px;
+  border-top: 1px solid var(--si-border, #E7EDEE);
+  margin-bottom: 10px;
+}
+.pd-maintenance-predictive { display: flex; flex-direction: column; gap: 8px; }
+.pd-predictive-item { padding: 9px 10px; border-radius: 9px; background: var(--si-page-bg, #F4F7F7); }
+.pd-predictive-item-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.pd-predictive-item-top b { font-size: 11.5px; font-weight: 600; }
+.pd-predictive-risk { font-size: 10.5px; font-weight: 700; }
+.pd-predictive-risk.is-high { color: var(--si-danger, #D64545); }
+.pd-predictive-risk.is-medium { color: var(--si-warning, #E3A21A); }
+.pd-predictive-risk.is-low { color: var(--si-success, #2F9E6E); }
+.pd-predictive-bar { height: 5px; border-radius: 999px; background: var(--si-border, #E7EDEE); overflow: hidden; margin-bottom: 6px; }
+.pd-predictive-bar span { display: block; height: 100%; border-radius: inherit; background: var(--si-warning, #E3A21A); }
+.pd-predictive-item.is-high .pd-predictive-bar span { background: var(--si-danger, #D64545); }
+.pd-predictive-item.is-low .pd-predictive-bar span { background: var(--si-success, #2F9E6E); }
+.pd-predictive-note { font-size: 10.5px; color: var(--si-muted, #7C8B8D); line-height: 1.4; }
+.pd-predictive-empty { font-size: 11.5px; color: var(--si-muted, #7C8B8D); text-align: center; padding: 10px 0; }
+
+/* Alert severity counts */
+.pd-alert-counts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.pd-alert-count {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  padding: 8px 6px;
+  border-radius: 10px;
+  background: var(--si-page-bg, #F4F7F7);
+}
+.pd-alert-count b { font-size: 16px; font-weight: 700; }
+.pd-alert-count span { font-size: 10px; color: var(--si-muted, #7C8B8D); }
+.pd-alert-count.is-critical b { color: var(--si-danger, #D64545); }
+.pd-alert-count.is-warning b { color: var(--si-warning, #E3A21A); }
+.pd-alert-count.is-info b { color: var(--si-info, #3E7CB1); }
+
+.pd-alert-list { display: flex; flex-direction: column; gap: 10px; }
+.pd-alert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--si-page-bg, #F4F7F7);
+}
+.pd-alert-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.pd-alert-item.is-critical .pd-alert-icon { background: var(--si-danger-soft, #FBE8E8); color: var(--si-danger, #D64545); }
+.pd-alert-item.is-warning .pd-alert-icon { background: var(--si-warning-soft, #FBF1DE); color: var(--si-warning, #E3A21A); }
+.pd-alert-item.is-info .pd-alert-icon { background: var(--si-info-soft, #E7F0F8); color: var(--si-info, #3E7CB1); }
+.pd-alert-body { min-width: 0; flex: 1; }
+.pd-alert-title { font-size: 12.5px; font-weight: 600; }
+.pd-alert-meta { font-size: 11px; color: var(--si-muted, #7C8B8D); margin-top: 2px; }
+
+.pd-notif-row { display: flex; flex-direction: column; gap: 10px; }
+.pd-notif-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--si-page-bg, #F4F7F7);
+  border-radius: 10px;
+  padding: 10px;
+}
+.pd-notif-item b { display: block; font-size: 15px; font-weight: 700; }
+.pd-notif-item span { font-size: 11px; color: var(--si-muted, #7C8B8D); }
+
+.pd-notif-last {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border-top: 1px solid var(--si-border, #E7EDEE);
+  font-size: 11.5px;
+  color: var(--si-muted, #7C8B8D);
+}
+.pd-notif-last strong { color: var(--si-ink, #25343F); font-weight: 600; text-align: right; }
+.pd-notif-delivery {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--si-border, #E7EDEE);
+  font-size: 11.5px;
+  color: var(--si-muted, #7C8B8D);
+}
+
+.pd-battery-body { margin-bottom: 12px; }
+.pd-soc-bar-wrap { margin-bottom: 10px; }
+.pd-soc-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--si-page-bg, #F4F7F7);
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.pd-soc-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--si-primary, #0f6a71), var(--si-primary-light, #6DC3BB));
+  transition: width 0.3s ease;
+}
+.pd-soc-label { font-size: 12px; color: var(--si-muted, #7C8B8D); }
+.pd-soc-label b { color: var(--si-ink, #25343F); font-size: 15px; }
+.pd-battery-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--si-muted, #7C8B8D);
+}
+.pd-battery-meta b { color: var(--si-ink, #25343F); }
+
+/* ---------- Inverter Summary card ---------- */
+.pd-inverter-body { margin-bottom: 12px; }
+.pd-inverter-main {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.pd-inverter-main b { font-size: 20px; font-weight: 700; }
+.pd-inverter-main span { font-size: 11.5px; color: var(--si-muted, #7C8B8D); }
+.pd-inverter-meta {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.pd-inverter-tag {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  color: var(--si-muted, #7C8B8D);
+  background: var(--si-page-bg, #F4F7F7);
+}
+.pd-inverter-tag b { font-size: 14px; font-weight: 700; }
+.pd-inverter-tag.is-healthy b { color: var(--si-success, #2F9E6E); }
+.pd-inverter-tag.is-fault b { color: var(--si-danger, #D64545); }
+.pd-inverter-comm {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid var(--si-border, #E7EDEE);
+  font-size: 11.5px;
+  color: var(--si-muted, #7C8B8D);
+}
+.pd-inverter-comm b { color: var(--si-ink, #25343F); font-weight: 600; }
+
+/* ---------- Tertiary grid: Maintenance + Activity ---------- */
+/* ---------- Performance Analytics ---------- */
+.pd-performance-section { margin-bottom: 14px; }
+.pd-performance-head { margin-bottom: 12px; }
+.pd-performance-period {
+  flex: 0 0 auto; font-size: 10.5px; color: var(--si-muted, #7C8B8D);
+  background: var(--si-page-bg, #F4F7F7); border: 1px solid var(--si-border, #E7EDEE);
+  border-radius: 999px; padding: 6px 10px; white-space: nowrap;
+}
+.pd-performance-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+.pd-performance-card { position: relative; min-width: 0; background: var(--si-page-bg, #F4F7F7); border: 1px solid var(--si-border, #E7EDEE); border-radius: 11px; padding: 12px; display: flex; flex-direction: column; }
+/* Remove (x) button reuses the Operator dashboard's .opd-card-remove
+   look — fades in on hover, same as its cards. */
+.pd-performance-card:hover .opd-card-remove { opacity: 1; }
+/* "Lebarkan sebaris" / shrink toggle — same idea + look as the Operator
+   dashboard's .opd-card-resize (see css/operator/operator-dashboard.css),
+   just re-scoped to fade in on .pd-performance-card hover too. */
+.pd-performance-card:hover .opd-card-resize { opacity: 1; }
+.pd-performance-card:hover .opd-card-download { opacity: 1; }
+/* Resize + remove sit right on top of the drag handle/title row in this
+   card (no room below like the Operator dashboard's taller header), so
+   the default 26px gap between them (see operator-dashboard.css) reads
+   as cramped/overlapping here. Push resize further left for a clearer
+   gap, purely a positioning tweak — same size/look otherwise. */
+.pd-performance-card .opd-card-resize {
+  position: absolute;
+  top: 8px;
+  right: 40px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 7px;
+  background: var(--si-page-bg, #F4F7F7);
+  color: var(--si-muted, #7c8b8d);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.pd-performance-card .opd-card-resize:hover {
+  background: var(--si-primary-soft, #e4f1f1);
+  color: var(--si-primary-dark, #0b4f54);
+}
+.pd-performance-card .opd-card-remove { right: 10px; }
+/* Download PNG/CSV buttons — same look/size as .opd-card-resize, just
+   two more slots pushed further left of it (resize sits at right:40px,
+   remove at right:10px). */
+.pd-performance-card .opd-card-download {
+  position: absolute;
+  top: 8px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 7px;
+  background: var(--si-page-bg, #F4F7F7);
+  color: var(--si-muted, #7c8b8d);
+  font-size: 10.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.pd-performance-card .opd-card-download:hover {
+  background: var(--si-primary-soft, #e4f1f1);
+  color: var(--si-primary-dark, #0b4f54);
+}
+.pd-performance-card .opd-card-download-png { right: 70px; }
+.pd-performance-card .opd-card-download-csv { right: 100px; }
+/* Expanded state: card takes the full grid row instead of 1/3 of it,
+   and gets a taller chart — mirrors .opd-card-chart.is-wide. */
+.pd-performance-card.is-wide { grid-column: 1 / -1; }
+.pd-performance-card.is-wide .pd-performance-chart { height: 470px; }
+/* Drag-and-drop reordering (see wirePerfCardDragAndDrop in
+   js/project-detail.js) — same "hide the original in place while an
+   opaque floating clone tracks the pointer" approach as the Operator
+   dashboard's .opd-card.is-dragging (css/operator/operator-dashboard.css),
+   just re-scoped to this card class. */
+.pd-performance-card.is-dragging { opacity: 0; }
+/* ============================================================
+   Shared modal base classes: .modal-backdrop / .modal-card /
+   .modal-scroll / .modal-header / .modal-title / .modal-close /
+   .modal-actions / .modal-actions-right / .modal-btn / .modal-input
+
+   Used by the "Create graph" modal below (#pdGraphModal, markup in
+   pages/project-detail.html, two-pane layout styled by the
+   .opd-graph-* rules in css/operator/operator-dashboard.css). These
+   generic classes were referenced everywhere -- including a comment
+   in operator-dashboard.css claiming they're "reused from
+   css/alert.css" -- but never actually defined anywhere in the
+   stylesheet. Without them the modal had no fixed positioning, no
+   dark backdrop and no hidden/.is-open toggle, so it rendered as a
+   plain block in the normal page flow (pushed down below the rest
+   of #pdContent, "bentrok"/colliding with the layout underneath it)
+   instead of appearing centered on top of the page like every other
+   modal in this codebase. Modeled on the same fixed-overlay +
+   .is-open pattern already used by .pd-report-modal-backdrop below
+   and .sp-modal-backdrop in css/catalog.css. */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 32, 35, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+  font-family: 'Poppins', sans-serif;
+}
+.modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+
+.modal-card {
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 40px);
+  background: var(--si-surface, #fff);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(11, 79, 84, 0.28);
+  padding: 24px;
+  transform: translateY(10px) scale(0.98);
+  transition: transform 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--si-ink, #25343F);
+}
+.modal-backdrop.is-open .modal-card { transform: translateY(0) scale(1); }
+
+.modal-scroll { overflow-y: auto; min-height: 0; }
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.modal-title { font-size: 18px; font-weight: 700; }
+.modal-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: none;
+  background: var(--si-page-bg, #F4F7F7);
+  color: var(--si-muted, #7C8B8D);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.modal-close:hover { color: var(--si-danger, #D64545); }
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
+}
+.modal-actions-right { display: flex; align-items: center; gap: 10px; }
+
+.modal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+.modal-btn-secondary {
+  background: #fff;
+  color: var(--si-muted, #7C8B8D);
+  border-color: var(--si-border, #E7EDEE);
+}
+.modal-btn-secondary:hover { background: var(--si-page-bg, #F4F7F7); color: var(--si-ink, #25343F); }
+.modal-btn-primary {
+  background: var(--si-primary, #0f6a71);
+  color: #fff;
+  border-color: var(--si-primary, #0f6a71);
+}
+.modal-btn-primary:hover { background: var(--si-primary-dark, #0b4f54); border-color: var(--si-primary-dark, #0b4f54); }
+.modal-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.modal-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--si-border, #E7EDEE);
+  background: var(--si-surface, #fff);
+  color: var(--si-ink, #25343F);
+  font-family: inherit;
+  font-size: 13px;
+}
+.modal-input:focus {
+  outline: none;
+  border-color: var(--si-primary, #0f6a71);
+  box-shadow: 0 0 0 3px rgba(15, 106, 113, 0.12);
+}
+
+@media (max-width: 640px) {
+  .modal-actions { flex-direction: column-reverse; align-items: stretch; }
+  .modal-actions-right { width: 100%; }
+  .modal-actions-right .modal-btn { flex: 1; }
+}
+
+/* Dashed "+" add tile at the end of the grid, opens the same
+   "Create graph" modal used by "Add Graph" (see #pdAddGraphBtn /
+   #pdGraphModal in pages/project-detail.html + js/project-detail.js). */
+.pd-performance-grid .opd-card-add { width: 100%; height: 100%; min-height: 150px; }
+.pd-performance-head { flex-wrap: wrap; }
+#pdAddGraphBtn { flex-shrink: 0; }
+.pd-performance-card-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
+/* Grip handle + title, side by side. .opd-card-drag-handle had no
+   styling anywhere in the codebase before this (it rendered at the
+   browser/icon-font default — ~16px, bold, flex-start-aligned against
+   a 12px title), which is what made this row look oversized/misaligned
+   with an odd gap under the title. Sized down to match the title's
+   scale and centered on it instead. */
+.pd-performance-title-wrap { display:flex; align-items:center; gap:5px; min-width:0; }
+.opd-card-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 12px;
+  font-size: 10px;
+  line-height: 1;
+  color: var(--si-muted, #7C8B8D);
+  opacity: 0.5;
+  cursor: grab;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+.opd-card-drag-handle:active { cursor: grabbing; }
+.pd-performance-card:hover .opd-card-drag-handle,
+.pd-performance-card.is-dragging .opd-card-drag-handle {
+  opacity: 0.9;
+  color: var(--si-primary-dark, #0b4f54);
+}
+.pd-performance-title { font-size:12px; font-weight:650; color:var(--si-ink,#25343F); flex-shrink:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pd-performance-title-editable { cursor:pointer; transition: color 0.15s ease; }
+.pd-performance-title-editable:hover,
+.pd-performance-title-editable:focus-visible {
+  color: var(--si-primary, #0f6a71);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+/* Wraps title + device-group tag on the SAME line (e.g. "Daily
+   Production  PLTS TAWABI GRUP 2"), not stacked underneath -- the tag
+   is flex-shrink:0 so it always stays fully visible and the title is
+   the one that truncates first if the row runs out of room. */
+.pd-performance-title-col { display:flex; flex-direction:row; align-items:baseline; gap:5px; min-width:0; }
+/* Which inverter/device group this custom card's data comes from (e.g.
+   "PLTS Tawabi Grup 2") -- same info already shown under the chart in
+   the "Create graph" modal's preview (see the `caption`/`from ${...}`
+   text in updatePdGraphPreview), just also surfaced here on the saved
+   dashboard card itself so it isn't only visible while creating it. */
+.pd-performance-subtitle { font-size:10.5px; font-weight:500; color:var(--si-muted,#7C8B8D); flex-shrink:0; white-space:nowrap; }
+.pd-performance-unit { display:block; margin-top:2px; font-size:9.5px; color:var(--si-muted,#7C8B8D); }
+.pd-performance-current { font-size:14px; font-weight:700; white-space:nowrap; }
+.pd-performance-current small { font-size:9px; font-weight:600; color:var(--si-muted,#7C8B8D); }
+.pd-performance-chart { height:340px; border-radius:8px; overflow:hidden; position:relative; margin-top:2px; }
+.pd-performance-chart canvas { display:block; width:100% !important; height:100% !important; }
+.pd-perf-chart-loading {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.72);
+  color: #5B6B6C; font-size: 12px; font-family: "Poppins", sans-serif;
+  pointer-events: none;
+}
+.pd-perf-chart-loading.is-hidden { display: none; }
+.pd-perf-chart-loading i { font-size: 12px; }
+
+/* Per-card period toggle (24H/7D/30D/Custom) + range slider — reuses
+   the same building blocks as the Operator dashboard's graph cards
+   (.opd-card-period-toggle / .opd-card-range-*, see
+   css/operator/operator-dashboard.css) so the chart *feature* itself
+   matches 1:1; only the outer card shell here stays the existing
+   Performance Analytics look (.pd-performance-card grid). */
+.pd-performance-card .opd-card-period-row { margin-top: 6px; margin-bottom: 6px; }
+.pd-performance-card .opd-card-period-toggle button { font-size: 9.5px; padding: 4px 7px; }
+.pd-performance-card .opd-card-range { margin-top: 8px; }
+
+/* Range-slider track: mini sparkline (drawn on <canvas> by JS) with a
+   draggable from/to window on top. Never had base styling anywhere in
+   the codebase before this — handles/masks/fill existed only as bare,
+   zero-size <div>s positioned via inline left/width (%) set in JS
+   (renderPerfCardRangeSlider), so they rendered invisibly. */
+.opd-card-range-track {
+  position: relative;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--si-page-bg, #F4F7F7);
+  border: 1px solid var(--si-border, #E7EDEE);
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+/* Chart + shading are clipped to the track's rounded corners here, in
+   their own layer — kept separate from the handles below so a handle
+   sitting right at the 0%/100% edge never gets cut in half by this
+   overflow:hidden (that was the previous bug: the pill was clipped
+   down to a sliver at full range). */
+.opd-card-range-inner {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+}
+.opd-card-range-spark {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none;
+}
+/* Dim the parts of the sparkline outside the selected from/to window. */
+.opd-card-range-mask-left,
+.opd-card-range-mask-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(244, 247, 247, 0.72);
+  pointer-events: none;
+  z-index: 1;
+}
+.opd-card-range-mask-left { left: 0; }
+.opd-card-range-mask-right { right: 0; }
+/* Selected window: draggable as a whole to shift both handles together. */
+.opd-card-range-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(15, 106, 113, 0.10);
+  border-top: 2px solid var(--si-primary, #0F6A71);
+  border-bottom: 2px solid var(--si-primary, #0F6A71);
+  cursor: grab;
+  z-index: 2;
+}
+.opd-card-range-fill:active { cursor: grabbing; }
+/* Individual from/to handles: bigger fully-rounded pill, standing a
+   little taller than the track (like a scrollbar thumb) so it reads
+   clearly even parked right at the very edge of the range. Sits
+   outside .opd-card-range-inner, so it's never clipped. */
+.opd-card-range-handle {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 14px;
+  transform: translateX(-50%);
+  background: var(--si-primary, #0F6A71);
+  border: 2px solid #fff;
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgba(16, 24, 32, 0.35);
+  cursor: ew-resize;
+  z-index: 3;
+}
+/* Tiny grip mark (two short lines) centered in the pill, purely
+   decorative, signals "draggable" the way a scrollbar/modal grip does. */
+.opd-card-range-handle::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  border-left: 1.5px solid rgba(255, 255, 255, 0.75);
+  border-right: 1.5px solid rgba(255, 255, 255, 0.75);
+}
+.opd-card-range-handle:hover,
+.opd-card-range-handle:active {
+  background: var(--si-primary-dark, #0B4F54);
+}
+.opd-card-range-caption {
+  margin-top: 6px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--si-muted, #7C8B8D);
+  text-align: center;
+}
+
+.pd-grid-tertiary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.pd-activity-list { display: flex; flex-direction: column; gap: 12px; }
+.pd-activity-item { display: flex; gap: 10px; }
+.pd-activity-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--si-primary, #0f6a71);
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.pd-activity-dot.is-success { background: var(--si-success, #2F9E6E); }
+.pd-activity-dot.is-warning { background: var(--si-warning, #E3A21A); }
+.pd-activity-dot.is-info { background: var(--si-info, #3E7CB1); }
+.pd-activity-text { font-size: 12.5px; }
+.pd-activity-time { font-size: 11px; color: var(--si-muted, #7C8B8D); margin-top: 2px; }
+
+/* ============================================================
+   Performance Report modal
+============================================================= */
+.pd-report-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 32, 35, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+  font-family: 'Poppins', sans-serif;
+}
+.pd-report-modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+
+.pd-report-modal {
+  width: 100%;
+  max-width: 720px;
+  max-height: calc(100vh - 40px);
+  background: var(--si-surface, #fff);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(11, 79, 84, 0.28);
+  transform: translateY(10px) scale(0.98);
+  transition: transform 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--si-ink, #25343F);
+}
+.pd-report-modal-backdrop.is-open .pd-report-modal { transform: translateY(0) scale(1); }
+
+.pd-report-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 22px 24px 16px;
+  border-bottom: 1px solid var(--si-border, #E7EDEE);
+}
+.pd-report-eyebrow {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--si-primary, #0f6a71);
+  margin-bottom: 5px;
+}
+.pd-report-modal-head h3 { font-size: 18px; font-weight: 700; }
+.pd-report-close-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: none;
+  background: var(--si-page-bg, #F4F7F7);
+  color: var(--si-muted, #7C8B8D);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.pd-report-close-btn:hover { color: var(--si-danger, #D64545); }
+
+.pd-report-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+.pd-report-period {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--si-border, #E7EDEE);
+}
+.pd-report-period-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  color: var(--si-muted, #7C8B8D);
+}
+.pd-report-period-chips { display: flex; gap: 4px; background: var(--si-page-bg, #F4F7F7); border-radius: 8px; padding: 3px; }
+.pd-report-period-chips button {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--si-muted, #7C8B8D);
+  cursor: pointer;
+}
+.pd-report-period-chips button.is-active { background: var(--si-surface, #fff); color: var(--si-primary-dark, #0b4f54); box-shadow: 0 1px 3px rgba(15,106,113,.14); }
+.pd-report-period-range { font-size: 11.5px; color: var(--si-muted, #7C8B8D); margin-left: auto; }
+
+.pd-report-section { margin-bottom: 20px; }
+.pd-report-section:last-child { margin-bottom: 0; }
+.pd-report-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--si-primary, #0f6a71);
+  margin-bottom: 12px;
+}
+.pd-report-grid { display: grid; gap: 12px 16px; }
+.pd-report-grid-4 { grid-template-columns: repeat(3, 1fr); }
+.pd-report-grid div { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.pd-report-grid span { font-size: 10.5px; color: var(--si-muted, #7C8B8D); }
+.pd-report-grid b { font-size: 12.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pd-report-trend {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--si-border, #E7EDEE);
+  font-size: 12px;
+  color: var(--si-muted, #7C8B8D);
+}
+.pd-report-trend b { color: var(--si-ink, #25343F); }
+
+.pd-report-alert-list { display: flex; flex-direction: column; gap: 8px; }
+.pd-report-alert-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 11px;
+  border-radius: 9px;
+  background: var(--si-page-bg, #F4F7F7);
+  font-size: 12px;
+}
+.pd-report-alert-list li span:first-child { font-weight: 600; }
+.pd-report-alert-list li span:last-child { font-size: 10.5px; color: var(--si-muted, #7C8B8D); white-space: nowrap; }
+.pd-report-alert-empty { text-align: center; color: var(--si-muted, #7C8B8D); font-size: 12px; padding: 10px 0; }
+
+.pd-report-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--si-border, #E7EDEE);
+}
+
+/* Print only the report modal content when exporting as PDF via
+   window.print() — same mechanism used by guide.html's "Save as
+   PDF" button, so no extra export library is introduced. */
+@media print {
+  body.pd-printing-report * { visibility: hidden !important; }
+  body.pd-printing-report .pd-report-modal,
+  body.pd-printing-report .pd-report-modal * { visibility: visible !important; }
+  body.pd-printing-report .pd-report-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: none;
+    padding: 0;
+  }
+  body.pd-printing-report .pd-report-modal {
+    max-width: 100%;
+    max-height: none;
+    box-shadow: none;
+    border-radius: 0;
+    transform: none;
+  }
+  body.pd-printing-report .pd-report-modal-body { overflow: visible; }
+  body.pd-printing-report .pd-report-close-btn,
+  body.pd-printing-report .pd-report-modal-actions,
+  body.pd-printing-report .pd-report-period-chips { display: none !important; }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1180px) {
+  .pd-stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .pd-grid-main { grid-template-columns: 1fr; }
+  .pd-grid-status { grid-template-columns: 1fr 1fr; }
+  .pd-performance-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pd-grid-tertiary { grid-template-columns: 1fr; }
+  .pd-summary-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pd-summary-owner { grid-column: span 3; }
+  .pd-env-grid { grid-template-columns: 1fr 1fr; }
+  .pd-env-arrow { display: none; }
+  .pd-report-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 720px) {
+  .pd-stat-grid { grid-template-columns: 1fr; }
+  .pd-grid-secondary { grid-template-columns: 1fr; }
+  .pd-grid-status { grid-template-columns: 1fr; }
+  .pd-performance-grid { grid-template-columns: 1fr; }
+  .pd-head-top { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .pd-chart-filters { flex-wrap: wrap; }
+  .pd-chart-legend { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .pd-control-row { flex-direction: column; align-items: stretch; }
+  .pd-project-picker { max-width: none; flex-basis: auto; }
+  .pd-live-controls { justify-content: flex-end; }
+  .pd-info-heading { flex-direction: column; align-items: flex-start; }
+  .pd-summary-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pd-summary-owner { grid-column: span 2; }
+  .pd-env-grid { grid-template-columns: 1fr; }
+  .pd-report-period { flex-direction: column; align-items: flex-start; }
+  .pd-report-period-range { margin-left: 0; }
+}
+
+/* Project information card -- header controls stack + full-width */
+@media (max-width: 640px) {
+  .pd-info-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .pd-info-project-controls,
+  .pd-live-controls {
+    width: 100%;
+  }
+  .pd-project-picker {
+    max-width: none;
+    flex: 1 1 auto;
+  }
+  .pd-live-controls {
+    justify-content: flex-end;
+  }
+}
+
+/* Small phones (~480px and below): stack every spec field (Location,
+   Capacity, PV Panels, Commission Date, Owner) into a single column.
+   A 2-column grid still squeezes long values (long addresses, long
+   owner names) against their neighbour and can visually overlap on
+   narrow screens -- one column per row removes that risk entirely. */
+@media (max-width: 480px) {
+  .pd-info-card { padding: 16px; }
+  .pd-summary-strip { grid-template-columns: 1fr; gap: 12px; }
+  .pd-summary-owner { grid-column: auto; }
+}
+
+/* ===========================================================
+   "Create graph" modal — skeleton / error state
+   Shown while pdEnsureGraphCatalog() fetches Tawabi telemetry
+   history the first time the modal is opened (see
+   openPdGraphModal() in js/project-detail.js). Kept in this
+   file rather than css/operator/operator-dashboard.css because
+   only the project-detail copy of the modal opens instantly and
+   needs a placeholder — the operator dashboard version still
+   waits for the fetch before opening.
+   =========================================================== */
+.opd-graph-loading {
+  display: none;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 22px;
+}
+.opd-graph-loading.is-visible {
+  display: grid;
+}
+.opd-graph-skel-col {
+  min-width: 0;
+}
+.opd-graph-skel-bar,
+.opd-graph-skel-row,
+.opd-graph-skel-box {
+  background: linear-gradient(
+    90deg,
+    var(--border, #e7edee) 25%,
+    var(--primary-soft, #e4f1f1) 37%,
+    var(--border, #e7edee) 63%
+  );
+  background-size: 400% 100%;
+  animation: pd-skel-shimmer 1.4s ease infinite;
+  border-radius: 6px;
+}
+.opd-graph-skel-row {
+  height: 38px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+.opd-graph-skel-box {
+  width: 100%;
+  height: 220px;
+  border-radius: 12px;
+}
+.opd-graph-loading-caption {
+  grid-column: 1 / -1;
+  margin: 18px 0 0;
+  font-size: 12.5px;
+  color: var(--muted, #7c8b8d);
+  text-align: center;
+}
+.opd-graph-loading-caption i {
+  margin-right: 6px;
+}
+@keyframes pd-skel-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+
+/* ===========================================================
+   PAGE-LEVEL LOADING STATE (#pdLoadingState)
+   Shown on the FIRST visit to Project Detail in the session while
+   window.initProjectDetail() awaits pdLoadRealTawabiProject()
+   (see js/project-detail.js). Reuses the pd-skel-shimmer animation
+   already defined above for the "Create graph" modal skeleton, so
+   both loading states feel like the same component.
+   =========================================================== */
+.pd-loading-state {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 2px 0 8px;
+}
+.pd-skel-bar,
+.pd-skel-card {
+  background: linear-gradient(
+    90deg,
+    var(--si-border, #e7edee) 25%,
+    var(--si-primary-soft, #e4f1f1) 37%,
+    var(--si-border, #e7edee) 63%
+  );
+  background-size: 400% 100%;
+  animation: pd-skel-shimmer 1.4s ease infinite;
+  border-radius: 8px;
+}
+.pd-skel-info-card {
+  background: var(--si-surface, #fff);
+  border: 1px solid var(--si-border, #E7EDEE);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pd-skel-row-inline { display: flex; gap: 10px; flex-wrap: wrap; }
+.pd-skel-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.pd-skel-stat-grid .pd-skel-card { height: 96px; }
+.pd-skel-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 18px;
+}
+.pd-skel-card-tall { height: 220px; }
+.pd-skel-card-wide { height: 260px; }
+.pd-loading-caption {
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--si-muted, #7C8B8D);
+  margin: 4px 0 0;
+}
+.pd-loading-caption i { margin-right: 6px; }
+
+@media (max-width: 760px) {
+  .pd-skel-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pd-skel-main-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.opd-graph-error {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 36px 20px;
+}
+.opd-graph-error.is-visible {
+  display: flex;
+}
+.opd-graph-error .opd-graph-empty-icon {
+  font-size: 26px;
+  color: var(--muted, #7c8b8d);
+  margin-bottom: 10px;
+}
+.opd-graph-error #pdGraphRetryBtn {
+  margin-top: 14px;
+}
+
+@media (max-width: 760px) {
+  .opd-graph-loading {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* "Create graph" modal — graph-type buttons that only make sense for a
+   specific variable selection (Compare: e.g. Daily Production vs Daily
+   Consumption; Stack: Daily Consumption/Production split into segments).
+   #pdGraphCompareBtn/#pdGraphStackBtn get this class toggled on/off by
+   updatePdGraphCompareAvailability()/updatePdGraphStackAvailability() in
+   js/project-detail.js every time the checked variables change — hidden
+   entirely (not just greyed out/disabled) while the current selection
+   doesn't match, so "Line"/"Bar" aren't crowded by buttons that don't
+   apply. Base .opd-graph-seg-btn styling lives in css/operator/
+   operator-dashboard.css (shared across both "Add Graph" modals). */
+.opd-graph-seg-btn.is-hidden {
+  display: none;
+}
+
+/* =============================================================
+   Bill Savings settings modal (reuses .pd-report-eyebrow /
+   .pd-report-close-btn from the Performance Report modal above,
+   own backdrop/box/body/actions since it's a smaller, one-form dialog)
+============================================================= */
+.pd-env-settings-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 32, 35, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+  font-family: 'Poppins', sans-serif;
+}
+.pd-env-settings-modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+
+.pd-env-settings-modal {
+  width: 100%;
+  max-width: 440px;
+  max-height: calc(100vh - 40px);
+  background: var(--si-surface, #fff);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(11, 79, 84, 0.28);
+  transform: translateY(10px) scale(0.98);
+  transition: transform 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--si-ink, #25343F);
+}
+.pd-env-settings-modal-backdrop.is-open .pd-env-settings-modal { transform: translateY(0) scale(1); }
+
+.pd-env-settings-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 22px 24px 16px;
+  border-bottom: 1px solid var(--si-border, #E7EDEE);
+}
+.pd-env-settings-modal-head h3 { font-size: 17px; font-weight: 700; }
+
+.pd-env-settings-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+.pd-env-settings-desc {
+  font-size: 12.5px;
+  color: var(--si-muted, #7C8B8D);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+.pd-env-settings-source-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.pd-env-source-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--si-border, #E7EDEE);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--si-muted, #7C8B8D);
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.pd-env-source-option input { accent-color: var(--si-primary, #0f6a71); }
+.pd-env-source-option:has(input:checked) {
+  border-color: var(--si-primary, #0f6a71);
+  background: var(--si-primary-soft, #e4f1f1);
+  color: var(--si-primary, #0f6a71);
+}
+.pd-env-settings-field { margin-bottom: 4px; }
+.pd-env-settings-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.pd-env-settings-field select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--si-border, #E7EDEE);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--si-ink, #25343F);
+  background: var(--si-surface, #fff);
+}
+.pd-env-settings-field select:focus {
+  outline: none;
+  border-color: var(--si-primary, #0f6a71);
+  box-shadow: 0 0 0 3px var(--si-primary-soft, #e4f1f1);
+}
+/* Rp prefix chip glued to the left of the manual cost input, so the
+   field reads like a currency box instead of a bare number field. */
+.pd-env-manual-input-wrap {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--si-border, #E7EDEE);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--si-surface, #fff);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.pd-env-manual-input-wrap:focus-within {
+  border-color: var(--si-primary, #0f6a71);
+  box-shadow: 0 0 0 3px var(--si-primary-soft, #e4f1f1);
+}
+.pd-env-manual-prefix {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--si-muted, #7C8B8D);
+  background: var(--si-page-bg, #F4F7F7);
+  border-right: 1px solid var(--si-border, #E7EDEE);
+}
+.pd-env-manual-input-wrap input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  border-radius: 0;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--si-ink, #25343F);
+  background: transparent;
+}
+.pd-env-manual-input-wrap input:focus { outline: none; }
+.pd-env-settings-hint {
+  display: block;
+  font-size: 10.5px;
+  color: var(--si-muted, #7C8B8D);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.pd-env-settings-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--si-border, #E7EDEE);
+}

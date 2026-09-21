@@ -1,0 +1,1565 @@
+{
+  "_comment": "Data untuk chart 'Energy Production (Actual vs Expected)' di Project Detail (js/project-detail.js, dulu masih pakai buildSeries() seededRandom dummy). 'daily' = actual harian REAL (kWh) hasil pembacaan register Etdy_ge1 (max per hari, dibagi ke tanggal LOKAL WIT/UTC+9) dari kedua logger PLTS Tawabi Grup 1 & Grup 2, dijumlah per tanggal \u2014 dipakai utk tab 7 Days/30 Days/Custom. 'today' = kurva per-jam utk hari lokal WIT terlengkap TERBARU yang datanya lengkap di kedua logger (2026-08-06, sama dgn sourceDate tawabi-telemetry.json) \u2014 actualKwh per jam diturunkan dari daya DC string (DP1-DP4) lalu di-rescale supaya totalnya PERSIS sama dgn energi harian real (Etdy_ge1). 'expectedKwh' (baik di 'daily' maupun 'today') BUKAN data terukur \u2014 ini kurva/target referensi: flat 120 kWh/hari mengikuti konvensi dailyTargetMWh=0.12 yang sudah dipakai tawabi-telemetry.json & projects.json (kapasitas gabungan 120 kWp x 1 jam-puncak-matahari), dan utk 'today' didistribusikan sbg kurva bell/sinus 06:00-18:00 (model clear-sky sederhana) supaya jumlah hariannya tetap sama. Kalau logger belum sempat kirim data pada tanggal tsb utk salah satu grup, 'systemsReporting' < 2 menandainya (bukan 0 yang dikarang).",
+  "dailyTargetKwh": 120.0,
+  "today": {
+    "date": "2026-08-06",
+    "labels": [
+      "00:00",
+      "01:00",
+      "02:00",
+      "03:00",
+      "04:00",
+      "05:00",
+      "06:00",
+      "07:00",
+      "08:00",
+      "09:00",
+      "10:00",
+      "11:00",
+      "12:00",
+      "13:00",
+      "14:00",
+      "15:00",
+      "16:00",
+      "17:00",
+      "18:00",
+      "19:00",
+      "20:00",
+      "21:00",
+      "22:00",
+      "23:00"
+    ],
+    "actualKwh": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.516,
+      3.341,
+      9.973,
+      17.673,
+      33.998,
+      16.009,
+      1.972,
+      1.142,
+      0.259,
+      2.049,
+      0.346,
+      2.277,
+      1.235,
+      0.008,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "expectedKwh": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      4.089,
+      7.899,
+      11.171,
+      13.682,
+      15.26,
+      15.798,
+      15.26,
+      13.682,
+      11.171,
+      7.899,
+      4.089,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "totalActualKwh": 90.8,
+    "totalExpectedKwh": 120.0
+  },
+  "daily": [
+    {
+      "date": "2026-02-08",
+      "actualKwh": 39.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 39.8,
+      "grup2Kwh": null,
+      "systemsReporting": 1
+    },
+    {
+      "date": "2026-02-09",
+      "actualKwh": 36.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 36.6,
+      "grup2Kwh": null,
+      "systemsReporting": 1
+    },
+    {
+      "date": "2026-02-10",
+      "actualKwh": 36.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 36.5,
+      "grup2Kwh": null,
+      "systemsReporting": 1
+    },
+    {
+      "date": "2026-02-11",
+      "actualKwh": 81.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 39.0,
+      "grup2Kwh": 42.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-12",
+      "actualKwh": 78.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 39.2,
+      "grup2Kwh": 39.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-13",
+      "actualKwh": 77.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 38.2,
+      "grup2Kwh": 38.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-14",
+      "actualKwh": 79.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 38.4,
+      "grup2Kwh": 40.7,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-15",
+      "actualKwh": 79.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 38.2,
+      "grup2Kwh": 41.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-16",
+      "actualKwh": 82.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 40.4,
+      "grup2Kwh": 42.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-17",
+      "actualKwh": 81.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 40.3,
+      "grup2Kwh": 41.2,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-18",
+      "actualKwh": 84.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 41.0,
+      "grup2Kwh": 43.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-19",
+      "actualKwh": 92.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 46.9,
+      "grup2Kwh": 45.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-20",
+      "actualKwh": 89.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 46.4,
+      "grup2Kwh": 43.0,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-21",
+      "actualKwh": 88.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 45.0,
+      "grup2Kwh": 43.2,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-22",
+      "actualKwh": 87.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 43.4,
+      "grup2Kwh": 44.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-23",
+      "actualKwh": 83.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 41.0,
+      "grup2Kwh": 42.2,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-24",
+      "actualKwh": 85.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 42.3,
+      "grup2Kwh": 43.0,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-25",
+      "actualKwh": 84.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 41.8,
+      "grup2Kwh": 42.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-26",
+      "actualKwh": 81.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 41.3,
+      "grup2Kwh": 40.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-27",
+      "actualKwh": 85.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 43.6,
+      "grup2Kwh": 42.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-02-28",
+      "actualKwh": 84.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 43.1,
+      "grup2Kwh": 41.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-01",
+      "actualKwh": 83.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 42.7,
+      "grup2Kwh": 40.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-02",
+      "actualKwh": 83.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 42.0,
+      "grup2Kwh": 41.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-03",
+      "actualKwh": 84.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 42.4,
+      "grup2Kwh": 42.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-04",
+      "actualKwh": 85.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 43.2,
+      "grup2Kwh": 42.7,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-05",
+      "actualKwh": 88.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 43.6,
+      "grup2Kwh": 45.0,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-06",
+      "actualKwh": 87.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 43.6,
+      "grup2Kwh": 44.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-07",
+      "actualKwh": 86.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 43.2,
+      "grup2Kwh": 42.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-08",
+      "actualKwh": 89.0,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 44.5,
+      "grup2Kwh": 44.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-09",
+      "actualKwh": 88.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 44.0,
+      "grup2Kwh": 44.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-10",
+      "actualKwh": 84.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 42.7,
+      "grup2Kwh": 41.7,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-11",
+      "actualKwh": 89.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 44.6,
+      "grup2Kwh": 44.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-12",
+      "actualKwh": 88.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 43.1,
+      "grup2Kwh": 45.2,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-13",
+      "actualKwh": 87.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 43.4,
+      "grup2Kwh": 43.8,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-14",
+      "actualKwh": 86.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 43.3,
+      "grup2Kwh": 42.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-15",
+      "actualKwh": 89.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 44.9,
+      "grup2Kwh": 44.7,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-16",
+      "actualKwh": 88.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 45.1,
+      "grup2Kwh": 43.0,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-17",
+      "actualKwh": 88.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 44.0,
+      "grup2Kwh": 44.8,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-18",
+      "actualKwh": 90.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 45.8,
+      "grup2Kwh": 44.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-19",
+      "actualKwh": 93.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 47.6,
+      "grup2Kwh": 46.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-20",
+      "actualKwh": 95.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 50.1,
+      "grup2Kwh": 45.8,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-21",
+      "actualKwh": 104.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 56.8,
+      "grup2Kwh": 47.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-22",
+      "actualKwh": 96.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 50.7,
+      "grup2Kwh": 45.8,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-23",
+      "actualKwh": 98.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 51.3,
+      "grup2Kwh": 47.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-24",
+      "actualKwh": 97.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 52.5,
+      "grup2Kwh": 45.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-25",
+      "actualKwh": 98.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 53.5,
+      "grup2Kwh": 44.8,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-26",
+      "actualKwh": 94.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 51.3,
+      "grup2Kwh": 43.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-27",
+      "actualKwh": 100.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 55.2,
+      "grup2Kwh": 45.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-28",
+      "actualKwh": 97.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 53.6,
+      "grup2Kwh": 44.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-29",
+      "actualKwh": 99.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 55.2,
+      "grup2Kwh": 44.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-30",
+      "actualKwh": 96.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 52.2,
+      "grup2Kwh": 44.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-03-31",
+      "actualKwh": 91.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.8,
+      "grup2Kwh": 42.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-01",
+      "actualKwh": 93.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.6,
+      "grup2Kwh": 44.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-02",
+      "actualKwh": 93.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.5,
+      "grup2Kwh": 45.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-03",
+      "actualKwh": 91.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 47.2,
+      "grup2Kwh": 44.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-04",
+      "actualKwh": 92.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 47.5,
+      "grup2Kwh": 44.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-05",
+      "actualKwh": 94.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 51.5,
+      "grup2Kwh": 42.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-06",
+      "actualKwh": 96.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 52.6,
+      "grup2Kwh": 44.2,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-07",
+      "actualKwh": 91.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 46.4,
+      "grup2Kwh": 45.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-08",
+      "actualKwh": 97.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 51.6,
+      "grup2Kwh": 45.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-09",
+      "actualKwh": 94.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.8,
+      "grup2Kwh": 44.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-10",
+      "actualKwh": 98.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 53.8,
+      "grup2Kwh": 45.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-11",
+      "actualKwh": 91.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.1,
+      "grup2Kwh": 42.8,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-12",
+      "actualKwh": 86.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 45.2,
+      "grup2Kwh": 40.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-13",
+      "actualKwh": 86.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 45.1,
+      "grup2Kwh": 41.2,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-14",
+      "actualKwh": 88.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 46.5,
+      "grup2Kwh": 41.7,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-15",
+      "actualKwh": 92.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.5,
+      "grup2Kwh": 43.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-16",
+      "actualKwh": 88.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 45.8,
+      "grup2Kwh": 43.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-17",
+      "actualKwh": 91.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 46.7,
+      "grup2Kwh": 44.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-18",
+      "actualKwh": 88.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 46.0,
+      "grup2Kwh": 42.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-19",
+      "actualKwh": 90.0,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 46.7,
+      "grup2Kwh": 43.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-20",
+      "actualKwh": 90.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 47.0,
+      "grup2Kwh": 43.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-21",
+      "actualKwh": 90.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 47.5,
+      "grup2Kwh": 42.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-22",
+      "actualKwh": 90.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 46.5,
+      "grup2Kwh": 44.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-23",
+      "actualKwh": 92.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 47.4,
+      "grup2Kwh": 44.8,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-24",
+      "actualKwh": 93.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.6,
+      "grup2Kwh": 43.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-25",
+      "actualKwh": 91.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 46.8,
+      "grup2Kwh": 44.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-26",
+      "actualKwh": 92.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.0,
+      "grup2Kwh": 44.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-27",
+      "actualKwh": 90.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 46.8,
+      "grup2Kwh": 43.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-28",
+      "actualKwh": 89.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 45.4,
+      "grup2Kwh": 44.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-29",
+      "actualKwh": 91.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 47.4,
+      "grup2Kwh": 44.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-04-30",
+      "actualKwh": 90.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 45.8,
+      "grup2Kwh": 45.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-01",
+      "actualKwh": 93.0,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 47.8,
+      "grup2Kwh": 45.2,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-02",
+      "actualKwh": 89.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 47.0,
+      "grup2Kwh": 42.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-03",
+      "actualKwh": 93.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.8,
+      "grup2Kwh": 43.7,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-04",
+      "actualKwh": 93.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.3,
+      "grup2Kwh": 44.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-05",
+      "actualKwh": 96.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 51.1,
+      "grup2Kwh": 45.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-06",
+      "actualKwh": 92.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.4,
+      "grup2Kwh": 43.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-07",
+      "actualKwh": 93.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.4,
+      "grup2Kwh": 44.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-08",
+      "actualKwh": 94.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.5,
+      "grup2Kwh": 44.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-09",
+      "actualKwh": 95.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 50.5,
+      "grup2Kwh": 45.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-10",
+      "actualKwh": 94.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.6,
+      "grup2Kwh": 45.0,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-11",
+      "actualKwh": 97.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 51.2,
+      "grup2Kwh": 45.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-12",
+      "actualKwh": 95.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 50.5,
+      "grup2Kwh": 44.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-13",
+      "actualKwh": 94.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 47.7,
+      "grup2Kwh": 46.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-14",
+      "actualKwh": 96.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 50.1,
+      "grup2Kwh": 46.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-15",
+      "actualKwh": 90.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.1,
+      "grup2Kwh": 42.7,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-16",
+      "actualKwh": 92.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.3,
+      "grup2Kwh": 43.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-17",
+      "actualKwh": 93.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 50.0,
+      "grup2Kwh": 43.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-18",
+      "actualKwh": 94.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.7,
+      "grup2Kwh": 45.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-19",
+      "actualKwh": 91.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.2,
+      "grup2Kwh": 43.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-20",
+      "actualKwh": 94.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 50.2,
+      "grup2Kwh": 44.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-21",
+      "actualKwh": 94.0,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.2,
+      "grup2Kwh": 44.8,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-22",
+      "actualKwh": 98.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 52.5,
+      "grup2Kwh": 45.8,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-23",
+      "actualKwh": 106.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 55.4,
+      "grup2Kwh": 51.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-24",
+      "actualKwh": 105.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 55.5,
+      "grup2Kwh": 50.2,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-25",
+      "actualKwh": 100.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 51.8,
+      "grup2Kwh": 48.8,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-26",
+      "actualKwh": 107.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 56.7,
+      "grup2Kwh": 50.7,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-27",
+      "actualKwh": 109.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 58.4,
+      "grup2Kwh": 50.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-28",
+      "actualKwh": 111.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 58.9,
+      "grup2Kwh": 52.8,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-29",
+      "actualKwh": 112.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 59.7,
+      "grup2Kwh": 53.2,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-30",
+      "actualKwh": 108.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 55.5,
+      "grup2Kwh": 53.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-05-31",
+      "actualKwh": 110.0,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 56.6,
+      "grup2Kwh": 53.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-01",
+      "actualKwh": 99.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.0,
+      "grup2Kwh": 50.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-02",
+      "actualKwh": 107.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 56.8,
+      "grup2Kwh": 51.0,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-03",
+      "actualKwh": 102.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 56.7,
+      "grup2Kwh": 46.0,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-04",
+      "actualKwh": 99.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 53.0,
+      "grup2Kwh": 46.7,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-05",
+      "actualKwh": 97.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 52.4,
+      "grup2Kwh": 45.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-06",
+      "actualKwh": 104.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 56.4,
+      "grup2Kwh": 48.2,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-07",
+      "actualKwh": 101.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 54.3,
+      "grup2Kwh": 46.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-08",
+      "actualKwh": 93.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.0,
+      "grup2Kwh": 45.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-09",
+      "actualKwh": 99.0,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 51.9,
+      "grup2Kwh": 47.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-10",
+      "actualKwh": 94.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.7,
+      "grup2Kwh": 45.8,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-11",
+      "actualKwh": 97.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.8,
+      "grup2Kwh": 47.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-12",
+      "actualKwh": 94.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.8,
+      "grup2Kwh": 45.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-13",
+      "actualKwh": 95.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.7,
+      "grup2Kwh": 46.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-14",
+      "actualKwh": 99.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 51.2,
+      "grup2Kwh": 48.2,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-15",
+      "actualKwh": 95.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 47.3,
+      "grup2Kwh": 48.0,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-16",
+      "actualKwh": 96.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.7,
+      "grup2Kwh": 47.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-17",
+      "actualKwh": 101.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 51.5,
+      "grup2Kwh": 49.7,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-18",
+      "actualKwh": 98.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 50.9,
+      "grup2Kwh": 47.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-19",
+      "actualKwh": 97.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.9,
+      "grup2Kwh": 47.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-20",
+      "actualKwh": 94.0,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.0,
+      "grup2Kwh": 46.0,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-21",
+      "actualKwh": 97.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 52.7,
+      "grup2Kwh": 45.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-22",
+      "actualKwh": 92.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 45.5,
+      "grup2Kwh": 46.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-23",
+      "actualKwh": 95.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.2,
+      "grup2Kwh": 47.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-24",
+      "actualKwh": 95.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.6,
+      "grup2Kwh": 47.0,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-25",
+      "actualKwh": 99.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 51.7,
+      "grup2Kwh": 48.2,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-26",
+      "actualKwh": 96.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.9,
+      "grup2Kwh": 47.2,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-27",
+      "actualKwh": 95.0,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.2,
+      "grup2Kwh": 46.8,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-28",
+      "actualKwh": 95.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.1,
+      "grup2Kwh": 46.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-29",
+      "actualKwh": 95.0,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.0,
+      "grup2Kwh": 46.0,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-06-30",
+      "actualKwh": 100.0,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 50.9,
+      "grup2Kwh": 49.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-01",
+      "actualKwh": 97.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 50.5,
+      "grup2Kwh": 47.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-02",
+      "actualKwh": 100.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 52.8,
+      "grup2Kwh": 47.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-03",
+      "actualKwh": 96.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 50.0,
+      "grup2Kwh": 46.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-04",
+      "actualKwh": 95.0,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.4,
+      "grup2Kwh": 45.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-05",
+      "actualKwh": 98.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 52.5,
+      "grup2Kwh": 46.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-06",
+      "actualKwh": 96.0,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.5,
+      "grup2Kwh": 46.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-07",
+      "actualKwh": 95.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.7,
+      "grup2Kwh": 46.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-08",
+      "actualKwh": 99.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 51.5,
+      "grup2Kwh": 47.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-09",
+      "actualKwh": 98.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 51.4,
+      "grup2Kwh": 46.7,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-10",
+      "actualKwh": 99.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 52.8,
+      "grup2Kwh": 46.7,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-11",
+      "actualKwh": 96.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 50.5,
+      "grup2Kwh": 45.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-12",
+      "actualKwh": 100.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 53.0,
+      "grup2Kwh": 47.7,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-13",
+      "actualKwh": 98.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 52.2,
+      "grup2Kwh": 46.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-14",
+      "actualKwh": 99.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 53.4,
+      "grup2Kwh": 46.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-15",
+      "actualKwh": 98.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 50.3,
+      "grup2Kwh": 48.0,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-16",
+      "actualKwh": 98.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 51.0,
+      "grup2Kwh": 47.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-17",
+      "actualKwh": 96.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.9,
+      "grup2Kwh": 46.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-18",
+      "actualKwh": 95.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 50.0,
+      "grup2Kwh": 45.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-19",
+      "actualKwh": 95.2,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.8,
+      "grup2Kwh": 45.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-20",
+      "actualKwh": 96.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 50.0,
+      "grup2Kwh": 46.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-21",
+      "actualKwh": 93.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.0,
+      "grup2Kwh": 45.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-22",
+      "actualKwh": 95.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.2,
+      "grup2Kwh": 46.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-23",
+      "actualKwh": 94.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.3,
+      "grup2Kwh": 46.1,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-24",
+      "actualKwh": 98.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 52.0,
+      "grup2Kwh": 46.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-25",
+      "actualKwh": 93.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.3,
+      "grup2Kwh": 43.8,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-26",
+      "actualKwh": 94.4,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 47.9,
+      "grup2Kwh": 46.5,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-27",
+      "actualKwh": 93.0,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 47.7,
+      "grup2Kwh": 45.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-28",
+      "actualKwh": 92.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 46.8,
+      "grup2Kwh": 45.9,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-29",
+      "actualKwh": 95.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.3,
+      "grup2Kwh": 46.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-30",
+      "actualKwh": 99.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 51.8,
+      "grup2Kwh": 47.7,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-07-31",
+      "actualKwh": 100.9,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 50.6,
+      "grup2Kwh": 50.3,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-08-01",
+      "actualKwh": 96.1,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.4,
+      "grup2Kwh": 46.7,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-08-02",
+      "actualKwh": 94.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 48.2,
+      "grup2Kwh": 46.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-08-03",
+      "actualKwh": 96.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.6,
+      "grup2Kwh": 46.7,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-08-04",
+      "actualKwh": 95.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 49.3,
+      "grup2Kwh": 46.2,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-08-05",
+      "actualKwh": 95.3,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 47.9,
+      "grup2Kwh": 47.4,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-08-06",
+      "actualKwh": 90.8,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 45.2,
+      "grup2Kwh": 45.6,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-08-07",
+      "actualKwh": 86.7,
+      "expectedKwh": 120.0,
+      "grup1Kwh": 41.5,
+      "grup2Kwh": 45.2,
+      "systemsReporting": 2
+    },
+    {
+      "date": "2026-08-08",
+      "actualKwh": 44.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": null,
+      "grup2Kwh": 44.6,
+      "systemsReporting": 1
+    },
+    {
+      "date": "2026-08-09",
+      "actualKwh": 45.5,
+      "expectedKwh": 120.0,
+      "grup1Kwh": null,
+      "grup2Kwh": 45.5,
+      "systemsReporting": 1
+    },
+    {
+      "date": "2026-08-10",
+      "actualKwh": 43.6,
+      "expectedKwh": 120.0,
+      "grup1Kwh": null,
+      "grup2Kwh": 43.6,
+      "systemsReporting": 1
+    }
+  ],
+  "range": {
+    "firstDate": "2026-02-08",
+    "lastDate": "2026-08-10"
+  }
+}

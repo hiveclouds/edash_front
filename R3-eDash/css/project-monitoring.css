@@ -1,0 +1,168 @@
+/* ============================================================
+   Page: Project Monitoring — 360eDash
+   Menggunakan design token yang sama dengan System Information
+   (--si-*, sudah didefinisikan di :root oleh css/system-information.css)
+   supaya seluruh tab menyatu secara visual.
+============================================================= */
+
+.pm-page {
+  font-family: 'Poppins', sans-serif;
+  color: var(--si-ink, #25343F);
+}
+.pm-page * { box-sizing: border-box; }
+
+/* ---------- Page head ---------- */
+.pm-page-head {
+  margin-bottom: 20px;
+}
+.pm-eyebrow {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--si-primary, #0f6a71);
+  margin-bottom: 6px;
+}
+.pm-page-head h1 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 4px;
+}
+.pm-page-head p {
+  font-size: 13px;
+  color: var(--si-muted, #7C8B8D);
+  max-width: 560px;
+  line-height: 1.6;
+}
+
+/* ---------- Tab bar ---------- */
+.pm-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--si-surface, #fff);
+  border: 1px solid var(--si-border, #E7EDEE);
+  border-radius: 12px;
+  padding: 6px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.pm-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  flex: 1 1 0;
+  min-width: max-content;
+  padding: 10px 18px;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--si-muted, #7C8B8D);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pm-tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: var(--si-page-bg, #F4F7F7);
+  color: var(--si-muted, #7C8B8D);
+  font-size: 11px;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.pm-tab:hover {
+  background: var(--si-primary-soft, #e4f1f1);
+  color: var(--si-primary-dark, #0b4f54);
+}
+
+.pm-tab.is-active {
+  background: var(--si-primary-soft, #e4f1f1);
+  color: var(--si-primary-dark, #0b4f54);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(15, 106, 113, 0.12);
+}
+.pm-tab.is-active .pm-tab-icon {
+  background: var(--si-primary, #0f6a71);
+  color: #fff;
+}
+
+/* ---------- Panels ---------- */
+.pm-tab-panels {
+  position: relative;
+}
+
+.pm-tab-panel {
+  display: none;
+}
+.pm-tab-panel.is-active {
+  display: block;
+  animation: pmFadeIn 0.18s ease;
+}
+
+@keyframes pmFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.pm-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  padding: 60px 0;
+  color: var(--si-muted, #7C8B8D);
+  font-size: 13.5px;
+}
+
+/* ---------- Battery Station placeholder ---------- */
+.pm-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 70px 20px;
+  border: 1px dashed var(--si-border, #E7EDEE);
+  border-radius: 14px;
+  background: var(--si-surface, #fff);
+}
+.pm-empty-state i {
+  font-size: 34px;
+  color: var(--si-primary-light, #6DC3BB);
+  margin-bottom: 14px;
+}
+.pm-empty-state h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--si-ink, #25343F);
+  margin-bottom: 6px;
+}
+.pm-empty-state p {
+  font-size: 13px;
+  color: var(--si-muted, #7C8B8D);
+  max-width: 380px;
+  line-height: 1.6;
+}
+
+@media (max-width: 720px) {
+  .pm-tab span:not(.pm-tab-icon) {
+    display: none;
+  }
+  .pm-tab {
+    padding: 10px 11px;
+  }
+}

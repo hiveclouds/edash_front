@@ -1,0 +1,1303 @@
+/* ============================================================
+   360eDash — Dark Mode Consistency v9
+   Scope: existing pages/components only.
+   Does NOT redesign layouts or touch header/notification.
+   v9 adds dark-mode styling for the sidebar "Setting" button
+   (previously excluded / left disabled-looking in v8).
+   Palette follows the existing guide tokens and the established
+   360eDash dark theme in global.css.
+============================================================= */
+
+html[data-theme="dark"] {
+  /* Shared dark surfaces derived from the existing guide palette. */
+  --surface-alt: #203238;
+  --surface-raised: #1c2d32;
+  --field-bg: #16262b;
+  --border-strong: #385057;
+}
+
+/* ---------- Page-local token families ---------- */
+html[data-theme="dark"] {
+  --al-primary: #21a7ae;
+  --al-primary-dark: #16868d;
+  --al-primary-soft: rgba(33,167,174,.16);
+  --al-header-teal: #69c8c2;
+  --al-success: #4fbd8a;
+  --al-success-soft: rgba(79,189,138,.14);
+  --al-warning: #e8b34a;
+  --al-warning-soft: rgba(232,179,74,.14);
+  --al-danger: #ef6b6b;
+  --al-danger-soft: rgba(239,107,107,.14);
+  --al-info: #69a8d6;
+  --al-info-soft: rgba(105,168,214,.14);
+  --al-ink: #e7eff0;
+  --al-muted: #9ab0b4;
+  --al-border: #2a3d42;
+  --al-surface: #18272c;
+  --al-page-bg: #101b1f;
+
+  --si-primary: #21a7ae;
+  --si-primary-dark: #16868d;
+  --si-primary-light: #69c8c2;
+  --si-primary-soft: rgba(33,167,174,.16);
+  --si-accent: #fa9a3a;
+  --si-success: #4fbd8a;
+  --si-success-soft: rgba(79,189,138,.14);
+  --si-warning: #e8b34a;
+  --si-warning-soft: rgba(232,179,74,.14);
+  --si-danger: #ef6b6b;
+  --si-danger-soft: rgba(239,107,107,.14);
+  --si-info: #69a8d6;
+  --si-info-soft: rgba(105,168,214,.14);
+  --si-ink: #e7eff0;
+  --si-muted: #9ab0b4;
+  --si-border: #2a3d42;
+  --si-surface: #18272c;
+  --si-page-bg: #101b1f;
+
+  --surface: #18272c;
+  --page-bg: #101b1f;
+  --ink: #e7eff0;
+  --text: #e7eff0;
+  --muted: #9ab0b4;
+  --border: #2a3d42;
+  --primary: #21a7ae;
+  --primary-dark: #16868d;
+  --primary-soft: rgba(33,167,174,.16);
+  --success: #4fbd8a;
+  --success-soft: rgba(79,189,138,.14);
+  --warning: #e8b34a;
+  --warning-soft: rgba(232,179,74,.14);
+  --danger: #ef6b6b;
+  --danger-soft: rgba(239,107,107,.14);
+  --info: #69a8d6;
+  --info-soft: rgba(105,168,214,.14);
+
+  /* Admin Calculator / Admin View local token families. */
+  --accent-orange: #fa9a3a;
+}
+
+/* ---------- Sidebar: active/inactive states remain visible but softer ---------- */
+html[data-theme="dark"] .edash-sidebar {
+  background: #122227;
+  border-color: #294047;
+  color: #dce8e9;
+}
+html[data-theme="dark"] .edash-sidebar .sb-nav-item,
+html[data-theme="dark"] .edash-sidebar .sb-nav-link {
+  color: #b8cacc;
+  border-color: #294047;
+  background: transparent;
+}
+html[data-theme="dark"] .edash-sidebar .sb-nav-item:hover,
+html[data-theme="dark"] .edash-sidebar .sb-nav-link:hover {
+  background: rgba(33,167,174,.10);
+  color: #dce8e9;
+}
+html[data-theme="dark"] .edash-sidebar .sb-nav-item.active,
+html[data-theme="dark"] .edash-sidebar .sb-nav-link.active,
+html[data-theme="dark"] .edash-sidebar .active {
+  background: rgba(33,167,174,.22);
+  border-color: rgba(105,200,194,.45);
+  color: #e4f1f1;
+}
+html[data-theme="dark"] .edash-sidebar .sb-nav-item.active i,
+html[data-theme="dark"] .edash-sidebar .sb-nav-link.active i,
+html[data-theme="dark"] .edash-sidebar .active i {
+  color: #69c8c2;
+}
+
+/* ---------- Alerts ---------- */
+html[data-theme="dark"] .alert-page,
+html[data-theme="dark"] .alert-page * {
+  --al-surface: #18272c;
+}
+html[data-theme="dark"] .alert-search input,
+html[data-theme="dark"] .alert-sort,
+html[data-theme="dark"] .alert-table-card,
+html[data-theme="dark"] .alert-panel,
+html[data-theme="dark"] .alert-stat-card,
+html[data-theme="dark"] .alert-modal,
+html[data-theme="dark"] .alert-form-card {
+  background: var(--al-surface);
+  color: var(--al-ink);
+  border-color: var(--al-border);
+}
+html[data-theme="dark"] .alert-search input:focus,
+html[data-theme="dark"] .alert-sort:focus {
+  background: #1d3035;
+}
+html[data-theme="dark"] .alert-table thead th {
+  background: #203238;
+  color: var(--al-muted);
+}
+html[data-theme="dark"] .alert-table tbody td {
+  background: var(--al-surface);
+  color: var(--al-ink);
+  border-color: var(--al-border);
+}
+html[data-theme="dark"] .alert-table tbody tr:hover td {
+  background: rgba(33,167,174,.08);
+}
+html[data-theme="dark"] .alert-stat-icon-total { background: rgba(33,167,174,.16); }
+html[data-theme="dark"] .alert-stat-icon-high { background: rgba(239,107,107,.14); }
+html[data-theme="dark"] .alert-stat-icon-medium { background: rgba(232,179,74,.14); }
+html[data-theme="dark"] .alert-stat-icon-low { background: rgba(79,189,138,.14); }
+html[data-theme="dark"] .alert-action-btn,
+html[data-theme="dark"] .alert-icon-btn {
+  background: #1d3035;
+  border-color: var(--al-border);
+  color: var(--al-muted);
+}
+html[data-theme="dark"] .alert-action-btn:hover,
+html[data-theme="dark"] .alert-icon-btn:hover {
+  background: rgba(33,167,174,.14);
+  color: var(--al-primary);
+}
+html[data-theme="dark"] .pg-info {
+  color: #c9dde0;
+}
+html[data-theme="dark"] .alert-page-btn {
+  background: #1d3035 !important;
+  color: #ffffff !important;
+  border-color: #2a3d42 !important;
+}
+html[data-theme="dark"] .alert-page-btn i {
+  color: #ffffff !important;
+}
+html[data-theme="dark"] .alert-page-btn:disabled {
+  opacity: 0.85 !important;
+}
+html[data-theme="dark"] .alert-page-btn.is-active {
+  background: var(--al-primary) !important;
+  border-color: var(--al-primary) !important;
+  color: #ffffff !important;
+}
+html[data-theme="dark"] .alert-page-dots {
+  color: #c9dde0;
+}
+
+/* ---------- Project Selector ---------- */
+html[data-theme="dark"] .ps-page .ps-map-wrap,
+html[data-theme="dark"] .ps-page .ps-detail-panel,
+html[data-theme="dark"] .ps-page .ps-power-panel,
+html[data-theme="dark"] .ps-page .ps-summary-card,
+html[data-theme="dark"] .ps-page .ps-project-card,
+html[data-theme="dark"] .ps-page .ps-panel,
+html[data-theme="dark"] .ps-page .ps-locate-btn,
+html[data-theme="dark"] .ps-page .ps-power-toggle,
+html[data-theme="dark"] .ps-page .ps-detail-tech-btn,
+html[data-theme="dark"] .ps-page .ps-modal,
+html[data-theme="dark"] .ps-page .ps-search,
+html[data-theme="dark"] .ps-page input,
+html[data-theme="dark"] .ps-page select,
+html[data-theme="dark"] .ps-page textarea {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .ps-page .ps-detail-close,
+html[data-theme="dark"] .ps-page .ps-power-refresh {
+  background: #203238;
+  color: var(--muted);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .ps-page .ps-power-toggle-btn.is-active,
+html[data-theme="dark"] .ps-page .ps-detail-tech-btn:hover,
+html[data-theme="dark"] .ps-page .ps-power-refresh:hover {
+  background: rgba(33,167,174,.16);
+  color: var(--primary);
+}
+html[data-theme="dark"] .ps-page .demo-map-card {
+  border-color: var(--border);
+}
+
+/* "Project Locations" collapsible header -- has its own hardcoded
+   white background separate from .ps-panel's, so it stays white even
+   after .ps-panel itself goes dark. */
+html[data-theme="dark"] .ps-page .ps-panel-toggle {
+  background: #18272c;
+  color: #e7eff0;
+}
+html[data-theme="dark"] .ps-page .ps-panel-toggle i:first-child {
+  background: rgba(33,167,174,.18);
+  color: #69c8c2;
+}
+html[data-theme="dark"] .ps-page .ps-panel-toggle-chevron {
+  color: #9ab0b4;
+}
+html[data-theme="dark"] .ps-page .ps-panel.is-open .ps-panel-toggle {
+  border-bottom-color: #2a3d42;
+}
+
+/* Detail card: project name / power output title -- hardcoded dark
+   text, invisible on the now-dark panel background. */
+html[data-theme="dark"] .ps-page .ps-detail-name,
+html[data-theme="dark"] .ps-page .ps-power-title {
+  color: #e7eff0;
+}
+html[data-theme="dark"] .ps-page .ps-detail-location,
+html[data-theme="dark"] .ps-page .ps-power-eyebrow {
+  color: #9ab0b4;
+}
+
+/* "Upcoming Schedule" collapsible panel (own hardcoded white
+   background, separate component from .ps-panel). */
+html[data-theme="dark"] .ps-page .ps-history-panel {
+  background: #18272c;
+  border-color: #2a3d42;
+  box-shadow: 0 10px 32px rgba(0,0,0,.4);
+}
+html[data-theme="dark"] .ps-page .ps-history-toggle {
+  background: #18272c;
+  color: #e7eff0;
+}
+html[data-theme="dark"] .ps-page .ps-history-toggle i:first-child {
+  background: rgba(250,137,26,.18);
+  color: #fa9a3a;
+}
+html[data-theme="dark"] .ps-page .ps-history-count,
+html[data-theme="dark"] .ps-page .ps-history-toggle-chevron {
+  color: #9ab0b4;
+}
+html[data-theme="dark"] .ps-page .ps-history-panel.is-open .ps-history-toggle {
+  border-bottom-color: #2a3d42;
+}
+html[data-theme="dark"] .ps-page .ps-history-item {
+  background: #1d3035;
+}
+html[data-theme="dark"] .ps-page .ps-history-item:hover {
+  border-color: #21a7ae;
+}
+html[data-theme="dark"] .ps-page .ps-history-icon {
+  background: rgba(250,137,26,.18);
+  color: #fa9a3a;
+}
+html[data-theme="dark"] .ps-page .ps-history-item-title {
+  color: #e7eff0;
+}
+html[data-theme="dark"] .ps-page .ps-history-item-note {
+  color: #9ab0b4;
+}
+html[data-theme="dark"] .ps-page .ps-history-tag {
+  background: #203238;
+  color: #9ab0b4;
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .ps-page .ps-history-tag-device {
+  background: rgba(33,167,174,.16);
+  color: #69c8c2;
+  border-color: rgba(33,167,174,.3);
+}
+html[data-theme="dark"] .ps-page .ps-empty {
+  color: #9ab0b4;
+}
+
+/* Summary cards (All Projects / Online / Offline / Active Alerts) */
+html[data-theme="dark"] .ps-page .ps-summary-item {
+  background: #1d3035;
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .ps-page .ps-summary-value {
+  color: #e7eff0;
+}
+html[data-theme="dark"] .ps-page .ps-summary-label {
+  color: #9ab0b4;
+}
+html[data-theme="dark"] .ps-page .ps-summary-icon-all     { background: rgba(33,167,174,.18); color: #69c8c2; }
+html[data-theme="dark"] .ps-page .ps-summary-icon-online  { background: rgba(79,189,138,.18); color: #4fbd8a; }
+html[data-theme="dark"] .ps-page .ps-summary-icon-offline { background: rgba(239,107,107,.18); color: #ef6b6b; }
+html[data-theme="dark"] .ps-page .ps-summary-icon-alerts  { background: rgba(232,179,74,.18); color: #e8b34a; }
+
+/* Category cards (Solaris BSS / Rooftop Solar / Solar Fish Farm) --
+   colors come from inline CSS vars (--cat-bg etc.) set by JS, so we
+   must override the background/border property directly. */
+html[data-theme="dark"] .ps-page .ps-category-item {
+  background: #1d3035 !important;
+  border-color: #2a3d42 !important;
+}
+html[data-theme="dark"] .ps-page .ps-category-icon {
+  background: rgba(250,137,26,.18) !important;
+  color: #fa9a3a !important;
+}
+/* Restore per-category color identity to match the Dashboard's
+   PO_CATEGORY_COLORS mapping (BSS = orange, Rooftop Solar = blue,
+   Fish Farm = green) instead of the old teal/orange/green order --
+   PS_CATEGORY_ORDER always renders bss, rooftop, fish-farm in this
+   fixed order, so nth-of-type is safe here. */
+html[data-theme="dark"] .ps-page .ps-category-item:nth-of-type(2) .ps-category-icon {
+  background: rgba(47,128,237,.18) !important;
+  color: #6ba8f2 !important;
+}
+html[data-theme="dark"] .ps-page .ps-category-item:nth-of-type(3) .ps-category-icon {
+  background: rgba(39,174,96,.18) !important;
+  color: #4fbd8a !important;
+}
+html[data-theme="dark"] .ps-page .ps-category-value {
+  color: #e7eff0;
+}
+html[data-theme="dark"] .ps-page .ps-category-label,
+html[data-theme="dark"] .ps-page .ps-section-title,
+html[data-theme="dark"] .ps-page .ps-empty,
+html[data-theme="dark"] .ps-page .ps-table-head {
+  color: #9ab0b4;
+}
+
+/* Today's Generation stat boxes (MWh / MWp / CO2) */
+html[data-theme="dark"] .ps-page .ps-gen-item {
+  background: #1d3035;
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .ps-page .ps-gen-value {
+  color: #e7eff0;
+}
+html[data-theme="dark"] .ps-page .ps-gen-unit {
+  color: #69c8c2;
+}
+html[data-theme="dark"] .ps-page .ps-gen-label {
+  color: #9ab0b4;
+}
+
+/* "Today" floating chart card */
+html[data-theme="dark"] .ps-page .ps-today-float {
+  background: #18272c;
+  border-color: #2a3d42;
+  box-shadow: 0 8px 28px rgba(0,0,0,.45);
+}
+html[data-theme="dark"] .ps-page .ps-today-title,
+html[data-theme="dark"] .ps-page .ps-today-value span,
+html[data-theme="dark"] .ps-page .ps-today-legend-item {
+  color: #9ab0b4;
+}
+html[data-theme="dark"] .ps-page .ps-today-value {
+  color: #69c8c2;
+}
+html[data-theme="dark"] .ps-page .ps-today-now-label {
+  color: #e7eff0;
+}
+
+/* Saved Projects / All Projects tables */
+html[data-theme="dark"] .ps-page .ps-table-row:hover,
+html[data-theme="dark"] .ps-page .ps-table-row.is-active {
+  background: rgba(33,167,174,.14);
+}
+html[data-theme="dark"] .ps-page .ps-table-row-name {
+  color: #e7eff0;
+}
+html[data-theme="dark"] .ps-page .ps-table-row-location {
+  color: #9ab0b4;
+}
+html[data-theme="dark"] .ps-page .ps-row-action-btn {
+  color: #7c9195;
+}
+html[data-theme="dark"] .ps-page .ps-row-action-btn:hover {
+  background: #24393f;
+  color: #69c8c2;
+}
+html[data-theme="dark"] .ps-page .ps-row-action-btn.ps-action-delete:hover {
+  color: #ef6b6b;
+}
+html[data-theme="dark"] .ps-page .ps-row-action-btn.ps-action-save.is-saved {
+  color: #fa9a3a;
+}
+
+/* ---------- Project Overview ---------- */
+html[data-theme="dark"] body:has(.page-container) {
+  background: var(--page-bg);
+  color: var(--ink);
+}
+html[data-theme="dark"] .page-container .card {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border);
+}
+html[data-theme="dark"] .page-container .project-selector select {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .page-container .project-meta,
+html[data-theme="dark"] .page-container .weather-desc,
+html[data-theme="dark"] .page-container .empty-state {
+  color: var(--muted);
+}
+html[data-theme="dark"] .page-container .chart-placeholder {
+  border-color: #385057;
+  color: var(--muted);
+}
+html[data-theme="dark"] .page-container button {
+  background: #7c3aed;
+  color: #f4efff;
+}
+
+/* ---------- Project Monitoring ---------- */
+html[data-theme="dark"] .pm-page .pm-tabs,
+html[data-theme="dark"] .pm-page .pm-empty-state,
+html[data-theme="dark"] .pm-page .pm-card,
+html[data-theme="dark"] .pm-page .pm-panel,
+html[data-theme="dark"] .pm-page .pm-stat-card,
+html[data-theme="dark"] .pm-page .pm-table-card {
+  background: var(--si-surface);
+  color: var(--si-ink);
+  border-color: var(--si-border);
+}
+html[data-theme="dark"] .pm-page .pm-tab-icon,
+html[data-theme="dark"] .opd-page .pm-tab-icon {
+  background: #203238;
+  color: var(--si-muted);
+}
+html[data-theme="dark"] .pm-page .pm-tab.is-active,
+html[data-theme="dark"] .opd-page .pm-tab.is-active {
+  background: rgba(33,167,174,.14);
+  color: #dcebec;
+}
+html[data-theme="dark"] .pm-page .pm-tab.is-active .pm-tab-icon,
+html[data-theme="dark"] .opd-page .pm-tab.is-active .pm-tab-icon {
+  background: #0f6a71;
+  color: #d9eeee;
+}
+
+/* ---------- System Information / Task Management / Task Maintenance ---------- */
+html[data-theme="dark"] .si,
+html[data-theme="dark"] .tm,
+html[data-theme="dark"] .tkm {
+  color: var(--si-ink);
+}
+html[data-theme="dark"] .si .si-card,
+html[data-theme="dark"] .si .si-panel,
+html[data-theme="dark"] .si .si-stat-card,
+html[data-theme="dark"] .si .si-table-card,
+html[data-theme="dark"] .si input,
+html[data-theme="dark"] .si select,
+html[data-theme="dark"] .si textarea,
+html[data-theme="dark"] .tm .tm-card,
+html[data-theme="dark"] .tm .tm-panel,
+html[data-theme="dark"] .tm input,
+html[data-theme="dark"] .tm select,
+html[data-theme="dark"] .tm textarea,
+html[data-theme="dark"] .tkm-task-card {
+  background: var(--si-surface);
+  color: var(--si-ink);
+  border-color: var(--si-border);
+}
+html[data-theme="dark"] .si input::placeholder,
+html[data-theme="dark"] .si textarea::placeholder,
+html[data-theme="dark"] .tm input::placeholder,
+html[data-theme="dark"] .tm textarea::placeholder {
+  color: var(--si-muted);
+}
+html[data-theme="dark"] .si .si-table th,
+html[data-theme="dark"] .tm .tm-table th {
+  background: #203238;
+  color: var(--si-muted);
+}
+html[data-theme="dark"] .si .si-table td,
+html[data-theme="dark"] .tm .tm-table td {
+  background: var(--si-surface);
+  color: var(--si-ink);
+  border-color: var(--si-border);
+}
+html[data-theme="dark"] .si .si-table tbody tr:hover td,
+html[data-theme="dark"] .tm .tm-table tbody tr:hover td {
+  background: rgba(33,167,174,.08);
+}
+html[data-theme="dark"] .tkm-range-row input[type="range"]::-webkit-slider-thumb,
+html[data-theme="dark"] .tkm-range-row input[type="range"]::-moz-range-thumb {
+  border-color: #d9eeee;
+}
+
+/* ---------- Battery Station ---------- */
+html[data-theme="dark"] .bs-page .bs-card,
+html[data-theme="dark"] .bs-page .bs-stat-card,
+html[data-theme="dark"] .bs-page .bs-select,
+html[data-theme="dark"] .bs-page .bs-slot,
+html[data-theme="dark"] .bs-page .bs-table-card,
+html[data-theme="dark"] .bs-page .bs-bat-card,
+html[data-theme="dark"] .bs-page .bs-filter-select,
+html[data-theme="dark"] .bs-page .bs-timeline-card,
+html[data-theme="dark"] .bs-page .bs-empty,
+html[data-theme="dark"] .bs-page input,
+html[data-theme="dark"] .bs-page select,
+html[data-theme="dark"] .bs-page textarea {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .bs-page .bs-slot {
+  background: #1d3035;
+}
+html[data-theme="dark"] .bs-page .bs-slot:hover {
+  border-color: #467077;
+}
+html[data-theme="dark"] .bs-page .bs-info-item,
+html[data-theme="dark"] .bs-page .bs-energy-item,
+html[data-theme="dark"] .bs-page .bs-chart-card,
+html[data-theme="dark"] .bs-page .bs-chip-item,
+html[data-theme="dark"] .bs-page .bs-hero-graphic-card,
+html[data-theme="dark"] .bs-page .bs-attention-pill,
+html[data-theme="dark"] .bs-page .bs-timeline-card {
+  background: #1d3035;
+}
+html[data-theme="dark"] .bs-page .bs-summary-card {
+  background: linear-gradient(155deg, var(--surface) 0%, #12242a 145%);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .bs-page .bs-summary-item {
+  background: rgba(29, 48, 53, 0.72);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .bs-page .bs-src::after {
+  background: #0b1a1d;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+}
+html[data-theme="dark"] .bs-page .bs-src::before {
+  border-top-color: #0b1a1d;
+}
+html[data-theme="dark"] .bs-page .bs-badge-unknown,
+html[data-theme="dark"] .bs-page .bs-chip-icon-muted,
+html[data-theme="dark"] .bs-page .bs-timeline-dot-unknown {
+  background: #26383d;
+}
+html[data-theme="dark"] .bs-page .bs-batt-graphic-icon {
+  border-color: #1d3035;
+}
+html[data-theme="dark"] .bs-page .bs-tabs {
+  background: #16262a;
+}
+html[data-theme="dark"] .bs-page .bs-nodata-note {
+  background: rgba(227, 162, 26, 0.12);
+  border-color: rgba(227, 162, 26, 0.35);
+  color: #E3A21A;
+}
+
+/* ---------- Add New Project ---------- */
+html[data-theme="dark"] .ap-wrap,
+html[data-theme="dark"] .ap-wrap {
+  color: var(--ink);
+}
+html[data-theme="dark"] .ap-card,
+html[data-theme="dark"] .ap-tab-header,
+html[data-theme="dark"] .ap-tab-btn.active,
+html[data-theme="dark"] .ap-add-inverter-btn,
+html[data-theme="dark"] .ap-field input,
+html[data-theme="dark"] .ap-field select,
+html[data-theme="dark"] .ap-file-btn,
+html[data-theme="dark"] .ap-modal,
+html[data-theme="dark"] .ap-summary {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .ap-tab-header,
+html[data-theme="dark"] .ap-file-btn {
+  background: #203238;
+}
+html[data-theme="dark"] .ap-tab-btn.active {
+  background: #1d3035;
+  color: var(--primary);
+}
+html[data-theme="dark"] .ap-field input::placeholder {
+  color: var(--muted);
+}
+html[data-theme="dark"] .ap-card-head h3,
+html[data-theme="dark"] .ap-tab-btn.active,
+html[data-theme="dark"] .ap-add-inverter-btn {
+  color: #dcebec;
+}
+
+/* ---------- Admin View ---------- */
+html[data-theme="dark"] .um-wrap,
+html[data-theme="dark"] .um-head,
+html[data-theme="dark"] .um-toolbar,
+html[data-theme="dark"] .um-table-card,
+html[data-theme="dark"] .um-stat-card {
+  color: var(--ink);
+}
+html[data-theme="dark"] .um-toolbar,
+html[data-theme="dark"] .um-table-card,
+html[data-theme="dark"] .um-stat-card,
+html[data-theme="dark"] .um-modal,
+html[data-theme="dark"] .um-form-card {
+  background: var(--surface);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .um-search input,
+html[data-theme="dark"] .um-toolbar select,
+html[data-theme="dark"] .um-modal input,
+html[data-theme="dark"] .um-modal select,
+html[data-theme="dark"] .um-modal textarea {
+  background: var(--field-bg);
+  color: var(--ink);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .um-search input:focus,
+html[data-theme="dark"] .um-toolbar select:focus {
+  background: var(--surface);
+}
+html[data-theme="dark"] .um-table th {
+  background: #203238;
+  color: var(--muted);
+}
+html[data-theme="dark"] .um-table td {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .um-table tbody tr:hover td {
+  background: rgba(33,167,174,.08);
+}
+html[data-theme="dark"] .um-pill-muted {
+  background: #203238;
+  color: var(--muted);
+}
+
+/* ---------- Activity Log ---------- */
+html[data-theme="dark"] .al-page .al-card,
+html[data-theme="dark"] .al-page .al-toolbar,
+html[data-theme="dark"] .al-page .al-table-card,
+html[data-theme="dark"] .al-page input,
+html[data-theme="dark"] .al-page select,
+html[data-theme="dark"] .al-page textarea,
+html[data-theme="dark"] .al-page .al-date-input {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .al-page .al-table thead tr {
+  background: #0f6a71;
+}
+html[data-theme="dark"] .al-page .al-table td {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .al-page .al-table tbody tr:hover td {
+  background: rgba(33,167,174,.08);
+}
+html[data-theme="dark"] .al-page .al-type-logout {
+  background: #263238;
+  color: var(--muted);
+}
+
+/* ---------- Admin Calculator ---------- */
+html[data-theme="dark"] .sp-wrap,
+html[data-theme="dark"] .sp-head,
+html[data-theme="dark"] .sp-layout {
+  color: var(--ink);
+}
+html[data-theme="dark"] .sp-stepper,
+html[data-theme="dark"] .sp-form,
+html[data-theme="dark"] .sp-accordion,
+html[data-theme="dark"] .sp-card,
+html[data-theme="dark"] .sp-panel,
+html[data-theme="dark"] .sp-rab-card,
+html[data-theme="dark"] .sp-summary-card,
+html[data-theme="dark"] .sp-btn-outline,
+html[data-theme="dark"] .sp-editable-cell {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .sp-accordion-btn {
+  background: #16262b;
+  color: var(--ink);
+}
+html[data-theme="dark"] .sp-accordion.is-open .sp-accordion-btn {
+  background: rgba(33,167,174,.14);
+  color: #dcebec;
+}
+html[data-theme="dark"] .sp-select-wrap select,
+html[data-theme="dark"] .sp-number-wrap input[type="number"],
+html[data-theme="dark"] .sp-field input,
+html[data-theme="dark"] .sp-field textarea,
+html[data-theme="dark"] .sp-field select {
+  background: var(--field-bg);
+  color: var(--ink);
+  border-color: var(--border);
+}
+html[data-theme="dark"] .sp-select-wrap select:focus,
+html[data-theme="dark"] .sp-number-wrap input[type="number"]:focus,
+html[data-theme="dark"] .sp-field input:focus,
+html[data-theme="dark"] .sp-field textarea:focus,
+html[data-theme="dark"] .sp-field select:focus {
+  background: var(--surface);
+}
+html[data-theme="dark"] .sp-rab-total-row td {
+  background: rgba(33,167,174,.14);
+  color: #dcebec;
+}
+html[data-theme="dark"] .sp-filter-chip.is-active {
+  background: #0f6a71;
+  border-color: #0f6a71;
+  color: #dcebec;
+}
+html[data-theme="dark"] .sp-filter-chip {
+  background: var(--surface-alt);
+  border-color: var(--border);
+  color: var(--ink);
+}
+html[data-theme="dark"] .sp-filter-chip:hover {
+  background: var(--surface-raised);
+}
+html[data-theme="dark"] .sp-add-row-select {
+  background: var(--surface-alt);
+  border-color: var(--border);
+  color: var(--ink);
+}
+
+/* ---------- Shared dark form/table safeguards for pages above ---------- */
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea {
+  color-scheme: dark;
+}
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: #839b9f;
+}
+html[data-theme="dark"] option {
+  background: #18272c;
+  color: #e7eff0;
+}
+
+/* Keep status pills colorful, but use dark tints rather than light pastel blocks. */
+html[data-theme="dark"] .pill-success { background: rgba(79,189,138,.14); color: #70d19f; }
+html[data-theme="dark"] .pill-warning { background: rgba(232,179,74,.14); color: #efc466; }
+html[data-theme="dark"] .pill-danger  { background: rgba(239,107,107,.14); color: #f08080; }
+html[data-theme="dark"] .pill-info    { background: rgba(105,168,214,.14); color: #82bce3; }
+
+/* Avoid bright white utility surfaces outside Settings/header. */
+html[data-theme="dark"] .edash-content .modal-content,
+html[data-theme="dark"] .edash-content .modal,
+html[data-theme="dark"] .edash-content .dropdown-menu,
+html[data-theme="dark"] .edash-content .popover {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border);
+}
+
+/* ============================================================
+   Dark Mode Consistency Patch — v10
+   Scope: Dashboard, Battery Station, shared header/sidebar,
+   logout modal, Admin profile popup, and Login.
+============================================================= */
+
+/* ---------- Dashboard: remove remaining bright surfaces ---------- */
+html[data-theme="dark"] .po-page {
+  --po-surface: #18272c;
+  --po-border: #2a3d42;
+  --po-ink: #e7eff0;
+  --po-muted: #9ab0b4;
+  --po-primary-soft: rgba(33,167,174,.16);
+  --po-primary-dark: #69c8c2;
+  color: var(--po-ink);
+}
+html[data-theme="dark"] .po-page .po-card,
+html[data-theme="dark"] .po-page .po-refresh-btn,
+html[data-theme="dark"] .po-page .po-download-btn,
+html[data-theme="dark"] .po-page .po-map-stat {
+  background: #18272c;
+  color: #e7eff0;
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .po-page .po-map-stat {
+  background: rgba(24,39,44,.94);
+}
+html[data-theme="dark"] .po-page .po-legend-row,
+html[data-theme="dark"] .po-page .po-site-row,
+html[data-theme="dark"] .po-page .po-poi-row {
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .po-page .po-legend-row {
+  background: #1d3035;
+}
+html[data-theme="dark"] .po-page .po-summary-item {
+  background: #1d3035;
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .po-page .po-map {
+  background: #1b2c31;
+}
+html[data-theme="dark"] .po-page .po-title,
+html[data-theme="dark"] .po-page .po-card-value,
+html[data-theme="dark"] .po-page .po-site-name,
+html[data-theme="dark"] .po-page .po-site-value,
+html[data-theme="dark"] .po-page .po-poi-site,
+html[data-theme="dark"] .po-page .po-map-stat-value,
+html[data-theme="dark"] .po-page .po-map-stat-metric {
+  color: #e7eff0;
+}
+html[data-theme="dark"] .po-page .po-subtitle,
+html[data-theme="dark"] .po-page .po-card-eyebrow,
+html[data-theme="dark"] .po-page .po-site-region,
+html[data-theme="dark"] .po-page .po-poi-region,
+html[data-theme="dark"] .po-page .po-poi-date,
+html[data-theme="dark"] .po-page .po-map-stat-label,
+html[data-theme="dark"] .po-page .po-legend-label {
+  color: #9ab0b4;
+}
+
+/* ---------- Battery Station: dropdown/status controls and cards ---------- */
+html[data-theme="dark"] .bs-page .bs-card,
+html[data-theme="dark"] .bs-page .bs-stat-card,
+html[data-theme="dark"] .bs-page .bs-table-card,
+html[data-theme="dark"] .bs-page .bs-select,
+html[data-theme="dark"] .bs-page .bs-slot,
+html[data-theme="dark"] .bs-page .bs-schedule,
+html[data-theme="dark"] .bs-page .bs-history,
+html[data-theme="dark"] .bs-page .bs-panel,
+html[data-theme="dark"] .bs-page .bs-dropdown,
+html[data-theme="dark"] .bs-page .bs-filter,
+html[data-theme="dark"] .bs-page .bs-status-select {
+  background: #18272c;
+  color: #e7eff0;
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .bs-page .bs-slot,
+html[data-theme="dark"] .bs-page .bs-table thead th {
+  background: #1d3035;
+}
+html[data-theme="dark"] .bs-page .bs-table td,
+html[data-theme="dark"] .bs-page .bs-table th {
+  border-color: #2a3d42;
+  color: #e7eff0;
+}
+html[data-theme="dark"] .bs-page .bs-table tbody tr:hover td {
+  background: rgba(33,167,174,.08);
+}
+
+/* ---------- Shared header: notification + admin/profile popups ---------- */
+html[data-theme="dark"] .edash-header {
+  --hd-surface: #18272c;
+  --hd-ink: #e7eff0;
+  --hd-muted: #9ab0b4;
+  --hd-border: #2a3d42;
+  --hd-primary-soft: rgba(33,167,174,.16);
+  --hd-success-soft: rgba(79,189,138,.14);
+  --hd-warning-soft: rgba(232,179,74,.14);
+  --hd-danger-soft: rgba(239,107,107,.14);
+  --hd-info-soft: rgba(105,168,214,.14);
+}
+html[data-theme="dark"] .edash-header .hd-notif-panel,
+html[data-theme="dark"] .edash-header .hd-profile-menu {
+  background: #18272c;
+  color: #e7eff0;
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .edash-header .hd-notif-item,
+html[data-theme="dark"] .edash-header .hd-profile-menu-row,
+html[data-theme="dark"] .edash-header .hd-profile-menu-body {
+  background: #18272c;
+  color: #e7eff0;
+}
+html[data-theme="dark"] .edash-header .hd-notif-item.is-unread {
+  background: #1d3035;
+}
+html[data-theme="dark"] .edash-header .hd-notif-item:hover,
+html[data-theme="dark"] .edash-header .hd-profile-menu-row:hover {
+  background: rgba(33,167,174,.12);
+}
+html[data-theme="dark"] .edash-header .hd-notif-panel-head,
+html[data-theme="dark"] .edash-header .hd-profile-menu-divider {
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .edash-header .hd-profile-menu-value,
+html[data-theme="dark"] .edash-header .hd-profile-menu-text,
+html[data-theme="dark"] .edash-header .hd-notif-item-title {
+  color: #e7eff0;
+}
+html[data-theme="dark"] .edash-header .hd-profile-menu-label,
+html[data-theme="dark"] .edash-header .hd-notif-item-msg,
+html[data-theme="dark"] .edash-header .hd-notif-item-time {
+  color: #9ab0b4;
+}
+
+/* ---------- Sidebar brand + red Logout ---------- */
+html[data-theme="dark"] .edash-sidebar .sb-brand {
+  background: #122227;
+  border-bottom-color: #294047;
+}
+html[data-theme="dark"] .edash-sidebar .sb-nav-item-danger,
+html[data-theme="dark"] .edash-sidebar .sb-nav-group-footer .sb-nav-item-danger {
+  background: #d64545;
+  border-color: #d64545;
+  color: #fff;
+}
+html[data-theme="dark"] .edash-sidebar .sb-nav-item-danger .sb-nav-icon,
+html[data-theme="dark"] .edash-sidebar .sb-nav-group-footer .sb-nav-item-danger .sb-nav-icon {
+  background: rgba(255,255,255,.18);
+}
+html[data-theme="dark"] .edash-sidebar .sb-nav-item-danger .sb-nav-icon i,
+html[data-theme="dark"] .edash-sidebar .sb-nav-group-footer .sb-nav-item-danger .sb-nav-icon i {
+  color: #fff;
+}
+html[data-theme="dark"] .edash-sidebar .sb-nav-item-danger:hover,
+html[data-theme="dark"] .edash-sidebar .sb-nav-group-footer .sb-nav-item-danger:hover {
+  background: #b93a3a;
+  border-color: #b93a3a;
+  color: #fff;
+}
+
+/* ---------- Sidebar "OTHERS" group: Setting button (v11 — forced override) ----------
+   The OTHERS panel and the Setting item are both rendering with the
+   same solid teal fill (inherited from base/global CSS, not from
+   this file), so they visually merge. Below forces the Setting
+   item onto a dark neutral surface — visually distinct from the
+   teal panel behind it AND from the red Logout — with !important
+   so it wins regardless of base CSS specificity/order. Wildcard
+   attribute selectors are added as a safety net in case the real
+   class name differs from .sb-nav-item. */
+html[data-theme="dark"] .edash-sidebar .sb-nav-group-footer > *:has(i, svg):not(.sb-nav-item-danger):not(.sb-nav-item-danger *) {
+  background: #0f6a71 !important;
+  border: 1px solid #0f6a71 !important;
+  color: #e7eff0 !important;
+  border-radius: 12px !important;
+}
+html[data-theme="dark"] .edash-sidebar .sb-nav-group-footer > *:has(i, svg):not(.sb-nav-item-danger):not(.sb-nav-item-danger *) i,
+html[data-theme="dark"] .edash-sidebar .sb-nav-group-footer > *:has(i, svg):not(.sb-nav-item-danger):not(.sb-nav-item-danger *) svg {
+  color: #d9eeee !important;
+  fill: #d9eeee !important;
+}
+html[data-theme="dark"] .edash-sidebar .sb-nav-group-footer > *:has(i, svg):not(.sb-nav-item-danger):not(.sb-nav-item-danger *):hover {
+  background: #0c565b !important;
+  border-color: #0c565b !important;
+}
+html[data-theme="dark"] .edash-sidebar .sb-nav-group-footer > *:has(i, svg):not(.sb-nav-item-danger):not(.sb-nav-item-danger *):not(.disabled) {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Safety net: any element literally containing the word "Setting"
+   inside the OTHERS group, regardless of class name. Does not
+   touch the "OTHERS" group label/heading itself. */
+html[data-theme="dark"] .edash-sidebar [class*="sb-nav"][class*="setting" i],
+html[data-theme="dark"] .edash-sidebar [data-key="setting" i] {
+  background: #0f6a71 !important;
+  border: 1px solid #0f6a71 !important;
+  color: #e7eff0 !important;
+}
+
+/* ---------- Logout modal ---------- */
+html[data-theme="dark"] .lg-overlay {
+  --lg-surface: #18272c;
+  --lg-ink: #e7eff0;
+  --lg-muted: #9ab0b4;
+  --lg-border: #2a3d42;
+  --lg-danger-soft: rgba(239,107,107,.14);
+}
+html[data-theme="dark"] .lg-modal {
+  background: #18272c;
+  color: #e7eff0;
+  border: 1px solid #2a3d42;
+  box-shadow: 0 24px 60px rgba(0,0,0,.38);
+}
+html[data-theme="dark"] .lg-btn-secondary {
+  background: #1d3035;
+  color: #e7eff0;
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .lg-btn-secondary:hover {
+  background: #253b41;
+  border-color: #385057;
+}
+
+/* ---------- Login page ---------- */
+html[data-theme="dark"] body:has(.login-shell) {
+  background: #101b1f;
+  color: #e7eff0;
+}
+html[data-theme="dark"] .login-form-panel {
+  background: #18272c;
+  color: #e7eff0;
+  scrollbar-color: #385057 transparent;
+}
+html[data-theme="dark"] .login-form-head p,
+html[data-theme="dark"] .login-footnote {
+  color: #9ab0b4;
+}
+html[data-theme="dark"] .login-form-head h1,
+html[data-theme="dark"] .form-group label {
+  color: #e7eff0;
+}
+html[data-theme="dark"] .input-control {
+  background: #16262b;
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .input-control input,
+html[data-theme="dark"] .input-control select {
+  color: #e7eff0;
+  background: transparent;
+}
+html[data-theme="dark"] .input-control select option {
+  background: #18272c;
+  color: #e7eff0;
+}
+
+/* ============================================================
+   Dark Mode Final Patch — Dashboard, Battery Station, Login
+   Scope: ONLY the three remaining dark-mode gaps.
+============================================================= */
+
+/* ---------- Dashboard: eliminate remaining light surfaces ---------- */
+html[data-theme="dark"] .po-page .po-row,
+html[data-theme="dark"] .po-page .po-chart-wrap,
+html[data-theme="dark"] .po-page .po-trend-legend,
+html[data-theme="dark"] .po-page .po-sites-list,
+html[data-theme="dark"] .po-page .po-poi-list {
+  color: #e7eff0;
+}
+html[data-theme="dark"] .po-page .po-card,
+html[data-theme="dark"] .po-page .po-map-stat,
+html[data-theme="dark"] .po-page .po-refresh-btn,
+html[data-theme="dark"] .po-page .po-download-btn {
+  background: #18272c;
+  color: #e7eff0;
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .po-page .po-legend-row,
+html[data-theme="dark"] .po-page .po-site-row,
+html[data-theme="dark"] .po-page .po-poi-row {
+  background: #1d3035;
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .po-page .po-map-stat {
+  background: rgba(24,39,44,.96);
+}
+html[data-theme="dark"] .po-page .po-map {
+  background: #17282d;
+}
+html[data-theme="dark"] .po-page .po-chart-wrap svg line {
+  stroke: #2a3d42 !important;
+}
+html[data-theme="dark"] .po-page .po-chart-wrap svg text {
+  fill: #9ab0b4 !important;
+}
+html[data-theme="dark"] .po-page .po-chart-wrap svg rect[fill="#fff"],
+html[data-theme="dark"] .po-page .po-chart-wrap svg rect[fill="#FFFFFF"] {
+  fill: #18272c !important;
+}
+html[data-theme="dark"] .po-page .po-card-value,
+html[data-theme="dark"] .po-page .po-site-value,
+html[data-theme="dark"] .po-page .po-site-name,
+html[data-theme="dark"] .po-page .po-poi-site,
+html[data-theme="dark"] .po-page .po-map-stat-value,
+html[data-theme="dark"] .po-page .po-map-stat-metric,
+html[data-theme="dark"] .po-page .po-trend-legend-value {
+  color: #e7eff0;
+}
+
+/* ---------- Map pin popup card (Dashboard hover tooltip + Project
+   Selector click popup) — maplibregl.Popup renders its DOM straight
+   into <body>, outside .po-page/.ps-page, and previously only got its
+   background from maplibre's own CSS (always white) while its text
+   inherited color: var(--ink) from body (catalog.css), which flips to
+   a near-white token in dark mode. Result: near-invisible light text
+   on a white card, exactly like the report. Force an explicit dark
+   card here instead of relying on inheritance. */
+html[data-theme="dark"] .maplibregl-popup-content {
+  background: #18272c;
+  color: #e7eff0;
+  box-shadow: 0 4px 16px rgba(0,0,0,.45);
+}
+html[data-theme="dark"] .maplibregl-popup-content b,
+html[data-theme="dark"] .maplibregl-popup-content .ps-popup-title {
+  color: #e7eff0;
+}
+html[data-theme="dark"] .ps-popup-category {
+  color: #9ab0b4;
+}
+html[data-theme="dark"] .maplibregl-popup-close-button {
+  color: #9ab0b4;
+}
+/* Tint the little arrow to match the new dark card (only the color,
+   not the border-style/width, so the pointer keeps its shape). */
+html[data-theme="dark"] .maplibregl-popup-anchor-top .maplibregl-popup-tip,
+html[data-theme="dark"] .maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+html[data-theme="dark"] .maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+  border-bottom-color: #18272c;
+}
+html[data-theme="dark"] .maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+html[data-theme="dark"] .maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+html[data-theme="dark"] .maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+  border-top-color: #18272c;
+}
+html[data-theme="dark"] .maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: #18272c;
+}
+html[data-theme="dark"] .maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: #18272c;
+}
+
+/* ---------- Battery Station: Charging Schedule + Swap History ---------- */
+html[data-theme="dark"] .bs-page .bs-schedule-row,
+html[data-theme="dark"] .bs-page .bs-tt thead th,
+html[data-theme="dark"] .bs-page thead .bs-tt-sticky {
+  background: #1d3035;
+  color: #e7eff0;
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .bs-page .bs-schedule-row:hover {
+  background: #20363b;
+}
+html[data-theme="dark"] .bs-page .bs-tt-scroll {
+  background: #18272c;
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .bs-page .bs-tt,
+html[data-theme="dark"] .bs-page .bs-tt th,
+html[data-theme="dark"] .bs-page .bs-tt td {
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .bs-page .bs-tt-sticky {
+  background: #18272c;
+}
+html[data-theme="dark"] .bs-page .bs-tt-swap-dot {
+  background: #315158;
+  box-shadow: 0 0 0 1px rgba(231,239,240,.28);
+}
+html[data-theme="dark"] .bs-page .skeleton {
+  background: #203238;
+}
+html[data-theme="dark"] .bs-page .skeleton::after {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.10), transparent);
+}
+
+/* ---------- Login page: ensure the standalone login document receives
+   the same dark theme as the authenticated application. ---------- */
+html[data-theme="dark"] body:has(.login-shell) {
+  background: #101b1f;
+  color: #e7eff0;
+}
+html[data-theme="dark"] .login-shell {
+  background: #101b1f;
+}
+html[data-theme="dark"] .login-form-panel {
+  background: #18272c;
+  color: #e7eff0;
+}
+html[data-theme="dark"] .login-form-head h1,
+html[data-theme="dark"] .login-form-head p,
+html[data-theme="dark"] .form-group label,
+html[data-theme="dark"] .login-footnote {
+  color: #e7eff0;
+}
+html[data-theme="dark"] .login-form-head p,
+html[data-theme="dark"] .login-footnote {
+  color: #9ab0b4;
+}
+html[data-theme="dark"] .input-control {
+  background: #16262b;
+  border-color: #2a3d42;
+}
+html[data-theme="dark"] .input-control input,
+html[data-theme="dark"] .input-control select {
+  color: #e7eff0;
+}
+html[data-theme="dark"] .input-control input::placeholder {
+  color: #839b9f;
+}
+html[data-theme="dark"] .input-control__icon,
+html[data-theme="dark"] .input-control__caret,
+html[data-theme="dark"] .input-control__toggle {
+  color: #9ab0b4;
+}
+html[data-theme="dark"] .input-control__toggle:hover {
+  color: #69c8c2;
+}
+html[data-theme="dark"] .input-control select option {
+  background: #18272c;
+  color: #e7eff0;
+}
+
+/* ---------- Sidebar Dashboard quick-action: dark-mode fix ---------- */
+html[data-theme="dark"] .edash-sidebar .sb-btn-primary,
+html[data-theme="dark"] .edash-sidebar .sb-btn-secondary {
+  background: #182c31;
+  border-color: #294047;
+  color: #dce8e9;
+}
+html[data-theme="dark"] .edash-sidebar .sb-btn-primary i,
+html[data-theme="dark"] .edash-sidebar .sb-btn-secondary i {
+  color: #69c8c2;
+}
+html[data-theme="dark"] .edash-sidebar .sb-btn-primary:hover,
+html[data-theme="dark"] .edash-sidebar .sb-btn-secondary:hover {
+  background: rgba(33,167,174,.14);
+  border-color: rgba(105,200,194,.45);
+  color: #e7eff0;
+}
+html[data-theme="dark"] .edash-sidebar .sb-btn.is-active {
+  background:
+    linear-gradient(rgba(33,167,174,.20), rgba(33,167,174,.20)) padding-box,
+    linear-gradient(90deg, #21a7ae, #69c8c2) border-box;
+  border-color: transparent;
+  color: #e7eff0;
+}
+html[data-theme="dark"] .edash-sidebar .sb-btn.is-active i {
+  color: #69c8c2;
+}
+/* ---------- Ticketing (WebDev) ---------- */
+/* ticketing.css defines its own local token family (--tk-*) in :root
+   and is not overridden anywhere for dark mode -- that's why the
+   heading blends into the page background and cards stay white.
+   Redefining the same --tk-* tokens here (mirrors the --al-*//*--si-*
+   pattern above) fixes almost everything at once since ticketing.css
+   consistently uses var(--tk-*) throughout. */
+html[data-theme="dark"] {
+  --tk-primary: #21a7ae;
+  --tk-primary-dark: #16868d;
+  --tk-primary-soft: rgba(33,167,174,.16);
+  --tk-success: #4fbd8a;
+  --tk-warning: #e8b34a;
+  --tk-danger: #ef6b6b;
+  --tk-info: #69a8d6;
+  --tk-success-soft: rgba(79,189,138,.14);
+  --tk-warning-soft: rgba(232,179,74,.14);
+  --tk-danger-soft: rgba(239,107,107,.14);
+  --tk-info-soft: rgba(105,168,214,.14);
+  --tk-ink: #e7eff0;
+  --tk-muted: #9ab0b4;
+  --tk-border: #2a3d42;
+  --tk-surface: #18272c;
+  --tk-page-bg: #101b1f;
+
+  --tk-heat-0: #182228;
+  --tk-heat-1: #1c3a3c;
+  --tk-heat-2: #1f5c5c;
+  --tk-heat-3: #1f8e8a;
+  --tk-heat-4: #21a7ae;
+}
+
+/* A few spots in ticketing.css hardcode #fff instead of var(--tk-surface)
+   -- those need direct overrides since redefining the token above
+   doesn't reach them. */
+html[data-theme="dark"] .tk-alert-icon,
+html[data-theme="dark"] .tk-pill-muted,
+html[data-theme="dark"] .tk-toast {
+  background: var(--tk-surface);
+}
+html[data-theme="dark"] .tk-view-btn:hover {
+  background: rgba(33,167,174,.24);
+}
+html[data-theme="dark"] .tk-btn-secondary:hover {
+  background: #203238;
+}
+html[data-theme="dark"] .tk-attach-remove {
+  background: rgba(16, 27, 31, 0.72);
+}
+
+/* Priority tooltip references --tk-text/--tk-text-muted (never defined
+   anywhere, including light mode) so it always falls back to its
+   hardcoded light-mode colors -- fix directly for dark mode. */
+html[data-theme="dark"] .tk-priority-info {
+  color: var(--tk-muted);
+}
+html[data-theme="dark"] .tk-priority-info:hover::after,
+html[data-theme="dark"] .tk-priority-info:focus::after {
+  background: #0b1a1d;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+}
+html[data-theme="dark"] .tk-priority-info:hover::before,
+html[data-theme="dark"] .tk-priority-info:focus::before {
+  border-top-color: #0b1a1d;
+}

@@ -1,0 +1,822 @@
+/* ============================================================
+   360eDash — Battery Station
+   Redesign selaras dengan design system guide.html DAN pola nyata
+   yang sudah dipakai di halaman lain (System Information / Task
+   Maintenance / Task Management): page-head 26px, stats-row kartu
+   ikon, card radius 14px, chart-wrap 150px, dsb. Tombol & pill
+   umum memakai class global (.btn/.pill dari css/global.css) —
+   class "bs-" hanya untuk komponen yang memang spesifik battery,
+   supaya halaman ini tidak "berdiri sendiri" secara visual.
+
+   Tetap 3 lapis informasi yang jelas terpisah:
+     LEVEL 1  .bs-stats-row     fleet/station health sekilas
+     LEVEL 2  .bs-grid          inventaris baterai terdaftar
+     LEVEL 3  #bsDetailView     detail satu baterai, view terpisah
+============================================================= */
+
+.bs-page {
+  max-width: 1360px;
+  margin: 0 auto;
+  font-family: 'Poppins', sans-serif;
+  color: var(--ink);
+}
+.bs-page * { box-sizing: border-box; }
+.bs-page button, .bs-page select, .bs-page input { font-family: inherit; }
+
+/* ---------- View switcher ---------- */
+.bs-view { display: none; }
+.bs-view.is-active { display: block; }
+
+/* ============================================================
+   A. PAGE HEADER — sama persis pola .si-page-head
+============================================================= */
+.bs-page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.bs-page-head h1 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.bs-page-head p {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 520px;
+  line-height: 1.6;
+}
+.bs-page-head-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.bs-source-pill {
+  cursor: default;
+}
+.bs-source-pill i { font-size: 10px; }
+
+/* ============================================================
+   LEVEL 1 — FLEET HEALTH OVERVIEW
+   Pola sama dengan .si-stats-row (dipakai System Information, Task
+   Maintenance, Task Management) supaya "sekali lihat langsung
+   kenal" di seluruh dashboard — bukan hero custom yang beda sendiri.
+============================================================= */
+.bs-stats-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 6px;
+}
+.bs-stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.bs-stat-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.bs-stat-icon-total       { background: var(--primary-soft); color: var(--primary); }
+.bs-stat-icon-charging    { background: var(--success-soft); color: var(--success); }
+.bs-stat-icon-discharging { background: var(--warning-soft); color: var(--warning); }
+.bs-stat-icon-soc         { background: var(--info-soft); color: var(--info); }
+.bs-stat-icon-soh         { background: var(--primary-soft); color: var(--primary-dark); }
+.bs-stat-value {
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.bs-stat-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 1px;
+  white-space: nowrap;
+}
+.bs-stats-note {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin: 8px 2px 22px;
+  min-height: 1px;
+}
+
+/* ============================================================
+   LEVEL 2 — BATTERY INVENTORY
+============================================================= */
+.bs-section-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.bs-section-toolbar-text h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+.bs-section-toolbar-text p {
+  margin-top: 2px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.bs-list-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.bs-count-pill {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary-dark);
+  background: var(--primary-soft);
+  padding: 5px 11px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.bs-filter-group { display: flex; align-items: center; gap: 10px; }
+.bs-filter-label { font-size: 12.5px; color: var(--muted); font-weight: 500; }
+.bs-filter-select {
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 8px 32px 8px 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--surface) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%237C8B8D' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>") no-repeat right 12px center;
+  appearance: none;
+  cursor: pointer;
+}
+.bs-filter-select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+
+/* ---------- Battery cards (sama idiom dengan .si-sys-card) ---------- */
+.bs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+.bs-reg-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 18px 16px;
+  cursor: pointer;
+  transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 190px;
+}
+.bs-reg-card:hover {
+  box-shadow: 0 8px 24px rgba(15, 106, 113, 0.12);
+  border-color: var(--primary-header);
+  transform: translateY(-2px);
+}
+.bs-reg-card:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* Placeholder cards ("Battery 1"/"Battery 2" dummy name for a
+   VPS-discovered device with no `batteries` row yet) — dashed grey
+   border + muted/italic name so they read as "not yet named" rather
+   than a real registered battery. See buildVirtualBattery() in
+   js/battery-station.js. */
+.bs-reg-card.is-placeholder {
+  border-style: dashed;
+  border-color: var(--border);
+  background: var(--surface-muted, #f4f5f6);
+}
+.bs-reg-card.is-placeholder .bs-reg-card-name {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.bs-reg-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.bs-reg-card-name {
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.3;
+  margin-bottom: 6px;
+  overflow-wrap: anywhere;
+}
+.bs-reg-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.bs-icon-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.5px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.bs-icon-btn:hover { background: var(--primary-soft); color: var(--primary-dark); border-color: var(--primary-soft); }
+.bs-icon-btn-danger:hover { background: var(--danger-soft); color: var(--danger); border-color: var(--danger-soft); }
+
+.bs-reg-card-identity { display: flex; flex-direction: column; gap: 2px; font-size: 12.5px; color: var(--muted); }
+.bs-reg-card-identity b { color: var(--ink); font-weight: 600; }
+.bs-reg-card-identity span:nth-child(2),
+.bs-reg-card-identity span:nth-child(3) { font-size: 11px; }
+
+.bs-reg-card-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+.bs-reg-card-metric { display: flex; flex-direction: column; gap: 1px; }
+.bs-reg-card-metric-value { font-size: 16px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.bs-reg-card-metric.is-primary .bs-reg-card-metric-value { color: var(--primary-dark); font-size: 19px; }
+.bs-reg-card-metric-label { font-size: 10.5px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.bs-reg-card-notele {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--page-bg);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: auto;
+}
+
+.bs-reg-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: var(--muted);
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.bs-reg-card-foot-link {
+  color: var(--primary);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.bs-reg-card:hover .bs-reg-card-foot-link { color: var(--primary-dark); }
+
+/* ---------- Status badge — pola PERSIS .pill guide.html: plain
+   soft-bg + colored text, tanpa dot/ikon tambahan. ---------- */
+.bs-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.bs-badge-charging    { background: var(--success-soft); color: var(--success); }
+.bs-badge-discharging { background: var(--warning-soft); color: var(--warning); }
+.bs-badge-idle         { background: var(--info-soft); color: var(--info); }
+.bs-badge-unknown,
+.bs-badge-none         { background: var(--page-bg); color: var(--muted); }
+.bs-badge-lg { font-size: 12px; padding: 6px 13px; }
+
+/* ---------- Empty state (sama pola .si-empty) ---------- */
+.bs-empty {
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  padding: 60px 24px;
+  text-align: center;
+  color: var(--muted);
+}
+.bs-empty img { width: 64px; opacity: 0.55; margin-bottom: 12px; }
+.bs-empty h3 { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+.bs-empty p { font-size: 13px; max-width: 360px; margin: 0 auto; line-height: 1.6; }
+
+/* ============================================================
+   LEVEL 3 — BATTERY DETAIL (view terpisah, sama pola .si-detail-*)
+============================================================= */
+.bs-detail-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.bs-back-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.bs-back-btn:hover { background: var(--primary-soft); color: var(--primary-dark); }
+
+.bs-detail-title-wrap { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+.bs-detail-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.bs-detail-title-row h2 { font-size: 21px; font-weight: 700; }
+.bs-detail-sub { font-size: 12.5px; color: var(--muted); }
+.bs-detail-sub b { color: var(--ink); font-weight: 600; }
+
+.bs-detail-head-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+.bs-caption { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+
+/* ---------- Card shell (sama pola .si-card) ---------- */
+.bs-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.bs-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.bs-card-head-text { display: flex; align-items: center; gap: 8px; }
+.bs-card-head-text h3 { font-size: 15px; font-weight: 600; }
+.bs-live-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 3px var(--success-soft);
+  flex-shrink: 0;
+}
+.bs-card-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary-dark);
+  background: var(--primary-soft);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.bs-nodata-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--muted);
+  background: var(--page-bg);
+  border-radius: 12px;
+  padding: 12px 16px;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.bs-nodata-note i { color: var(--warning); font-size: 14px; flex-shrink: 0; }
+
+/* ---------- Top row: Current State (wide) + Today's Energy
+   (narrow) side by side — fills horizontal space instead of two
+   full-width stacked cards, cutting a lot of dead vertical room. */
+.bs-detail-top-grid {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: 14px;
+  align-items: stretch;
+  margin-bottom: 14px;
+}
+.bs-detail-top-grid .bs-card { margin-bottom: 0; height: 100%; }
+
+/* ---------- Current Battery State — exactly 3 cards in row 1
+   (SoC ditonjolkan, tanpa sel kosong), lalu Voltage/Current/SoH
+   sebagai satu strip teks ringkas (bukan kartu) di row 2. ---------- */
+.bs-state-top {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 10px;
+}
+.bs-state-card {
+  background: var(--page-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.bs-state-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+.bs-state-value { font-size: 17px; font-weight: 700; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.bs-state-label { font-size: 10.5px; color: var(--muted); margin-top: 1px; }
+
+.bs-state-card.is-primary { background: var(--primary-soft); border-color: transparent; }
+.bs-state-card.is-primary .bs-state-icon { width: 42px; height: 42px; font-size: 17px; background: var(--surface); border-color: transparent; }
+.bs-state-card.is-primary .bs-state-value { font-size: 28px; color: var(--primary-dark); }
+.bs-state-card.is-primary .bs-state-label { color: var(--primary-dark); opacity: 0.8; }
+
+.bs-state-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding-top: 10px;
+  margin-top: 2px;
+  border-top: 1px dashed var(--border);
+}
+.bs-state-tech-item { display: flex; align-items: baseline; gap: 5px; font-size: 12px; color: var(--muted); }
+.bs-state-tech-item b { font-size: 13.5px; color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ---------- Today's Battery Energy — dua baris ringkas (label+nilai
+   di atas, batang penuh di bawah), muat di kolom sempit tanpa
+   ruang kosong. ---------- */
+.bs-energy-compare { display: flex; flex-direction: column; gap: 14px; justify-content: center; height: 100%; }
+.bs-energy-row-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.bs-energy-row-label { font-size: 12.5px; font-weight: 600; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.bs-energy-row-label i { font-size: 10.5px; }
+.bs-energy-row-value { font-size: 15px; font-weight: 700; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.bs-energy-bar-track { height: 8px; border-radius: 999px; background: var(--page-bg); overflow: hidden; }
+.bs-energy-bar-fill { height: 100%; border-radius: 999px; transition: width 0.4s ease; }
+.bs-energy-row.is-charge .bs-energy-row-label { color: var(--success); }
+.bs-energy-row.is-charge .bs-energy-bar-fill { background: var(--success); }
+.bs-energy-row.is-discharge .bs-energy-row-label { color: var(--warning); }
+.bs-energy-row.is-discharge .bs-energy-bar-fill { background: var(--warning); }
+.bs-energy-caption { font-size: 11px; color: var(--muted); margin-top: 0; }
+
+/* ---------- Performance History — grid grafik tren (line chart),
+   pilihan paling mudah dibaca untuk data deret waktu; dikelompokkan
+   2x2, bukan satu kolom panjang. ---------- */
+.bs-tabs {
+  display: inline-flex;
+  background: var(--page-bg);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+.bs-tab {
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.bs-tab.is-active { background: var(--surface); color: var(--primary-dark); box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+.bs-tab.is-disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------- Range controls — geser manual (dual slider) + isi
+   tanggal manual, keduanya beroperasi pada window yang sama. ---------- */
+.bs-range-controls { margin-bottom: 4px; }
+.bs-range-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 2px 0 2px;
+}
+.bs-range-dates { display: flex; align-items: center; gap: 6px; margin-left: auto; flex-wrap: wrap; }
+.bs-range-date-input {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 11.5px;
+  color: var(--ink);
+  width: 180px;
+  min-width: 0;
+}
+.bs-range-date-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+.bs-range-sep { font-size: 11px; color: var(--muted); }
+.bs-range-apply, .bs-range-reset {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--primary-dark);
+  cursor: pointer;
+}
+.bs-range-apply:hover { background: var(--primary-soft); }
+.bs-range-apply:disabled, .bs-range-apply.is-loading { opacity: 0.6; cursor: default; pointer-events: none; }
+.bs-range-reset { color: var(--muted); border-color: transparent; background: transparent; padding: 6px 4px; }
+.bs-range-reset:hover { color: var(--danger); }
+.bs-range-reset[hidden] { display: none; }
+
+.bs-range-slider {
+  position: relative;
+  height: 30px;
+  margin-bottom: 2px;
+}
+.bs-range-slider-track {
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 4px;
+  transform: translateY(-50%);
+  background: var(--page-bg);
+  border-radius: 999px;
+}
+.bs-range-slider-fill {
+  position: absolute;
+  top: 50%; height: 4px;
+  transform: translateY(-50%);
+  background: var(--primary);
+  border-radius: 999px;
+}
+.bs-range-slider input[type="range"] {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 30px;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  pointer-events: none;
+}
+.bs-range-slider input[type="range"]::-webkit-slider-thumb {
+  pointer-events: auto;
+  appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2.5px solid var(--primary);
+  cursor: grab;
+  margin-top: 0;
+}
+.bs-range-slider input[type="range"]::-moz-range-thumb {
+  pointer-events: auto;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2.5px solid var(--primary);
+  cursor: grab;
+}
+.bs-range-slider input[type="range"]::-webkit-slider-runnable-track { background: transparent; }
+.bs-range-caption {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bs-chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.bs-chart-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px 14px 10px; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.bs-chart-card:hover { border-color: var(--primary-header); box-shadow: 0 6px 18px rgba(15,106,113,.10); }
+.bs-chart-card-head { font-size: 12.5px; font-weight: 600; color: var(--ink); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 7px; }
+.bs-chart-card-head span { display: flex; align-items: center; gap: 7px; }
+.bs-chart-card-head i.fa-expand { color: var(--muted); font-size: 10px; }
+.bs-chart-card-head i:not(.fa-expand) { color: var(--primary); font-size: 11px; }
+.bs-chart-canvas-wrap { height: 150px; position: relative; }
+.bs-chart-canvas-wrap canvas { width: 100% !important; }
+.bs-chart-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 40px 16px;
+  background: var(--page-bg);
+  border-radius: 12px;
+}
+
+/* ---------- Status Transition — ribbon dulu (sekilas paham tanpa
+   scroll), baru daftar ringkas di bawahnya (default terpotong +
+   tombol "show all"), bukan list panjang langsung. ---------- */
+.bs-status-ribbon {
+  display: flex;
+  height: 26px;
+  border-radius: 7px;
+  overflow: hidden;
+  background: var(--page-bg);
+}
+.bs-status-ribbon-seg {
+  min-width: 3px;
+  transition: opacity 0.15s ease;
+  cursor: default;
+}
+.bs-status-ribbon-seg:hover { opacity: 0.75; }
+.bs-status-ribbon-seg.tone-charging    { background: var(--success); }
+.bs-status-ribbon-seg.tone-discharging { background: var(--warning); }
+.bs-status-ribbon-seg.tone-idle        { background: var(--info); }
+.bs-status-ribbon-seg.tone-unknown     { background: var(--border); }
+
+.bs-status-ribbon-foot { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.bs-status-legend { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.bs-status-legend-item {
+  display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 500; color: var(--muted);
+  background: none; border: 1px solid transparent; border-radius: 999px; padding: 5px 10px; cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.bs-status-legend-item:hover { background: var(--page-bg); }
+.bs-status-legend-item.is-active { background: var(--primary-soft); border-color: var(--primary-soft); color: var(--primary-dark); font-weight: 600; }
+.bs-status-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.bs-status-legend-dot.tone-charging    { background: var(--success); }
+.bs-status-legend-dot.tone-discharging { background: var(--warning); }
+.bs-status-legend-dot.tone-idle        { background: var(--info); }
+
+.bs-log-filter-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: var(--page-bg); border-radius: 10px; padding: 9px 13px; margin: 10px 0 -2px; font-size: 12px;
+}
+.bs-log-filter-bar span { color: var(--ink); font-weight: 500; }
+.bs-log-filter-bar span b { font-weight: 700; }
+.bs-log-filter-bar button {
+  border: none; background: none; color: var(--primary); font-weight: 600; font-size: 11.5px; cursor: pointer; padding: 2px;
+}
+.bs-log-filter-bar button:hover { color: var(--primary-dark); text-decoration: underline; }
+.bs-status-ribbon-range { font-size: 11px; color: var(--muted); }
+
+.bs-timeline { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.bs-timeline-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 2px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12.5px;
+}
+.bs-timeline-item:last-child { border-bottom: none; }
+.bs-timeline-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.bs-timeline-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.bs-timeline-dot.tone-charging    { background: var(--success); }
+.bs-timeline-dot.tone-discharging { background: var(--warning); }
+.bs-timeline-dot.tone-idle        { background: var(--info); }
+.bs-timeline-dot.tone-unknown     { background: var(--muted); }
+.bs-timeline-transition { color: var(--ink); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bs-timeline-arrow { margin: 0 4px; color: var(--muted); }
+.bs-timeline-time { color: var(--muted); white-space: nowrap; flex-shrink: 0; font-size: 11.5px; }
+
+.bs-timeline-more {
+  align-self: center;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 10px;
+}
+.bs-timeline-more:hover { color: var(--primary-dark); }
+
+.bs-empty-inline { font-size: 12.5px; color: var(--muted); background: var(--page-bg); border-radius: 12px; padding: 16px; text-align: center; }
+.bs-dash { color: var(--muted); }
+
+/* ============================================================
+   MODALS (Add/Edit/Deactivate)
+============================================================= */
+.bs-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 30, 34, 0.45);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+.bs-modal-overlay.is-visible { display: flex; }
+.bs-modal { background: var(--surface); border-radius: 16px; padding: 26px; width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto; }
+
+.bs-chart-modal { max-width: 720px; }
+.bs-chart-modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+.bs-chart-modal-canvas-wrap { height: 320px; position: relative; margin-bottom: 16px; }
+.bs-chart-modal-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; border-top: 1px solid var(--border); padding-top: 14px; }
+.bs-chart-modal-stat-label { display: block; font-size: 10.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+.bs-chart-modal-stat-value { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.bs-modal h2 { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 9px; }
+.bs-modal h2 i { color: var(--primary); font-size: 15px; }
+.bs-modal-desc { font-size: 12.5px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+.bs-modal-danger-icon { width: 50px; height: 50px; border-radius: 50%; background: var(--danger-soft); color: var(--danger); display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 14px; }
+
+.bs-form-group-label { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 22px 0 8px; }
+.bs-form-group-label:first-of-type { margin-top: 22px; }
+.bs-form-field { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+.bs-form-label { font-size: 12.5px; font-weight: 500; color: var(--ink); }
+.bs-req { color: var(--danger); }
+.bs-form-input, .bs-form-select { border: 1px solid var(--border); border-radius: 9px; padding: 9px 12px; font-size: 13px; color: var(--ink); width: 100%; }
+.bs-form-input:focus, .bs-form-select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+.bs-form-input.is-invalid { border-color: var(--danger); }
+.bs-form-hint { font-size: 11px; color: var(--muted); line-height: 1.5; }
+.bs-form-error { font-size: 11.5px; color: var(--danger); font-weight: 500; }
+.bs-form-group-dev { margin-top: 8px; padding: 14px; background: var(--page-bg); border-radius: 12px; }
+.bs-form-group-dev .bs-form-field { margin-top: 10px; }
+.bs-form-group-dev .bs-form-field:first-child { margin-top: 0; }
+
+.bs-modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+.bs-modal-btn-cancel { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px; font-size: 13px; font-weight: 500; color: var(--ink); cursor: pointer; }
+.bs-modal-btn-cancel:hover { background: var(--page-bg); }
+.bs-btn-add { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--primary); color: #fff; border: none; border-radius: 10px; padding: 10px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.bs-btn-add:hover { background: var(--primary-dark); }
+.bs-btn-deactivate { background: var(--danger); color: #fff; border: none; border-radius: 10px; padding: 10px; font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.bs-btn-deactivate:hover { background: #B93A3A; }
+
+/* ---------- Toast ---------- */
+.bs-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translate(-50%, 12px);
+  background: var(--ink);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 1100;
+}
+.bs-toast.is-show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.bs-toast i { color: var(--success); }
+
+/* ---------- Skeleton loading ---------- */
+[data-skeleton-target].is-skeleton { position: relative; overflow: hidden; min-height: 90px; }
+[data-skeleton-target].is-skeleton::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  animation: bsShimmer 1.2s infinite;
+}
+@keyframes bsShimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+
+/* ============================================================
+   RESPONSIVE — Desktop 1440 / Laptop 1024 / Tablet 768 / Mobile 390
+============================================================= */
+@media (max-width: 1180px) {
+  .bs-stats-row { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 860px) {
+  .bs-stats-row { grid-template-columns: repeat(2, 1fr); }
+  .bs-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  .bs-detail-top-grid { grid-template-columns: 1fr; }
+  .bs-state-top { grid-template-columns: 1fr 1fr; }
+  .bs-chart-grid { grid-template-columns: 1fr; }
+  .bs-range-dates { margin-left: 0; width: 100%; justify-content: flex-start; }
+}
+@media (max-width: 480px) {
+  .bs-stats-row { grid-template-columns: 1fr; }
+  .bs-page-head { flex-direction: column; align-items: stretch; }
+  .bs-page-head-right { justify-content: space-between; }
+  .bs-page-head-right .btn { flex: 1; justify-content: center; }
+  .bs-section-toolbar { flex-direction: column; align-items: stretch; }
+  .bs-list-toolbar { justify-content: space-between; }
+  .bs-filter-select { flex: 1; }
+  .bs-grid { grid-template-columns: 1fr; }
+  .bs-detail-head-right { width: 100%; justify-content: space-between; margin-left: 0; }
+  .bs-state-top { grid-template-columns: 1fr; }
+  .bs-range-date-input { width: 152px; }
+  .bs-modal { padding: 20px; }
+}

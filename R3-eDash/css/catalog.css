@@ -1,0 +1,360 @@
+/* ============================================================
+   Catalog — 360eDash
+   Dipisah dari Admin Calculator (Solar Planning Tool) supaya
+   Katalog produk & harga jadi halaman/tools tersendiri di
+   sidebar. Design tokens sama persis dengan halaman lain
+   (admin-calculator, add-project, admin-view) supaya konsisten
+   satu sistem.
+============================================================= */
+:root {
+  --primary: #0f6a71;
+  --primary-dark: #0b4f54;
+  --primary-soft: #e4f1f1;
+  --accent-orange: #FA891A;
+
+  --success: #2f9e6e;
+  --warning: #e3a21a;
+  --danger: #d64545;
+  --info: #3e7cb1;
+  --success-soft: #e6f5ef;
+  --warning-soft: #fbf1e0;
+  --danger-soft: #fbe9e9;
+  --info-soft: #e9f0f7;
+
+  --ink: #25343F;
+  --muted: #7c8b8d;
+  --border: #e7edee;
+  --surface: #ffffff;
+  --page-bg: #f4f7f7;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Poppins', sans-serif; font-weight: 400; background: var(--page-bg); color: var(--ink); }
+
+/* Catatan: pages/catalog.html sekarang di-load sebagai FRAGMENT
+   murni (lihat komentar di bagian atas file itu), jadi TIDAK lagi
+   punya wrapper .edash-layout/.edash-main/.edash-content/
+   #sidebar-root/#header-root sendiri — semua itu sudah didefinisikan
+   sekali oleh shell utama di index.html. Dulu file ini masih
+   mendefinisikan ulang class-class tsb (peninggalan dari versi
+   standalone-nya) yang berakibat wrapper ke-nested dobel di dalam
+   punya index.html → muncul 2 scrollbar bertumpuk. JANGAN tambahkan
+   lagi rule .edash-layout/.edash-main/.edash-content di sini. */
+#sidebar-root:empty, #header-root:empty { display: none; }
+
+.hidden { display: none !important; }
+
+.sp-wrap { max-width: 1440px; margin: 0 auto; position: relative; }
+
+/* ---------- CSV drag & drop overlay ---------- */
+.sp-csv-drop-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(15, 106, 113, 0.12);
+  backdrop-filter: blur(1.5px);
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.sp-wrap.is-dragging-csv .sp-csv-drop-overlay { display: flex; }
+.sp-csv-drop-card {
+  background: var(--surface);
+  border: 2px dashed var(--primary);
+  border-radius: 16px;
+  padding: 28px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 12px 32px rgba(15, 106, 113, 0.18);
+  text-align: center;
+}
+.sp-csv-drop-card i { font-size: 30px; color: var(--primary); }
+.sp-csv-drop-card p { font-size: 14px; font-weight: 600; color: var(--ink); max-width: 320px; }
+
+/* ---------- Page head ---------- */
+.sp-head { margin-bottom: 20px; }
+.sp-head h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
+.sp-head p { font-size: 14px; color: var(--muted); margin-top: 4px; }
+.sp-head .sp-byline { font-size: 12px; color: var(--muted); font-style: italic; margin-top: 2px; }
+
+.sp-section-title { font-size: 12.5px; font-weight: 700; color: var(--ink); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 12px; }
+
+/* ---------- Table (reused look from Admin Calculator) ---------- */
+.sp-table-wrap { border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+.sp-table { width: max-content; min-width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.sp-table th, .sp-table td { white-space: nowrap; }
+.sp-table td:nth-child(2) { white-space: normal; }
+.sp-table th, .sp-table td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--border); }
+.sp-table th { color: var(--primary-dark); font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; background: var(--primary-soft); }
+.sp-table tr:last-child td { border-bottom: none; }
+.sp-table td.sp-mono { font-size: 12px; color: var(--ink); }
+.sp-catalog-id {
+  display: inline-flex;
+  align-items: center;
+  min-width: 58px;
+  padding: 4px 7px;
+  border-radius: 6px;
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.sp-id-cell { white-space: nowrap !important; }
+
+.sp-table td.sp-sub { font-size: 10.5px; color: var(--muted); display: block; margin-top: 2px; }
+.sp-table-section td {
+  background: var(--primary-dark); color: #fff; font-weight: 600; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.04em; padding: 9px 14px;
+}
+
+.sp-btn { border: none; border-radius: 8px; padding: 8px 14px; font-family: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.sp-btn-outline { background: var(--primary-soft); border: 1px solid var(--primary); color: var(--primary-dark); }
+.sp-btn-outline:hover { background: var(--primary); color: #fff; }
+.sp-btn-outline i { color: var(--primary-dark); }
+.sp-btn-outline:hover i { color: #fff; }
+
+.sp-btn-danger-outline { background: var(--danger-soft); border: 1px solid var(--danger); color: var(--danger); }
+.sp-btn-danger-outline:hover { background: var(--danger); color: #fff; }
+.sp-btn-danger-outline i { color: var(--danger); }
+.sp-btn-danger-outline:hover i { color: #fff; }
+
+/* ---------- Catalog ---------- */
+.sp-catalog-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.sp-catalog-hint { font-size: 11.5px; color: var(--muted); }
+.sp-catalog-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+.sp-catalog-filters {
+  display: flex; flex-wrap: nowrap; gap: 8px; margin-bottom: 16px;
+  overflow-x: auto; overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+}
+.sp-filter-chip {
+  border: 1px solid var(--border); background: #fff; color: var(--ink);
+  font-family: inherit; font-size: 11.5px; font-weight: 600; padding: 6px 13px;
+  border-radius: 20px; cursor: pointer; transition: all 0.15s ease;
+  flex-shrink: 0; white-space: nowrap;
+}
+.sp-filter-chip:hover { background: var(--page-bg); }
+.sp-filter-chip.is-active { background: var(--primary-soft); border-color: var(--primary); color: var(--primary-dark); }
+
+.sp-spec-note-wrap { display: none; margin-top: 4px; }
+#spCatalogTableWrap.is-spec-mode .sp-spec-note-wrap { display: block; }
+
+/* ---------- Technical spec columns (toggled by "Tampilkan Spesifikasi Teknik") ---------- */
+.sp-table th.sp-col-tech, .sp-table td.sp-col-tech { display: none; }
+#spCatalogTableWrap.is-spec-mode .sp-table th.sp-col-tech,
+#spCatalogTableWrap.is-spec-mode .sp-table td.sp-col-tech { display: table-cell; }
+.sp-table th.sp-col-tech { background: var(--info-soft); color: var(--info); }
+.sp-table td.sp-col-tech .sp-cell-input { color: var(--info); }
+
+/* ---------- Category divider row (shown when filter = "Semua") ---------- */
+.sp-cat-divider td {
+  background: var(--primary-dark); color: #fff; font-weight: 700; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.04em; padding: 8px 14px;
+}
+.sp-cat-divider .sp-cat-divider-count { font-weight: 400; opacity: 0.75; text-transform: none; letter-spacing: normal; margin-left: 6px; }
+
+.sp-editable-cell { cursor: text; border-radius: 6px; }
+.sp-editable-cell:hover { background: var(--primary-soft); }
+.sp-editable-cell:focus { outline: 2px solid var(--primary); outline-offset: -2px; background: #fff; }
+
+/* ---------- Editable cell inputs (JS-rendered rows) ---------- */
+.sp-cell-input {
+  width: 100%; min-width: 90px; border: 1px solid transparent; background: transparent;
+  font-family: inherit; font-size: 12.5px; color: var(--ink); padding: 5px 7px; border-radius: 6px;
+}
+.sp-cell-input-sm { min-width: 70px; }
+.sp-cell-input:hover { background: var(--primary-soft); }
+.sp-cell-input:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 2px rgba(15,106,113,0.15); }
+
+/* Nama produk: wrap ke bawah kalau teksnya panjang, bukan geser ke samping */
+.sp-cell-textarea {
+  display: block;
+  min-width: 140px;
+  resize: none;
+  overflow: hidden;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.4;
+  font-family: inherit;
+}
+.sp-spec-note-input { font-size: 10.5px; color: var(--muted); font-style: italic; }
+
+.sp-harga-aktif { font-weight: 600; color: var(--primary-dark); white-space: nowrap; }
+.sp-live-date { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+/* ---------- Harga Terbaru (Live) — editable input ---------- */
+.sp-live-price-wrap {
+  display: flex; align-items: center; gap: 4px; min-width: 110px;
+}
+.sp-live-price-prefix { font-size: 12px; font-weight: 600; color: var(--primary-dark); }
+.sp-live-price-input {
+  font-weight: 700; color: var(--primary-dark); background: var(--primary-soft);
+  border: 1px solid transparent;
+}
+.sp-live-price-input:hover { background: var(--primary-soft); border-color: var(--primary); }
+.sp-live-price-input:focus { background: #fff; border-color: var(--primary); }
+
+.sp-col-del { width: 40px; text-align: center; }
+.sp-del-btn {
+  border: none; background: transparent; color: var(--danger); cursor: pointer;
+  padding: 6px 8px; border-radius: 6px; font-size: 12.5px; display: inline-flex; align-items: center;
+}
+.sp-del-btn:hover { background: var(--danger-soft); }
+
+.sp-empty-row td { text-align: center; padding: 32px 16px; color: var(--muted); font-size: 12.5px; }
+
+/* ---------- Add row bar ---------- */
+.sp-add-row-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  margin-top: 14px; padding: 14px; background: var(--surface);
+  border: 1px dashed var(--primary); border-radius: 10px;
+}
+.sp-add-row-select {
+  font-family: inherit; font-size: 12.5px; color: var(--ink);
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; background: #fff;
+}
+.sp-btn-add { background: var(--primary); color: #fff; }
+.sp-btn-add:hover { background: var(--primary-dark); }
+.sp-add-row-count { margin-left: auto; font-size: 11.5px; color: var(--muted); }
+
+.sp-csv-hint { margin-top: 12px; font-size: 11px; color: var(--muted); line-height: 1.6; }
+
+/* ---------- Toast ---------- */
+.sp-catalog-toast {
+  position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(12px);
+  background: var(--primary-dark); color: #fff; font-size: 12.5px; font-weight: 600;
+  padding: 10px 18px; border-radius: 10px; box-shadow: 0 10px 28px rgba(0,0,0,0.22);
+  opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; z-index: 999;
+}
+.sp-catalog-toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 1100px) {
+  .sp-catalog-head { align-items: flex-start; }
+  .sp-add-row-count { margin-left: 0; width: 100%; }
+}
+/* ---------- Delete row confirmation modal ---------- */
+.sp-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 32, 35, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+.sp-modal-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sp-confirm-card {
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  background: var(--surface);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(11, 79, 84, 0.28);
+  padding: 28px 26px 26px;
+  transform: translateY(10px) scale(0.98);
+  transition: transform 0.18s ease;
+}
+.sp-modal-backdrop.is-open .sp-confirm-card {
+  transform: translateY(0) scale(1);
+}
+
+.sp-confirm-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--danger-soft);
+  color: var(--danger);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin: 0 auto 16px;
+}
+.sp-confirm-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.sp-confirm-text {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+.sp-confirm-text strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.sp-confirm-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+}
+.sp-modal-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.sp-modal-btn-secondary {
+  background: #fff;
+  color: var(--muted);
+  border-color: var(--border);
+}
+.sp-modal-btn-secondary:hover {
+  background: #f5f8f8;
+  color: var(--ink);
+}
+.sp-modal-btn-danger {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+.sp-modal-btn-danger:hover {
+  background: #b93636;
+  border-color: #b93636;
+}
+.sp-confirm-icon-primary {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+}
+.sp-modal-btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.sp-modal-btn-primary:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+@media (max-width: 640px) {
+  .sp-confirm-actions {
+    flex-direction: column-reverse;
+  }
+}

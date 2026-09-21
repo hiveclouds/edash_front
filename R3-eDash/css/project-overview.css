@@ -1,0 +1,98 @@
+*{box-sizing:border-box}
+.project-overview-page{padding:20px;max-width:1500px;margin:0 auto;color:#18313a}
+.project-overview-page .card{background:#fff;border:1px solid #dfe8eb;border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(18,43,52,.05);opacity:0;transform:translateY(10px)}
+.project-overview-page .card.is-animated{animation:podCardIn .4s ease forwards}
+@keyframes podCardIn{to{opacity:1;transform:translateY(0)}}
+.project-info{margin-bottom:18px}
+.project-info-head{display:grid;grid-template-columns:minmax(250px,340px) 1fr;gap:22px;align-items:end}
+.project-selector label{display:block;margin-bottom:6px;font-size:13px;font-weight:600;color:#60777f}
+.project-selector select{width:100%;padding:11px 12px;border:1px solid #d6e1e5;border-radius:9px;background:#fff;color:#18313a;font:inherit;cursor:pointer}
+.project-detail h1{font-size:25px;line-height:1.15;margin:0 0 8px}
+.project-meta{display:flex;gap:18px;flex-wrap:wrap;color:#687f87;font-size:13px}
+.project-meta span{white-space:nowrap}
+.top-grid,.second-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:18px;margin-bottom:18px}
+.side-column{display:flex;flex-direction:column;gap:18px}
+.large-card{min-height:365px}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.card-header h3,.card h3{font-size:16px;margin:0;color:inherit}
+.card-subtitle{display:block;margin-top:4px;color:#80939a;font-size:12px}
+.secondary-btn{border:1px solid #d5e1e4;background:#f7fafb;color:#24505b;padding:8px 12px;border-radius:8px;cursor:pointer}
+.chart-area{height:275px;margin-top:12px;border:1px solid #e2eaed;border-radius:10px;overflow:hidden;padding:10px;background:#fbfcfc}
+.chart-area.compact{height:235px}
+.chart-svg{display:block;width:100%;height:100%}
+.chart-grid-line{stroke:#dfe7e9;stroke-width:1}
+.chart-line-production{fill:none;stroke:#21a7ae;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.chart-line-consumption{fill:none;stroke:#fa9a3a;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.chart-label{font-size:10px;fill:#80939a}
+.status-dot{font-size:11px;color:#15956b;background:#e9f8f2;padding:5px 8px;border-radius:999px}
+.status-dot:before{content:'●';margin-right:4px}
+.weather-temp{font-size:38px;font-weight:700;margin-top:18px}
+.weather-desc{margin-top:4px;color:#60777f}
+.weather-info{margin-top:12px;padding-top:12px;border-top:1px solid #e4eaec;color:#60777f}
+.analysis-row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #e5ebed;font-size:13px;color:#60777f}
+.analysis-row:last-child{border-bottom:0}
+.analysis-row strong{color:#18313a}
+.spending-card{display:flex;flex-direction:column;justify-content:center;min-height:235px}
+.big-number{font-size:38px;font-weight:700;color:#15956b;margin:15px 0 4px}
+.spending-card>span,.kpi-card>span{color:#80939a;font-size:12px}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:18px}
+.kpi-card{text-align:center}
+.kpi-value{font-size:32px;font-weight:700;margin:12px 0 3px}
+ .performance-section{margin-bottom:18px}
+.section-heading{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:4px 2px 12px}
+.section-heading h2{font-size:18px;margin:0}
+.section-heading p{font-size:12px;color:#80939a;margin:4px 0 0}
+.live-badge{font-size:11px;color:#15956b;background:#e9f8f2;padding:6px 9px;border-radius:999px;white-space:nowrap}
+.live-badge i{display:inline-block;width:6px;height:6px;border-radius:50%;background:#35b886;margin-right:5px}
+.performance-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.performance-card{min-height:245px;padding:14px!important;overflow:hidden}
+.performance-card .performance-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.performance-title{font-size:13px;font-weight:650}
+.performance-unit{font-size:11px;color:#80939a;margin-top:2px}
+.performance-current{text-align:right;font-size:18px;font-weight:700;line-height:1.05;white-space:nowrap}
+.performance-current small{font-size:10px;font-weight:600;color:#80939a}
+.performance-chart{height:176px;margin-top:10px;border:1px solid #e2eaed;border-radius:10px;background:#fbfcfc;padding:6px}
+.performance-chart svg{display:block;width:100%;height:100%}
+.performance-grid-line{stroke:#dfe7e9;stroke-width:1}
+.performance-axis{font-size:8px;fill:#80939a}
+.performance-path{fill:none;stroke:#21a7ae;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.performance-point{fill:#21a7ae;stroke:#fff;stroke-width:1.5}
+.performance-legend{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:10px;color:#80939a}
+.performance-legend i{width:7px;height:7px;border-radius:50%;background:#21a7ae;display:inline-block}
+.bottom-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.bottom-grid p{margin-top:10px;color:#687f87;font-size:13px}
+.notification-list{margin:10px 0 0;padding:0;list-style:none}
+.notification-list li{font-size:13px;color:#687f87;padding:8px 0;border-bottom:1px solid #e5ebed}
+.notification-list li:last-child{border-bottom:0}
+
+html[data-theme="dark"] .project-overview-page{color:var(--ink,#e7eff0)}
+html[data-theme="dark"] .project-overview-page .card{background:var(--surface,#18272c);border-color:var(--border,#2a3d42);box-shadow:none}
+html[data-theme="dark"] .project-overview-page .project-selector label,
+html[data-theme="dark"] .project-overview-page .project-meta,
+html[data-theme="dark"] .project-overview-page .card-subtitle,
+html[data-theme="dark"] .project-overview-page .weather-desc,
+html[data-theme="dark"] .project-overview-page .weather-info,
+html[data-theme="dark"] .project-overview-page .analysis-row,
+html[data-theme="dark"] .project-overview-page .spending-card>span,
+html[data-theme="dark"] .project-overview-page .kpi-card>span,
+html[data-theme="dark"] .project-overview-page .section-heading p,
+html[data-theme="dark"] .project-overview-page .bottom-grid p{color:var(--muted,#9ab0b4)}
+html[data-theme="dark"] .project-overview-page .project-selector select,
+html[data-theme="dark"] .project-overview-page .secondary-btn{background:var(--field-bg,#16262b);color:var(--ink,#e7eff0);border-color:var(--border,#2a3d42)}
+html[data-theme="dark"] .project-overview-page .chart-area{background:#142328;border-color:var(--border,#2a3d42)}
+html[data-theme="dark"] .project-overview-page .chart-grid-line{stroke:#2a3d42}
+html[data-theme="dark"] .project-overview-page .chart-label{fill:#789096}
+html[data-theme="dark"] .project-overview-page .analysis-row,
+html[data-theme="dark"] .project-overview-page .weather-info,
+html[data-theme="dark"] .project-overview-page .notification-list li{border-color:var(--border,#2a3d42)}
+html[data-theme="dark"] .project-overview-page .status-dot,
+html[data-theme="dark"] .project-overview-page .live-badge{background:rgba(79,189,138,.14);color:#4fbd8a}
+
+html[data-theme="dark"] .project-overview-page .performance-unit{color:var(--muted,#9ab0b4)}
+html[data-theme="dark"] .project-overview-page .performance-chart{background:#142328;border-color:var(--border,#2a3d42)}
+html[data-theme="dark"] .project-overview-page .performance-grid-line{stroke:#2a3d42}
+html[data-theme="dark"] .project-overview-page .performance-axis{fill:#789096}
+html[data-theme="dark"] .project-overview-page .performance-point{stroke:#18272c}
+@media(max-width:1050px){.performance-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:850px){.project-info-head,.top-grid,.second-grid,.kpi-grid,.bottom-grid{grid-template-columns:1fr}.project-info-head{gap:14px}}
+@media(max-width:600px){.project-overview-page{padding:12px}.performance-grid{grid-template-columns:1fr}.project-detail h1{font-size:21px}.chart-area{height:230px}.section-heading{align-items:flex-start;flex-direction:column}}

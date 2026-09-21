@@ -1,0 +1,35 @@
+{
+  "_comment": "Data untuk halaman Project Overview (js/project-overview.js). Halaman ini sekarang HANYA menampilkan 'PLTS Tawabi' (satu-satunya proyek dengan data real). Field di bawah cuma seed/placeholder awal (dipakai kalau fetch real-data gagal, mis. dibuka via file://) — begitu poLoadRealTawabiData() di js/project-overview.js sukses, hampir semua field ini di-overwrite dari tawabi-telemetry.json + battery-station/tawabi-1.json + tawabi-2.json + GET /api/systems. weather tetap dummy karena kontrak API menandai sumbernya 'not confirmed Solarman' (belum ada data cuaca real).",
+  "projects": [
+    {
+      "projectId": "tawabi",
+      "name": "PLTS Tawabi",
+      "location": "Halmahera Utara, Maluku Utara",
+      "status": "online",
+      "timezone": "Asia/Jayapura",
+      "lastUpdated": "2026-08-07T04:44:27+00:00",
+      "time": "—",
+      "weather": { "temp": "—", "desc": "Not available", "humidity": 0 },
+      "spending": "—",
+      "emission": "—",
+      "trees": 0,
+      "treeCost": "—",
+      "weekly": { "production": "—", "performance": "—" },
+      "battery": "2 batteries available",
+      "swaps": "—",
+      "notifications": [
+        "Data telemetry real-time dari Solarman logger (PLTS Tawabi Grup 1/2)."
+      ],
+      "energy": { "production": [0, 0, 0, 0, 0, 0, 0], "consumption": [0, 0, 0, 0, 0, 0, 0] },
+      "pv": [0, 0, 0, 0],
+      "vars": {
+        "batteryVoltage": { "name": "Battery Voltage", "unit": "V", "value": 0, "decimals": 1, "delta": "—", "min": 0, "max": 0, "data": [0] },
+        "pvVoltage": { "name": "PV Voltage", "unit": "V", "value": 0, "decimals": 0, "delta": "—", "min": 0, "max": 0, "data": [0] },
+        "radiatorTemp": { "name": "Radiator Temperature", "unit": "°C", "value": 0, "decimals": 1, "delta": "—", "min": 0, "max": 0, "data": [0] },
+        "batteryCurrent": { "name": "Battery Current", "unit": "A", "value": 0, "decimals": 1, "delta": "—", "min": 0, "max": 0, "data": [0] },
+        "batteryPower": { "name": "Battery Power", "unit": "W", "value": 0, "decimals": 0, "delta": "—", "min": 0, "max": 0, "data": [0] },
+        "leakCurrent": { "name": "Inverter Leak Current", "unit": "mA", "value": 0, "decimals": 0, "delta": "—", "min": 0, "max": 0, "data": [0] }
+      }
+    }
+  ]
+}

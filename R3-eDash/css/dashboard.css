@@ -1,0 +1,657 @@
+/* ============================================================
+   Page: Project Overview — 360eDash
+   Default dashboard: map overview, generation charts, top sites,
+   points of interest, and long-term capacity/emissions trends.
+============================================================= */
+
+.po-page {
+  --po-primary: #0f6a71;
+  --po-primary-dark: #0b4f54;
+  --po-primary-light: #6DC3BB;
+  --po-primary-soft: #e4f1f1;
+  --po-accent: #FA891A;
+  --po-success: #2F9E6E;
+  --po-success-soft: #E4F5EC;
+  --po-warning: #E3A21A;
+  --po-warning-soft: #FBF1DE;
+  --po-danger: #D64545;
+  --po-danger-soft: #FBE8E8;
+  --po-info: #3E7CB1;
+  --po-info-soft: #E7F0F8;
+  --po-ink: #25343F;
+  --po-muted: #7C8B8D;
+  --po-border: #E7EDEE;
+  --po-surface: #FFFFFF;
+
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.po-page * {
+  box-sizing: border-box;
+}
+
+/* ---------- Page head ---------- */
+.po-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.po-eyebrow {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--po-primary);
+  margin-bottom: 6px;
+}
+.po-title {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--po-ink);
+}
+.po-subtitle {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--po-muted);
+}
+.po-refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--po-border);
+  background: var(--po-surface);
+  color: var(--po-ink);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.po-refresh-btn:hover {
+  background: var(--po-primary-soft);
+  border-color: var(--po-primary-soft);
+  color: var(--po-primary-dark);
+}
+.po-refresh-btn i {
+  color: var(--po-primary);
+}
+.po-refresh-btn.is-loading i {
+  animation: po-spin 0.8s linear infinite;
+}
+@keyframes po-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Whole-dashboard "refreshing" feedback: dim + block interaction while
+   Refresh re-fetches data, so it visibly reads as the page refreshing
+   instead of numbers silently changing underneath the user. */
+.po-page {
+  transition: opacity 0.2s ease;
+}
+.po-page.is-refreshing {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ---------- Layout ---------- */
+.po-row {
+  display: grid;
+  gap: 20px;
+}
+.po-row-top     { grid-template-columns: 2.1fr 1fr; }
+.po-row-charts  { grid-template-columns: 1.3fr 1fr; }
+.po-row-lists   { grid-template-columns: 1fr 1fr; }
+.po-row-trends  { grid-template-columns: 1fr 1fr; }
+
+.po-card {
+  background: var(--po-surface);
+  border: 1px solid var(--po-border);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(15, 106, 113, 0.05);
+}
+
+/* ---------- Map card ---------- */
+.po-map-card {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+  /* min-height (bukan height tetap) -- supaya kartu map IKUT tinggi
+     kartu Category di sebelahnya kalau isinya lebih tinggi dari 340px
+     (mis. toggle "Show all" dicentang, kategori yang tampil jadi
+     banyak), lewat grid stretch di .po-row-top (align-items:stretch
+     default -- tinggi row grid = konten tertinggi di antara kedua
+     kartu, lalu KEDUANYA di-stretch mengikuti tinggi row itu). Kalau
+     dibiarkan height:340px tetap seperti sebelumnya, kartu Category
+     yang lebih tinggi jadi overflow / scroll sendiri dan nyisain
+     white space kosong di kartu map. min-height tetap dijaga 340px
+     supaya map tidak collapse pendek waktu kategori yang tampil
+     cuma dikit (mis. cuma 1 kartu Category).
+  */
+  min-height: 340px;
+}
+.po-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #dfe8e8;
+  /* MapLibre's own panes/controls use z-index values up to 1000, which
+     otherwise escape this container and cover the .po-map-stat card
+     below once tiles finish loading (it flashes, then disappears).
+     isolation:isolate contains all of MapLibre's internal stacking
+     inside the map itself, and z-index:0 pins that whole layer under
+     the stat card regardless of paint order. */
+  isolation: isolate;
+  z-index: 0;
+}
+.po-map-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 130px;
+  background: linear-gradient(to top, rgba(11, 42, 45, 0.55), rgba(11, 42, 45, 0));
+  pointer-events: none;
+}
+.po-map-stat {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  border-radius: 14px;
+  padding: 14px 18px;
+  box-shadow: 0 6px 20px rgba(11, 42, 45, 0.18);
+  min-width: 220px;
+  /* Own compositor layer, decoupled from the map's tile/pan repaints
+     so the blur + card don't flicker or momentarily vanish. */
+  transform: translateZ(0);
+}
+.po-map-stat-value {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--po-ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.po-map-stat-label {
+  font-size: 11.5px;
+  color: var(--po-muted);
+  margin-top: 2px;
+  margin-bottom: 10px;
+}
+.po-map-stat-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.po-map-stat-metric {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--po-ink);
+}
+.po-map-stat-metric i {
+  width: 14px;
+  font-size: 11px;
+  color: var(--po-primary);
+}
+.po-map-stat-metric b {
+  font-weight: 700;
+}
+
+/* ---------- Project summary (disamakan dengan .ps-summary di
+   css/project-selector.css) ---------- */
+.po-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.po-summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px 9px;
+  background: #f4f7f7;
+  border: 1px solid var(--po-border);
+  border-radius: 12px;
+  text-align: center;
+  min-width: 0;
+}
+.po-summary-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+.po-summary-icon-all     { background: var(--po-primary-soft); color: var(--po-primary); }
+.po-summary-icon-online  { background: var(--po-success-soft); color: var(--po-success); }
+.po-summary-icon-offline { background: var(--po-danger-soft);  color: var(--po-danger); }
+.po-summary-icon-alerts  { background: var(--po-warning-soft); color: var(--po-warning); }
+.po-summary-value {
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--po-ink);
+  line-height: 1;
+}
+.po-summary-label {
+  font-size: 8px;
+  font-weight: 500;
+  color: var(--po-muted);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ---------- Category legend card ---------- */
+/* Kartu "CATEGORY" ini satu grid row (.po-row-top) sama kartu map.
+   Sebelumnya map fixed height:340px dan kartu ini overflow-y:auto biar
+   konten yang lebih tinggi (mis. toggle "Show all" dicentang) di-scroll
+   internal drpd mendorong tinggi row -- ATAS PERMINTAAN USER diubah:
+   kartu ini sekarang TIDAK dibatasi/discroll sama sekali, tingginya
+   ngikutin isi (summary chips + daftar kategori) apa adanya, dan kartu
+   map di sebelahnya (min-height:340px, lihat .po-map-card) otomatis
+   IKUT stretch ke tinggi row yang sama (default grid align-items:stretch)
+   -- jadi kalau kategori yang tampil banyak & kartu ini jadi tinggi,
+   kartu map ikut memanjang juga, TIDAK ada white space kosong di kartu
+   map lagi. */
+.po-legend-card {
+}
+.po-legend-title {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--po-muted);
+  margin-bottom: 14px;
+}
+.po-legend-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.po-legend-title-row .po-legend-title {
+  margin-bottom: 0;
+}
+.po-legend-show-all {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--po-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.po-legend-show-all input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  accent-color: var(--po-primary);
+  cursor: pointer;
+}
+.po-legend-empty {
+  padding: 10px 6px;
+  font-size: 12px;
+  color: var(--po-muted);
+  text-align: center;
+}
+.po-legend-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.po-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--cat-border, var(--po-border));
+  background: var(--cat-bg, #f7fafa);
+}
+.po-legend-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cat-icon-bg, var(--po-primary-soft));
+  color: var(--cat-color, var(--po-primary));
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.po-legend-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.po-legend-count {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--po-ink);
+  font-variant-numeric: tabular-nums;
+}
+.po-legend-label {
+  font-size: 11.5px;
+  color: var(--po-muted);
+}
+
+/* ---------- Shared card head / chart legend ---------- */
+.po-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.po-card-eyebrow {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--po-muted);
+}
+.po-card-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--po-ink);
+  font-variant-numeric: tabular-nums;
+  margin-top: 6px;
+}
+.po-card-value span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--po-muted);
+  margin-left: 4px;
+}
+.po-card-target {
+  font-size: 11.5px;
+  color: var(--po-muted);
+  margin-top: 2px;
+}
+.po-card-target.is-up   { color: var(--po-success); }
+.po-card-target.is-down { color: var(--po-danger); }
+
+.po-chart-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+.po-chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--po-muted);
+  white-space: nowrap;
+}
+.po-legend-dash {
+  width: 14px;
+  height: 0;
+  border-top: 2px dashed var(--po-accent);
+}
+.po-legend-dash.is-realized {
+  border-top: 2px solid var(--po-primary);
+}
+.po-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.po-legend-dot.is-this-week { background: #7C5CE0; }
+.po-legend-dot.is-last-week { background: #3E7CB1; }
+
+.po-chart-wrap {
+  width: 100%;
+}
+.po-chart-wrap svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ---------- Top Performing Sites ---------- */
+.po-sites-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--po-border) transparent;
+}
+.po-sites-list::-webkit-scrollbar { width: 6px; }
+.po-sites-list::-webkit-scrollbar-track { background: transparent; }
+.po-sites-list::-webkit-scrollbar-thumb { background: var(--po-border); border-radius: 10px; }
+.po-sites-list::-webkit-scrollbar-thumb:hover { background: var(--po-muted); }
+.po-site-row {
+  display: grid;
+  grid-template-columns: 22px 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 2px;
+  border-bottom: 1px solid var(--po-border);
+}
+.po-site-row:last-child {
+  border-bottom: none;
+  padding-bottom: 2px;
+}
+.po-site-rank {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--po-primary-soft);
+  color: var(--po-primary-dark);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.po-site-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cat-icon-bg, var(--po-primary-soft));
+  color: var(--cat-color, var(--po-primary));
+  font-size: 14px;
+}
+.po-site-info {
+  min-width: 0;
+}
+.po-site-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--po-ink);
+  white-space: normal;
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.po-site-region {
+  font-size: 11.5px;
+  color: var(--po-muted);
+}
+.po-site-metric {
+  text-align: right;
+}
+.po-site-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--po-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.po-site-percent {
+  font-size: 11px;
+  color: var(--po-success);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---------- Points of Interest ---------- */
+.po-poi-list {
+  display: flex;
+  flex-direction: column;
+}
+.po-poi-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 2px;
+  border-bottom: 1px solid var(--po-border);
+}
+.po-poi-row:last-child {
+  border-bottom: none;
+  padding-bottom: 2px;
+}
+.po-poi-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  background: var(--poi-bg, var(--po-primary-soft));
+  color: var(--poi-color, var(--po-primary));
+}
+.po-poi-info {
+  flex: 1;
+  min-width: 0;
+}
+.po-poi-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--poi-color, var(--po-primary));
+}
+.po-poi-site {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--po-ink);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.po-poi-region {
+  font-size: 11.5px;
+  color: var(--po-muted);
+}
+.po-poi-date {
+  font-size: 11.5px;
+  color: var(--po-muted);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ---------- Trend cards (Installed Capacity / Emissions Avoided) ---------- */
+.po-download-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  border: 1px solid var(--po-border);
+  background: var(--po-surface);
+  color: var(--po-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.po-download-btn:hover {
+  background: var(--po-primary-soft);
+  border-color: var(--po-primary-soft);
+  color: var(--po-primary-dark);
+}
+.po-trend-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.po-trend-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  color: var(--po-muted);
+}
+.po-trend-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.po-trend-legend-value {
+  font-weight: 700;
+  color: var(--po-ink);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+  .po-row-top,
+  .po-row-charts,
+  .po-row-lists,
+  .po-row-trends {
+    grid-template-columns: 1fr;
+  }
+  .po-map-card {
+    height: 280px;
+  }
+  .po-map-stat {
+    padding: 10px 14px;
+    min-width: 180px;
+  }
+  .po-map-stat-value {
+    font-size: 24px;
+  }
+  .po-map-stat-metrics {
+    gap: 4px;
+  }
+  .po-map-stat-metric {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 420px) {
+  .po-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

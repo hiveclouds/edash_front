@@ -1,0 +1,1422 @@
+/* ============================================================
+   System Information — 360eDash
+   Mengikuti design token guide.html (Poppins, teal/orange, status
+   semantik) supaya menyatu dengan dashboard lain.
+============================================================= */
+
+:root {
+  --si-primary: #0f6a71;
+  --si-primary-dark: #0b4f54;
+  --si-primary-light: #6DC3BB;
+  --si-primary-soft: #e4f1f1;
+  --si-accent: #FA891A;
+  --si-success: #2F9E6E;
+  --si-success-soft: #E4F5EC;
+  --si-warning: #E3A21A;
+  --si-warning-soft: #FBF1DE;
+  --si-danger: #D64545;
+  --si-danger-soft: #FBE8E8;
+  --si-info: #3E7CB1;
+  --si-info-soft: #E7F0F8;
+  --si-ink: #25343F;
+  --si-muted: #7C8B8D;
+  --si-border: #E7EDEE;
+  --si-surface: #FFFFFF;
+  --si-page-bg: #F4F7F7;
+}
+
+.si {
+  font-family: 'Poppins', sans-serif;
+  color: var(--si-ink);
+}
+
+/* Modal overlays live OUTSIDE .si in the DOM (they're siblings of #siRoot),
+   so they need the Poppins font + ink color applied directly too — they
+   already inherit the color tokens above since those are now on :root. */
+.si-modal-overlay {
+  font-family: 'Poppins', sans-serif;
+  color: var(--si-ink);
+}
+
+.si * { box-sizing: border-box; }
+
+.si button, .si select, .si input, .si textarea {
+  font-family: inherit;
+}
+
+/* ---------- Page head ---------- */
+.si-page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.si-page-head .si-eyebrow {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--si-muted);
+  margin-bottom: 6px;
+}
+.si-page-head h1 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.si-page-head p {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--si-muted);
+  max-width: 520px;
+  line-height: 1.6;
+}
+
+/* ---------- Buttons ---------- */
+.si-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  white-space: nowrap;
+}
+.si-btn:active { transform: translateY(1px); }
+.si-btn i { font-size: 12.5px; }
+
+.si-btn-primary {
+  background: var(--si-primary);
+  color: #fff;
+}
+.si-btn-primary:hover { background: var(--si-primary-dark); }
+
+.si-btn-secondary {
+  background: var(--si-surface);
+  color: var(--si-ink);
+  border-color: var(--si-border);
+}
+.si-btn-secondary:hover {
+  background: var(--si-primary-soft);
+  border-color: var(--si-primary-light);
+  color: var(--si-primary-dark);
+}
+
+/* Tombol Edit bulat icon-only (dipakai di header card: System/Inverter/
+   PV Overview, Device/Logger, Electrical Quality, Diagnostics, dan nama
+   system di header detail) — ganti dari tombol "Edit" bertulisan supaya
+   lebih ringkas & konsisten dengan referensi desain. */
+.si-icon-edit-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  border: 1px solid var(--si-primary-light);
+  background: var(--si-primary-soft);
+  color: var(--si-primary-dark);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 13px;
+}
+.si-icon-edit-btn:hover {
+  background: var(--si-primary);
+  border-color: var(--si-primary);
+  color: #fff;
+}
+
+.si-btn-ghost {
+  background: transparent;
+  color: var(--si-muted);
+  border-color: var(--si-border);
+}
+.si-btn-ghost:hover {
+  background: var(--si-primary-soft);
+  color: var(--si-primary-dark);
+  border-color: var(--si-primary-light);
+}
+
+.si-btn-sm { padding: 7px 12px; font-size: 12.5px; border-radius: 8px; }
+
+.si-btn-danger-ghost {
+  background: transparent;
+  color: var(--si-danger);
+  border-color: var(--si-danger-soft);
+}
+.si-btn-danger-ghost:hover { background: var(--si-danger-soft); }
+
+.si-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------- Badges / pills ---------- */
+.si-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.si-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+}
+.si-badge-connected { background: var(--si-success-soft); color: var(--si-success); }
+.si-badge-pending   { background: var(--si-warning-soft); color: var(--si-warning); }
+.si-badge-offline   { background: var(--si-danger-soft);  color: var(--si-danger); }
+.si-badge-info      { background: var(--si-info-soft);    color: var(--si-info); }
+.si-badge-neutral   { background: var(--si-primary-soft); color: var(--si-primary-dark); }
+
+/* ---------- Summary stat cards ---------- */
+.si-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 22px;
+}
+.si-stat-card {
+  background: var(--si-surface);
+  border: 1px solid var(--si-border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.si-stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.si-stat-icon-total    { background: var(--si-primary-soft); color: var(--si-primary); }
+.si-stat-icon-connected{ background: var(--si-success-soft); color: var(--si-success); }
+.si-stat-icon-pending  { background: var(--si-warning-soft); color: var(--si-warning); }
+.si-stat-icon-offline  { background: var(--si-danger-soft);  color: var(--si-danger); }
+.si-stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.si-stat-value.si-stat-connected { color: var(--si-success); }
+.si-stat-value.si-stat-pending { color: var(--si-warning); }
+.si-stat-value.si-stat-offline { color: var(--si-danger); }
+.si-stat-label {
+  font-size: 12.5px;
+  color: var(--si-muted);
+  margin-top: 2px;
+}
+
+/* ---------- List toolbar (filter) ---------- */
+.si-list-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.si-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.si-filter-label {
+  font-size: 12.5px;
+  color: var(--si-muted);
+  font-weight: 500;
+}
+.si-filter-select {
+  border: 1px solid var(--si-border);
+  border-radius: 9px;
+  padding: 8px 32px 8px 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--si-ink);
+  background: var(--si-surface) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%237C8B8D' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>") no-repeat right 12px center;
+  appearance: none;
+  cursor: pointer;
+}
+.si-filter-select:focus {
+  outline: none;
+  border-color: var(--si-primary);
+  box-shadow: 0 0 0 3px var(--si-primary-soft);
+}
+
+/* ---------- Pagination ---------- */
+.si-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 26px;
+}
+.si-page-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid var(--si-border);
+  background: var(--si-surface);
+  color: var(--si-muted);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+.si-page-btn:hover:not(:disabled):not(.is-active) {
+  background: var(--si-primary-soft);
+  color: var(--si-primary-dark);
+  border-color: var(--si-primary-light);
+}
+.si-page-btn.is-active {
+  background: var(--si-primary);
+  border-color: var(--si-primary);
+  color: #fff;
+}
+.si-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.si-page-ellipsis {
+  color: var(--si-muted);
+  font-size: 12.5px;
+  padding: 0 4px;
+}
+
+/* ---------- List: system cards ---------- */
+.si-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
+}
+
+.si-sys-card {
+  background: var(--si-surface);
+  border: 1px solid var(--si-border);
+  border-radius: 14px;
+  padding: 18px 18px 16px;
+  cursor: pointer;
+  transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.si-sys-card:hover {
+  box-shadow: 0 8px 24px rgba(15, 106, 113, 0.12);
+  border-color: var(--si-primary-light);
+  transform: translateY(-2px);
+}
+
+.si-sys-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.si-sys-card-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.si-card-delete-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--si-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.5px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.si-card-delete-btn:hover {
+  background: var(--si-danger-soft);
+  color: var(--si-danger);
+  border-color: var(--si-danger-soft);
+}
+
+.si-sys-card-id {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.si-sys-icon {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--si-primary-soft);
+  color: var(--si-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+
+.si-sys-name {
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--si-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.si-sys-sub {
+  font-size: 12.5px;
+  color: var(--si-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.si-sys-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--si-border);
+}
+.si-sys-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+}
+.si-sys-meta-row span:first-child { color: var(--si-muted); }
+.si-sys-meta-row span:last-child { font-weight: 500; text-align: right; }
+
+.si-sys-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--si-primary);
+}
+.si-sys-card:hover .si-sys-card-foot { color: var(--si-primary-dark); }
+
+/* ---------- Empty state ---------- */
+.si-empty {
+  background: var(--si-surface);
+  border: 1px dashed var(--si-border);
+  border-radius: 14px;
+  padding: 60px 24px;
+  text-align: center;
+  color: var(--si-muted);
+}
+.si-empty i {
+  font-size: 30px;
+  color: var(--si-primary-light);
+  margin-bottom: 12px;
+  display: block;
+}
+.si-empty h3 { font-size: 15px; font-weight: 600; color: var(--si-ink); margin-bottom: 4px; }
+.si-empty p { font-size: 13px; }
+
+/* ---------- Detail view ---------- */
+.si-view { display: none; }
+.si-view.is-active { display: block; }
+
+.si-detail-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.si-back-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--si-border);
+  background: var(--si-surface);
+  color: var(--si-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.si-back-btn:hover { background: var(--si-primary-soft); color: var(--si-primary-dark); }
+
+.si-detail-title-wrap { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.si-detail-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.si-detail-title-row h2 { font-size: 21px; font-weight: 700; }
+.si-detail-sub { font-size: 12.5px; color: var(--si-muted); }
+
+/* ---------- Card grid (detail) ---------- */
+.si-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-flow: dense;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.si-cards-grid.si-cols-2 { grid-template-columns: repeat(2, 1fr); }
+
+.si-card {
+  background: var(--si-surface);
+  border: 1px solid var(--si-border);
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  cursor: zoom-in;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+.si-card:hover {
+  box-shadow: 0 10px 26px rgba(15, 106, 113, 0.12);
+  border-color: var(--si-primary);
+}
+.si-card:active { transform: scale(0.997); }
+
+/* Modal Zoom Card */
+.si-modal-lg { max-width: 1040px; }
+.si-zoom-body {
+  cursor: default;
+}
+.si-zoom-body .si-card {
+  border: none;
+  padding: 0;
+  cursor: default;
+  box-shadow: none;
+}
+.si-zoom-body .si-card:hover { box-shadow: none; border-color: transparent; }
+.si-zoom-body .si-card-head { display: none; }
+.si-zoom-body .si-dl-row { padding: 14px 0; font-size: 15px; }
+.si-zoom-body .si-table { font-size: 14.5px; }
+.si-zoom-body .si-chart-wrap { height: 420px; }
+.si-zoom-body .si-gauge { width: 220px; height: 220px; }
+.si-zoom-body .si-gauge-inner b { font-size: 34px; }
+
+.si-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--si-border);
+  flex-wrap: wrap;
+}
+.si-card-head-text .si-card-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--si-muted);
+}
+.si-card-head-text h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.si-dl {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.si-dl-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+}
+.si-dl-row dt { color: var(--si-muted); flex-shrink: 0; }
+.si-dl-row dd {
+  font-weight: 500;
+  text-align: right;
+  color: var(--si-ink);
+  overflow-wrap: anywhere;
+}
+
+.si-device-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.si-device-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: var(--si-page-bg);
+  border: 1px solid var(--si-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--si-primary);
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+/* Chart cards */
+.si-chart-card canvas { width: 100% !important; }
+/* FIX: 150px terlalu pendek buat nampung label sumbu-X yang dirotasi
+   60° (rentang 7 Hari/30 Hari/Custom, titik banyak) -- sebelumnya
+   labelnya kepotong/numpuk di tepi bawah kartu. Ditambah jadi 180px
+   supaya ada ruang vertikal buat teks yang miring. */
+.si-chart-wrap { height: 180px; position: relative; }
+.si-chart-card-head { border-bottom: none; padding-bottom: 0; }
+.si-chart-head-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.si-chart-date-input {
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--si-ink);
+  border: 1px solid var(--si-border);
+  border-radius: 7px;
+  padding: 5px 8px;
+  background: var(--si-surface);
+  margin: 6px 0 2px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.si-chart-daterange {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 2px;
+}
+.si-chart-daterange-field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.si-chart-daterange-field label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--si-muted);
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+.si-chart-daterange-field input[type="date"] {
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--si-ink);
+  border: 1px solid var(--si-border);
+  border-radius: 7px;
+  padding: 5px 6px;
+  background: var(--si-surface);
+  width: 100%;
+  box-sizing: border-box;
+}
+.si-chart-stats {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: 11px;
+  color: var(--si-muted);
+  margin: 6px 0 8px;
+  min-height: 15px;
+}
+.si-chart-period-caption {
+  font-weight: 600;
+  color: var(--si-primary-dark);
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: .03em;
+}
+.si-chart-stats-values b { color: var(--si-ink); font-weight: 700; }
+.si-chart-toggle {
+  display: flex;
+  background: var(--si-page-bg);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+.si-chart-toggle button {
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 5px 7px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--si-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.si-chart-toggle button.is-active {
+  background: var(--si-surface);
+  color: var(--si-primary-dark);
+  box-shadow: 0 1px 4px rgba(15,106,113,0.18);
+}
+.si-chart-period-label {
+  font-size: 10.5px;
+  color: var(--si-muted);
+  margin-top: -4px;
+}
+.si-chart-value {
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.si-chart-value span {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--si-muted);
+  margin-left: 4px;
+}
+
+/* Solar Panel Health gauge */
+.si-health-wrap {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.si-gauge {
+  width: 92px;
+  height: 92px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+.si-gauge-inner {
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  background: var(--si-surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.si-gauge-inner b { font-size: 17px; font-weight: 700; }
+.si-gauge-inner span { font-size: 9px; color: var(--si-muted); }
+.si-health-meta { display: flex; flex-direction: column; gap: 6px; }
+.si-health-meta .si-health-label { font-size: 13px; font-weight: 600; }
+.si-health-meta .si-health-desc { font-size: 12px; color: var(--si-muted); line-height: 1.5; }
+
+/* ---------- Table ---------- */
+.si-table-wrap { overflow-x: auto; }
+.si-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.si-table th {
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--si-muted);
+  padding: 0 10px 10px 0;
+  border-bottom: 1px solid var(--si-border);
+}
+.si-table td {
+  padding: 10px 10px 10px 0;
+  border-bottom: 1px solid var(--si-border);
+  vertical-align: top;
+}
+.si-table tr:last-child td { border-bottom: none; }
+.si-table-empty {
+  text-align: center;
+  color: var(--si-muted);
+  padding: 24px 0;
+}
+
+/* ---------- Section header (Future/Historical Maintenance) ---------- */
+.si-section {
+  margin-top: 26px;
+}
+.si-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.si-section-head h2 {
+  font-size: 17px;
+  font-weight: 600;
+}
+.si-section-head .si-section-count {
+  font-size: 12px;
+  color: var(--si-muted);
+  font-weight: 400;
+  margin-left: 6px;
+}
+
+/* ---------- Future maintenance list ---------- */
+.si-maint-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.si-maint-item {
+  background: var(--si-surface);
+  border: 1px solid var(--si-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.si-maint-item:hover {
+  box-shadow: 0 6px 18px rgba(15, 106, 113, 0.1);
+  border-color: var(--si-primary-light);
+}
+.si-maint-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--si-warning-soft);
+  color: var(--si-warning);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 15px;
+}
+.si-maint-body { flex: 1; min-width: 180px; }
+.si-maint-title { font-size: 13.5px; font-weight: 600; }
+.si-maint-desc { font-size: 12px; color: var(--si-muted); margin-top: 2px; }
+.si-maint-tags { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.si-tag {
+  font-size: 11px;
+  color: var(--si-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.si-tag i { font-size: 10px; color: var(--si-primary); }
+
+.si-priority {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.si-priority-high { background: var(--si-danger-soft); color: var(--si-danger); }
+.si-priority-medium { background: var(--si-warning-soft); color: var(--si-warning); }
+.si-priority-low { background: var(--si-info-soft); color: var(--si-info); }
+
+.si-maint-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: auto; }
+
+/* ---------- Historical maintenance timeline ---------- */
+.si-timeline {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.si-timeline::before {
+  content: "";
+  position: absolute;
+  left: 19px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--si-border);
+}
+.si-timeline-item {
+  position: relative;
+  display: flex;
+  gap: 16px;
+}
+.si-timeline-dot {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--si-success-soft);
+  color: var(--si-success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+  z-index: 1;
+  border: 3px solid var(--si-page-bg);
+}
+.si-timeline-card {
+  flex: 1;
+  min-width: 0;
+  background: var(--si-surface);
+  border: 1px solid var(--si-border);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.si-timeline-card:hover {
+  box-shadow: 0 6px 18px rgba(15, 106, 113, 0.1);
+  border-color: var(--si-primary-light);
+}
+.si-timeline-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.si-timeline-head h4 { font-size: 14px; font-weight: 600; }
+.si-timeline-dates {
+  font-size: 11.5px;
+  color: var(--si-muted);
+  margin-top: 3px;
+}
+.si-timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 20px;
+  margin-top: 12px;
+  font-size: 12.5px;
+}
+.si-timeline-grid div b {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--si-muted);
+  margin-bottom: 3px;
+}
+.si-timeline-notes {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--si-border);
+  font-size: 12.5px;
+  color: var(--si-muted);
+  line-height: 1.6;
+}
+.si-timeline-tech {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--si-muted);
+}
+.si-timeline-tech .si-avatar-sm {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--si-primary-soft);
+  color: var(--si-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+
+/* ============================================================
+   Modal / Wizard
+============================================================= */
+.si-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(37, 52, 63, 0.45);
+  /* Harus lebih tinggi dari z-index header (800) supaya modal tidak
+     tertimpa/kepotong oleh header sticky saat dibuka. */
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.si-modal-overlay.is-open { display: flex; }
+
+.si-modal {
+  background: var(--si-surface);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 880px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(15, 106, 113, 0.25);
+  font-family: 'Poppins', sans-serif;
+  color: var(--si-ink);
+}
+.si-modal-sm { max-width: 640px; }
+
+.si-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 30px;
+  border-bottom: 1px solid var(--si-border);
+  flex-shrink: 0;
+}
+.si-modal-head h2 { font-size: 19px; font-weight: 600; }
+.si-modal-head p { font-size: 12.5px; color: var(--si-muted); margin-top: 4px; }
+.si-modal-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--si-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.si-modal-close:hover { background: var(--si-page-bg); color: var(--si-danger); }
+
+/* Stepper */
+.si-stepper {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px 0;
+  flex-shrink: 0;
+}
+.si-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+.si-step-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1.5px solid var(--si-border);
+  background: var(--si-surface);
+  color: var(--si-muted);
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+.si-step-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--si-muted);
+  white-space: nowrap;
+}
+.si-step-connector {
+  flex: 1;
+  height: 2px;
+  background: var(--si-border);
+  margin: 0 4px;
+}
+.si-step.is-active .si-step-circle {
+  border-color: var(--si-primary);
+  background: var(--si-primary);
+  color: #fff;
+}
+.si-step.is-active .si-step-label { color: var(--si-ink); font-weight: 600; }
+.si-step.is-done .si-step-circle {
+  border-color: var(--si-success);
+  background: var(--si-success);
+  color: #fff;
+}
+.si-step.is-done .si-step-label { color: var(--si-ink); }
+
+.si-modal-body {
+  padding: 26px 30px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.si-step-pane { display: none; flex-direction: column; gap: 26px; }
+.si-step-pane.is-active { display: flex; }
+
+.si-form-group-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--si-primary-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--si-border);
+}
+.si-form-group-title i { font-size: 13px; }
+
+.si-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px 20px;
+}
+.si-form-grid.si-form-grid-1 { grid-template-columns: 1fr; }
+.si-form-grid.si-form-grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+.si-field { display: flex; flex-direction: column; gap: 7px; }
+.si-field.si-span-2 { grid-column: span 2; }
+.si-field.si-span-3 { grid-column: span 3; }
+.si-field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--si-ink);
+}
+.si-field label .si-req { color: var(--si-danger); margin-left: 2px; }
+.si-field input,
+.si-field select,
+.si-field textarea {
+  border: 1px solid var(--si-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13.5px;
+  color: var(--si-ink);
+  background: var(--si-surface);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+}
+.si-field textarea { resize: vertical; min-height: 84px; }
+.si-field input:focus,
+.si-field select:focus,
+.si-field textarea:focus {
+  outline: none;
+  border-color: var(--si-primary);
+  box-shadow: 0 0 0 3px var(--si-primary-soft);
+}
+.si-field input.is-invalid,
+.si-field select.is-invalid {
+  border-color: var(--si-danger);
+  box-shadow: 0 0 0 3px var(--si-danger-soft);
+}
+.si-field-error {
+  font-size: 11.5px;
+  color: var(--si-danger);
+  display: none;
+}
+.si-field.has-error .si-field-error { display: block; }
+
+.si-field-hint {
+  font-size: 11.5px;
+  color: var(--si-muted);
+  line-height: 1.5;
+}
+
+.si-field input[readonly] {
+  background: var(--si-page-bg);
+  color: var(--si-muted);
+  cursor: not-allowed;
+}
+
+
+.si-conditional-field { display: none; margin-top: 8px; }
+.si-conditional-field.is-visible { display: block; }
+
+/* ---------- Priority pill selector ---------- */
+.si-priority-select {
+  display: flex;
+  gap: 8px;
+}
+.si-priority-opt {
+  flex: 1;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 9px 10px;
+  border-radius: 9px;
+  border: 1.5px solid var(--si-border);
+  background: var(--si-surface);
+  color: var(--si-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.si-priority-opt-low.is-selected { background: var(--si-info-soft); border-color: var(--si-info); color: var(--si-info); }
+.si-priority-opt-medium.is-selected { background: var(--si-warning-soft); border-color: var(--si-warning); color: var(--si-warning); }
+.si-priority-opt-high.is-selected { background: var(--si-danger-soft); border-color: var(--si-danger); color: var(--si-danger); }
+
+.si-maint-entry {
+  border: 1px solid var(--si-border);
+  border-radius: 12px;
+  padding: 16px;
+  position: relative;
+  background: var(--si-page-bg);
+}
+.si-maint-entry-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.si-maint-entry-head span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--si-primary-dark);
+}
+.si-maint-remove {
+  border: none;
+  background: transparent;
+  color: var(--si-muted);
+  cursor: pointer;
+  font-size: 13px;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.si-maint-remove:hover { background: var(--si-danger-soft); color: var(--si-danger); }
+
+.si-maint-entries { display: flex; flex-direction: column; gap: 14px; }
+
+.si-add-maint-btn {
+  align-self: flex-start;
+}
+
+.si-modal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-top: 1px solid var(--si-border);
+  flex-shrink: 0;
+  gap: 10px;
+}
+.si-modal-foot-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+
+/* ---------- Maintenance detail modal ---------- */
+.si-detail-modal-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.si-maint-icon-lg {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  font-size: 18px;
+}
+.si-maint-icon-done {
+  background: var(--si-success-soft);
+  color: var(--si-success);
+}
+.si-detail-modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+.si-detail-modal-dl {
+  padding: 14px 0;
+  border-top: 1px solid var(--si-border);
+  border-bottom: 1px solid var(--si-border);
+  margin-bottom: 16px;
+}
+.si-detail-modal-block { margin-bottom: 16px; }
+.si-detail-modal-block:last-child { margin-bottom: 0; }
+.si-detail-modal-block b {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--si-muted);
+  margin-bottom: 5px;
+}
+.si-detail-modal-block p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--si-ink);
+}
+
+.si-empty-inline {
+  font-size: 12.5px;
+  color: var(--si-muted);
+  text-align: center;
+  padding: 18px 0;
+  border: 1px dashed var(--si-border);
+  border-radius: 10px;
+}
+
+/* ---------- Legacy hidden (Future/Historical Maintenance) ----------
+   Markup dipertahankan supaya js/system-information.js tetap berjalan
+   tanpa error, tapi tidak lagi ditampilkan — sudah pindah ke tab
+   "Task Management" pada Project Monitoring. */
+.si-legacy-hidden {
+  display: none !important;
+}
+
+/* ---------- Need Maintenance banner ---------- */
+.si-need-maint-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, var(--si-primary-soft), #fff);
+  border: 1px solid var(--si-border);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+.si-need-maint-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--si-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.si-need-maint-text {
+  flex: 1;
+  min-width: 220px;
+}
+.si-need-maint-text h3 {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--si-ink);
+  margin-bottom: 3px;
+}
+.si-need-maint-text p {
+  font-size: 12.5px;
+  color: var(--si-muted);
+  line-height: 1.5;
+}
+.si-need-maint-banner .si-btn {
+  flex-shrink: 0;
+}
+
+/* Toast */
+.si-toast {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  background: var(--si-ink);
+  color: #fff;
+  padding: 13px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  z-index: 1000;
+  transform: translateY(20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s ease;
+}
+.si-toast.is-show { transform: translateY(0); opacity: 1; }
+.si-toast i { color: var(--si-success); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1180px) {
+  .si-cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 720px) {
+  .si-cards-grid,
+  .si-cards-grid.si-cols-2 { grid-template-columns: 1fr; }
+  .si-form-grid { grid-template-columns: 1fr; }
+  .si-field.si-span-2 { grid-column: span 1; }
+  .si-modal { max-height: 92vh; }
+  .si-step-label { display: none; }
+  .si-maint-actions { margin-left: 0; width: 100%; justify-content: flex-end; }
+  /* .si-stats-row dipakai apa adanya (3 kolom tetap) oleh System Information
+     & Task Management. Di layar sempit, 3 kartu dalam grid tetap (1fr each)
+     tidak bisa menyusut di bawah lebar konten (icon + angka + label), jadi
+     kolom ke-3 terdorong keluar viewport dan disembunyikan oleh
+     overflow-x:hidden milik .edash-content — bukan overflow yang kelihatan,
+     tapi kartu jadi tidak bisa diakses sama sekali. Turunkan ke 2 kolom di
+     sini, mengikuti pola yang sudah dipakai .tkm-stats-row (Task
+     Maintenance) di task-maintenance.css. */
+  .si-stats-row { grid-template-columns: repeat(2, 1fr); }
+  .si-toast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    max-width: none;
+  }
+}
+@media (max-width: 480px) {
+  .si-modal-overlay { padding: 12px; }
+  .si-stats-row { grid-template-columns: 1fr; }
+  .si-need-maint-banner { flex-direction: column; align-items: flex-start; }
+  .si-need-maint-banner .si-btn { width: 100%; justify-content: center; }
+}
+
+/* Drag & drop reorder kartu (lihat siMakeCardsSortable di
+   system-information.js). Cursor grab di card, opacity turun pas
+   ke-drag, garis indikator di atas/bawah kartu target drop. */
+.si-card-draggable {
+  cursor: grab;
+}
+.si-card-draggable:active {
+  cursor: grabbing;
+}
+.si-card-dragging {
+  opacity: 0.45;
+}
+.si-card-drop-before {
+  box-shadow: inset 0 3px 0 0 var(--si-primary);
+}
+.si-card-drop-after {
+  box-shadow: inset 0 -3px 0 0 var(--si-primary);
+}
+
+/* Indikator "Memuat grafik..." selagi history di-lazy-load (lihat
+   chartLoadingSetVisible di system-information.js). */
+.si-chart-wrap.si-chart-loading::after {
+  content: "Memuat grafik...";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--si-text-muted, #8a9a9c);
+  background: var(--si-surface);
+  opacity: 0.85;
+  border-radius: 8px;
+}

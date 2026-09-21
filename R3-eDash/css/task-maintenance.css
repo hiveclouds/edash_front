@@ -1,0 +1,316 @@
+/* ============================================================
+   Page: Task Maintenance — 360eDash
+   Reuse token & komponen dari css/system-information.css (--si-*,
+   .si-btn, .si-modal-*, .si-badge, dst.) dan css/task-management.css
+   (.tm-subtabs, .tm-photo-upload, .tm-lightbox-*) supaya menyatu
+   dengan Project Monitoring > Task Management. File ini hanya
+   menambahkan elemen yang belum ada: kartu task, progress bar,
+   status pill, dan modal kecil (accept/progress/submit).
+============================================================= */
+
+/* ---------- Stats row: 4 kolom (Total / Pending / Sedang Dikerjakan / Selesai) ---------- */
+.tkm-stats-row {
+  grid-template-columns: repeat(4, 1fr);
+}
+.si-stat-icon-accepted { background: var(--si-info-soft); color: var(--si-info); }
+.si-stat-value.si-stat-accepted { color: var(--si-info); }
+
+/* ---------- Tab count badge ---------- */
+.tkm-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--si-page-bg);
+  color: var(--si-muted);
+  font-size: 10.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-left: 2px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.tm-subtab.is-active .tkm-tab-count {
+  background: var(--si-primary);
+  color: #fff;
+}
+
+/* ---------- Status pill (extends .si-badge) ---------- */
+.tkm-status-pending   { background: var(--si-warning-soft); color: var(--si-warning); }
+.tkm-status-accepted  { background: var(--si-info-soft);    color: var(--si-info); }
+.tkm-status-completed { background: var(--si-success-soft); color: var(--si-success); }
+
+/* ---------- Task list & card ---------- */
+.tkm-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tkm-task-card {
+  background: var(--si-surface);
+  border: 1px solid var(--si-border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  transition: box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.tkm-task-card:hover {
+  box-shadow: 0 8px 24px rgba(15, 106, 113, 0.1);
+  border-color: var(--si-primary-light);
+}
+
+.tkm-task-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.tkm-task-card-head-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  min-width: 0;
+}
+
+.tkm-task-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  background: var(--si-warning-soft);
+  color: var(--si-warning);
+}
+.tkm-task-icon-high   { background: var(--si-danger-soft);  color: var(--si-danger); }
+.tkm-task-icon-medium { background: var(--si-warning-soft); color: var(--si-warning); }
+.tkm-task-icon-low    { background: var(--si-info-soft);    color: var(--si-info); }
+
+.tkm-task-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--si-ink);
+  line-height: 1.4;
+}
+
+.tkm-task-desc {
+  font-size: 12.5px;
+  color: var(--si-muted);
+  line-height: 1.6;
+  margin-top: 12px;
+}
+
+/* ---------- Progress bar ---------- */
+.tkm-progress-wrap { margin-top: 14px; }
+.tkm-progress-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11.5px;
+  color: var(--si-muted);
+  margin-bottom: 7px;
+}
+.tkm-progress-label span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tkm-progress-label span:last-child {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--si-ink);
+  font-variant-numeric: tabular-nums;
+}
+.tkm-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--si-page-bg);
+  border: 1px solid var(--si-border);
+  overflow: hidden;
+}
+.tkm-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--si-primary-light), var(--si-primary));
+  transition: width 0.3s ease;
+}
+
+/* ---------- Card footer ---------- */
+.tkm-task-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--si-border);
+}
+.tkm-task-card-foot-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+.tkm-completed-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--si-success);
+  margin-left: auto;
+}
+
+/* ---------- Confirm / small info box (Accept, Progress, Submit modals) ---------- */
+.si-modal-xs { max-width: 460px; }
+
+.tkm-confirm-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--si-page-bg);
+  border: 1px solid var(--si-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.tkm-confirm-box-sm { margin-bottom: 18px; }
+.tkm-confirm-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: var(--si-primary-soft);
+  color: var(--si-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.tkm-confirm-title { font-size: 13.5px; font-weight: 600; color: var(--si-ink); }
+.tkm-confirm-sub { font-size: 12px; color: var(--si-muted); margin-top: 2px; }
+.tkm-confirm-note {
+  font-size: 12.5px;
+  color: var(--si-muted);
+  line-height: 1.6;
+}
+.tkm-confirm-note b { color: var(--si-ink); font-weight: 600; }
+
+/* ---------- Progress range input ---------- */
+.tkm-range-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.tkm-range-row input[type="range"] {
+  flex: 1;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--si-border);
+  outline: none;
+  cursor: pointer;
+}
+.tkm-range-row input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--si-primary);
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 1px var(--si-primary);
+  cursor: pointer;
+}
+.tkm-range-row input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--si-primary);
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 1px var(--si-primary);
+  cursor: pointer;
+}
+.tkm-range-readout {
+  flex-shrink: 0;
+  min-width: 46px;
+  text-align: right;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--si-primary-dark);
+  font-variant-numeric: tabular-nums;
+}
+
+.tkm-quick-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.tkm-quick-btn {
+  flex: 1;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 6px;
+  border-radius: 8px;
+  border: 1.5px solid var(--si-border);
+  background: var(--si-surface);
+  color: var(--si-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.tkm-quick-btn:hover,
+.tkm-quick-btn.is-selected {
+  background: var(--si-primary-soft);
+  border-color: var(--si-primary);
+  color: var(--si-primary-dark);
+}
+
+/* ---------- Submit info banner ---------- */
+.tkm-submit-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--si-info-soft);
+  color: var(--si-primary-dark);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 4px;
+}
+.tkm-submit-info i { color: var(--si-info); font-size: 14px; margin-top: 1px; flex-shrink: 0; }
+.tkm-submit-info b { font-weight: 700; }
+
+/* ---------- Notification-focus highlight ----------
+   Applied briefly to a task card when the user arrives here from the
+   header notification bell ("Tugas Diterima" / "Progress Diperbarui"),
+   sama pola dengan .tm-flash-highlight di css/task-management.css. */
+.tkm-task-card.tm-flash-highlight {
+  animation: tmEntryFlash 2.4s ease;
+}
+@keyframes tmEntryFlash {
+  0%   { background: var(--si-primary-soft, #e4f1f1); box-shadow: inset 3px 0 0 var(--si-primary, #0f6a71); }
+  70%  { background: var(--si-primary-soft, #e4f1f1); box-shadow: inset 3px 0 0 var(--si-primary, #0f6a71); }
+  100% { background: transparent; box-shadow: inset 3px 0 0 transparent; }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 980px) {
+  .tkm-stats-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 720px) {
+  .tkm-stats-row { grid-template-columns: 1fr; }
+  .tkm-task-card-foot { flex-direction: column; align-items: stretch; }
+  .tkm-task-card-foot-actions { margin-left: 0; width: 100%; }
+  .tkm-task-card-foot-actions .si-btn { flex: 1; justify-content: center; }
+  .tkm-completed-date { margin-left: 0; }
+}

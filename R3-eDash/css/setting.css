@@ -1,0 +1,1272 @@
+/* ============================================================
+   Page: Settings — 360eDash
+   Design tokens match master/sidebar, master/header and
+   css/project-selector.css (Poppins, teal primary, 8px spacing,
+   12–16px card radius, 9–10px control radius).
+============================================================= */
+
+.st-page {
+  --st-primary: #0f6a71;
+  --st-primary-dark: #0b4f54;
+  --st-primary-light: #6DC3BB;
+  --st-primary-soft: #e4f1f1;
+  --st-accent: #FA891A;
+  --st-success: #2F9E6E;
+  --st-success-soft: #E4F5EC;
+  --st-warning: #E3A21A;
+  --st-warning-soft: #FBF1DE;
+  --st-danger: #D64545;
+  --st-danger-soft: #FBE8E8;
+  --st-info: #3E7CB1;
+  --st-info-soft: #E7F0F8;
+  --st-ink: #25343F;
+  --st-muted: #7c8b8d;
+  --st-border: #e7edee;
+  --st-surface: #ffffff;
+  --st-page-bg: #f4f7f7;
+
+  max-width: 1080px;
+  margin: 0 auto;
+  font-family: 'Poppins', sans-serif;
+  color: var(--st-ink);
+}
+
+.st-page * {
+  box-sizing: border-box;
+}
+
+/* ---------- Page head ---------- */
+.st-head {
+  margin-bottom: 18px;
+}
+
+.st-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* ---------- Layout: sticky settings tabs + stacked content ---------- */
+.st-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+  overflow: visible;
+}
+
+/* The tab bar used to stick to the top of the scrolling content area
+   so it stayed in view, but that made it float over the page content
+   (covering rows/text underneath) as soon as you scrolled down. It now
+   just sits in normal page flow, right under the "Settings" heading,
+   and scrolls away with the rest of the content like everything else. */
+.st-tabs {
+  position: static;
+  display: grid;
+  /* --st-tab-count is set by stRoleAccessSetup() in js/setting.js:
+     4 tabs normally, 5 when the admin-only Role Access tab is added
+     for an "admin360" session. */
+  grid-template-columns: repeat(var(--st-tab-count, 4), minmax(0, 1fr));
+  align-items: stretch;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  padding: 6px;
+  background: var(--st-surface);
+  border: 1px solid var(--st-border);
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(20, 60, 65, 0.04);
+  overflow: hidden;
+}
+
+.st-tab {
+  min-width: 0;
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--st-muted);
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+  transition: background 0.22s ease, border-color 0.22s ease, color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+}
+
+.st-tab-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--st-page-bg);
+  color: var(--st-muted);
+  font-size: 11px;
+  flex: 0 0 auto;
+  transition: background 0.22s ease, color 0.22s ease, transform 0.22s ease;
+}
+
+.st-tab:hover {
+  background: var(--st-page-bg);
+  color: var(--st-primary-dark);
+}
+
+.st-tab:hover .st-tab-icon {
+  color: var(--st-primary);
+  transform: translateY(-1px) scale(1.03);
+}
+
+.st-tab.is-active {
+  background: var(--st-primary-soft);
+  border-color: rgba(15, 106, 113, 0.18);
+  color: var(--st-primary-dark);
+  font-weight: 600;
+  box-shadow: 0 2px 7px rgba(15, 106, 113, 0.08);
+}
+
+.st-tab.is-active .st-tab-icon {
+  background: var(--st-primary);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+/*
+ * Settings content is a normal vertical stack. Clicking a tab shows
+ * only that panel (see stTabSwitcher() in js/setting.js) — there's
+ * no horizontal swipe/drag between sections any more.
+ */
+.st-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+}
+
+.st-panel {
+  display: none;
+}
+
+.st-panel.is-active-panel {
+  display: block;
+  animation: stPanelFadeIn 180ms ease;
+}
+
+@keyframes stPanelFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-panel.is-active-panel {
+    animation: none;
+  }
+}
+
+@media (max-width: 680px) {
+  .st-tabs {
+    gap: 3px;
+    padding: 5px;
+  }
+
+  .st-tab {
+    min-height: 44px;
+    padding-inline: 8px;
+    gap: 6px;
+    font-size: 11px;
+  }
+
+  .st-tab-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Keep the 4-column layout intact (same look as desktop) but let a
+     long label truncate with an ellipsis instead of being hard-clipped
+     mid-word by .st-tabs' overflow:hidden on very narrow phones. */
+  .st-tab span:not(.st-tab-icon) {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 380px) {
+  .st-tab {
+    padding-inline: 4px;
+    font-size: 10px;
+  }
+}
+
+/* ---------- Card ---------- */
+.st-card {
+  background: var(--st-surface);
+  border: 1px solid var(--st-border);
+  border-radius: 14px;
+  padding: 18px;
+  scroll-margin-top: 12px;
+}
+
+.st-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--st-border);
+}
+
+.st-card-head h2 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.st-card-head p {
+  font-size: 12px;
+  color: var(--st-muted);
+  line-height: 1.5;
+  max-width: 480px;
+}
+
+.st-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.st-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--st-muted);
+  line-height: 1.5;
+}
+.st-hint i {
+  color: var(--st-info);
+  font-size: 12px;
+  margin-top: 1.5px;
+}
+
+.st-caption {
+  font-size: 11.5px;
+  color: var(--st-muted);
+}
+
+/* ---------- Pills ---------- */
+.st-pill {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.st-pill-soon {
+  background: var(--st-warning-soft);
+  color: var(--st-warning);
+}
+
+/* ============================================================
+   1. Appearance — theme option cards
+============================================================= */
+.st-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.st-theme-option {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  background: var(--st-surface);
+  border: 1.5px solid var(--st-border);
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+.st-theme-option:hover {
+  border-color: var(--st-primary-light);
+  transform: translateY(-1px);
+}
+.st-theme-option.is-selected {
+  border-color: var(--st-primary);
+  background: var(--st-primary-soft);
+}
+.st-theme-option.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.st-theme-option.is-disabled:hover {
+  border-color: var(--st-border);
+  transform: none;
+}
+
+.st-theme-preview {
+  position: relative;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--st-border);
+  display: flex;
+}
+
+.st-theme-preview-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+}
+.st-theme-preview-side {
+  width: 22%;
+  height: 100%;
+}
+.st-theme-preview-card {
+  position: absolute;
+  top: 17px;
+  left: 30%;
+  width: 30%;
+  height: 16px;
+  border-radius: 4px;
+}
+.st-theme-preview-card-sm {
+  top: 37px;
+  width: 20%;
+}
+
+.st-theme-preview-light {
+  background: #eef3f3;
+}
+.st-theme-preview-light .st-theme-preview-bar { background: var(--st-primary); }
+.st-theme-preview-light .st-theme-preview-side { background: #ffffff; }
+.st-theme-preview-light .st-theme-preview-card { background: #ffffff; box-shadow: 0 1px 3px rgba(15,106,113,0.12); }
+
+.st-theme-preview-dark {
+  background: #1c2b30;
+}
+.st-theme-preview-dark .st-theme-preview-bar { background: #0b4f54; }
+.st-theme-preview-dark .st-theme-preview-side { background: #16232a; }
+.st-theme-preview-dark .st-theme-preview-card { background: #263a41; }
+
+.st-theme-preview-system {
+  background: linear-gradient(90deg, #eef3f3 50%, #1c2b30 50%);
+}
+.st-theme-preview-system .st-theme-preview-bar { background: linear-gradient(90deg, var(--st-primary) 50%, #0b4f54 50%); }
+.st-theme-preview-system .st-theme-preview-side { background: linear-gradient(180deg, #ffffff 0%, #16232a 100%); }
+.st-theme-preview-system .st-theme-preview-card { background: #ffffff; }
+
+.st-theme-option-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 2px;
+}
+
+.st-theme-radio {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--st-border);
+  background: var(--st-surface);
+  position: relative;
+  transition: border-color 0.15s ease;
+}
+.st-theme-radio::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--st-primary);
+  transform: scale(0);
+  transition: transform 0.15s ease;
+}
+.st-theme-option.is-selected .st-theme-radio {
+  border-color: var(--st-primary);
+}
+.st-theme-option.is-selected .st-theme-radio::after {
+  transform: scale(1);
+}
+
+.st-theme-option-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--st-ink);
+}
+
+/* ============================================================
+   2. Language — custom select
+============================================================= */
+.st-field-inline {
+  max-width: 360px;
+}
+
+.st-select-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.st-select-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 13px;
+  color: var(--st-primary);
+  pointer-events: none;
+}
+
+.st-select-caret {
+  position: absolute;
+  right: 14px;
+  font-size: 11px;
+  color: var(--st-muted);
+  pointer-events: none;
+}
+
+.st-select {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--st-ink);
+  background: var(--st-page-bg);
+  border: 1.5px solid var(--st-border);
+  border-radius: 9px;
+  padding: 9px 36px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.st-select:hover {
+  border-color: var(--st-primary-light);
+}
+.st-select:focus {
+  outline: none;
+  border-color: var(--st-primary);
+  box-shadow: 0 0 0 3px var(--st-primary-soft);
+}
+
+/* ============================================================
+   Shared form controls (Profile / Account)
+============================================================= */
+.st-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.st-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.st-field-full {
+  grid-column: 1 / -1;
+}
+
+.st-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--st-ink);
+}
+
+.st-field input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--st-ink);
+  background: var(--st-page-bg);
+  border: 1.5px solid var(--st-border);
+  border-radius: 9px;
+  padding: 9px 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.st-field input::placeholder {
+  color: #b6c2c3;
+}
+.st-field input:hover {
+  border-color: var(--st-primary-light);
+}
+.st-field input:focus {
+  outline: none;
+  border-color: var(--st-primary);
+  box-shadow: 0 0 0 3px var(--st-primary-soft);
+}
+
+.st-field input:disabled {
+  background: var(--st-border);
+  color: var(--st-muted);
+  cursor: not-allowed;
+}
+
+/* Validation states */
+.st-field.is-invalid input {
+  border-color: var(--st-danger);
+  background: var(--st-danger-soft);
+}
+.st-field.is-invalid input:focus {
+  box-shadow: 0 0 0 3px var(--st-danger-soft);
+}
+.st-field.is-valid input {
+  border-color: var(--st-success);
+}
+
+.st-error-msg {
+  display: none;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--st-danger);
+}
+.st-field.is-invalid .st-error-msg {
+  display: block;
+}
+
+/* ---------- Photo row ---------- */
+.st-photo-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.st-avatar {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--st-primary-dark), var(--st-primary-light));
+  color: #fff;
+  font-size: 21px;
+}
+.st-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.st-photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.st-photo-actions .st-caption {
+  flex-basis: 100%;
+}
+
+/* ---------- Password field with show/hide ---------- */
+.st-password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.st-password-wrap input {
+  padding-right: 42px;
+}
+
+.st-password-toggle {
+  position: absolute;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  border-radius: 7px;
+  color: var(--st-muted);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.st-password-toggle:hover {
+  background: var(--st-primary-soft);
+  color: var(--st-primary-dark);
+}
+
+/* ---------- Password strength ---------- */
+.st-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.st-strength-bar {
+  flex: 1;
+  max-width: 220px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--st-border);
+  overflow: hidden;
+}
+.st-strength-bar i {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: var(--st-danger);
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+.st-strength-label {
+  font-size: 11.5px;
+  color: var(--st-muted);
+}
+
+/* ============================================================
+   Buttons
+============================================================= */
+.st-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 2px;
+  padding-top: 12px;
+  border-top: 1px solid var(--st-border);
+}
+
+.st-save-state {
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--st-success);
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.st-save-state.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.st-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 9px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+.st-btn i {
+  font-size: 12px;
+}
+
+.st-btn-primary {
+  background: var(--st-primary);
+  color: #fff;
+}
+.st-btn-primary:hover:not(:disabled) {
+  background: var(--st-primary-dark);
+}
+.st-btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.st-btn-primary:disabled {
+  background: var(--st-border);
+  color: var(--st-muted);
+  cursor: not-allowed;
+}
+
+.st-btn-secondary {
+  background: var(--st-surface);
+  color: var(--st-ink);
+  border-color: var(--st-border);
+}
+.st-btn-secondary:hover {
+  background: var(--st-primary-soft);
+  border-color: var(--st-primary-soft);
+  color: var(--st-primary-dark);
+}
+
+.st-btn-ghost {
+  background: transparent;
+  color: var(--st-danger);
+  border-color: transparent;
+}
+.st-btn-ghost:hover {
+  background: var(--st-danger-soft);
+}
+
+.st-btn-danger {
+  background: var(--st-danger);
+  color: #fff;
+}
+.st-btn-danger:hover:not(:disabled) {
+  background: #b93a3a;
+}
+.st-btn-danger:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.st-btn-danger:disabled {
+  background: var(--st-border);
+  color: var(--st-muted);
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   Toast
+============================================================= */
+.st-toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* .st-toast is a sibling of .st-page (see setting.html), not a
+     descendant, so it can't see the --st-* variables defined on
+     .st-page. Without a fallback, var(--st-ink) resolves to nothing
+     in light mode — background stays transparent and the white text
+     becomes unreadable. Dark mode only "worked" by accident because
+     the page behind it is already dark. Fallbacks fix both. */
+  background: var(--st-ink, #25343f);
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 12px 18px;
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(15, 106, 113, 0.25);
+  transform: translateY(16px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.st-toast i {
+  color: var(--st-success, #2f9e6e);
+  font-size: 15px;
+}
+.st-toast.is-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ============================================================
+   Responsive
+============================================================= */
+@media (max-width: 860px) {
+  .st-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .st-theme-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .st-card {
+    padding: 14px;
+  }
+  .st-card-head {
+    flex-direction: column;
+  }
+  .st-card-actions {
+    flex-wrap: wrap;
+  }
+  .st-save-state {
+    margin-right: 0;
+    flex-basis: 100%;
+  }
+}
+
+
+/* ============================================================
+   Dark mode — Settings
+   Theme is controlled by [data-theme="dark"] on <html>.
+============================================================= */
+html[data-theme="dark"] .st-page {
+  --st-primary: #21a7ae;
+  --st-primary-dark: #16868d;
+  --st-primary-light: #69c8c2;
+  --st-primary-soft: rgba(33, 167, 174, 0.16);
+  --st-accent: #f5a044;
+  --st-success: #4fbd8a;
+  --st-success-soft: rgba(79, 189, 138, 0.14);
+  --st-warning: #e8b34a;
+  --st-warning-soft: rgba(232, 179, 74, 0.14);
+  --st-danger: #ef6b6b;
+  --st-danger-soft: rgba(239, 107, 107, 0.14);
+  --st-info: #69a8d6;
+  --st-info-soft: rgba(105, 168, 214, 0.14);
+  --st-ink: #e7eff0;
+  --st-muted: #9ab0b4;
+  --st-border: #2a3d42;
+  --st-surface: #18272c;
+  --st-page-bg: #101b1f;
+}
+
+html[data-theme="dark"] .st-tabs {
+  background: #18272c;
+  border-color: #2a3d42;
+  box-shadow: 0 3px 14px rgba(0,0,0,.18);
+}
+html[data-theme="dark"] .st-tab {
+  color: #9ab0b4;
+}
+html[data-theme="dark"] .st-tab-icon {
+  background: #22353a;
+  color: #9ab0b4;
+}
+html[data-theme="dark"] .st-tab:hover {
+  background: rgba(33,167,174,.12);
+  color: #d8e8ea;
+}
+html[data-theme="dark"] .st-tab.is-active {
+  background: #167d84;
+  border-color: #167d84;
+  color: #fff;
+}
+html[data-theme="dark"] .st-card {
+  box-shadow: 0 2px 12px rgba(0,0,0,.12);
+}
+html[data-theme="dark"] .st-field input,
+html[data-theme="dark"] .st-select {
+  color: var(--st-ink);
+}
+html[data-theme="dark"] .st-field input::placeholder {
+  color: #71898e;
+}
+html[data-theme="dark"] .st-theme-preview-system {
+  background: linear-gradient(90deg, #e9eeee 50%, #16252a 50%);
+}
+
+/* ============================================================
+   5. Role Access (Admin 360 only) — permission matrix table
+============================================================= */
+.st-ra-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--st-border);
+  border-radius: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.st-ra-table {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse;
+  font-family: inherit;
+}
+
+.st-ra-table thead th {
+  background: var(--st-page-bg);
+  padding: 10px 12px;
+  text-align: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--st-border);
+  white-space: nowrap;
+}
+
+.st-ra-cap-col-head {
+  text-align: left;
+  min-width: 230px;
+  color: var(--st-muted);
+}
+
+.st-ra-role-head {
+  min-width: 110px;
+}
+
+.st-ra-role-head {
+  display: table-cell;
+}
+
+.st-ra-role-name {
+  vertical-align: middle;
+}
+
+.st-ra-edit-role {
+  margin-left: 6px;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  opacity: 0.55;
+  cursor: pointer;
+  font-size: 9.5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.st-ra-edit-role:hover {
+  opacity: 1;
+  background: rgba(15, 106, 113, 0.1);
+}
+
+.st-ra-accent-primary { color: var(--st-primary); border-bottom-color: var(--st-primary) !important; }
+.st-ra-accent-accent   { color: var(--st-accent);  border-bottom-color: var(--st-accent) !important; }
+.st-ra-accent-info     { color: var(--st-info);    border-bottom-color: var(--st-info) !important; }
+.st-ra-accent-danger   { color: var(--st-danger);  border-bottom-color: var(--st-danger) !important; }
+.st-ra-accent-warning  { color: var(--st-warning); border-bottom-color: var(--st-warning) !important; }
+.st-ra-accent-muted    { color: var(--st-muted);   border-bottom-color: var(--st-muted) !important; }
+.st-ra-accent-success  { color: var(--st-success); border-bottom-color: var(--st-success) !important; }
+
+.st-ra-table tbody tr {
+  border-bottom: 1px solid var(--st-border);
+}
+.st-ra-table tbody tr:last-child {
+  border-bottom: none;
+}
+.st-ra-table tbody tr:hover {
+  background: var(--st-page-bg);
+}
+
+.st-ra-cap-head {
+  text-align: left;
+  padding: 12px;
+  min-width: 230px;
+  vertical-align: middle;
+}
+
+.st-ra-cap-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--st-ink);
+}
+
+.st-ra-cap-desc {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--st-muted);
+  line-height: 1.4;
+}
+
+.st-ra-cap-code {
+  display: inline-block;
+  margin-top: 5px;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 10px;
+  color: var(--st-primary-dark);
+  background: var(--st-primary-soft);
+  padding: 1px 6px;
+  border-radius: 5px;
+}
+
+.st-ra-cell {
+  text-align: center;
+  padding: 10px 12px;
+}
+
+/* ---------- Toggle switch ---------- */
+.st-ra-switch {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+}
+.st-ra-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+.st-ra-track {
+  width: 34px;
+  height: 19px;
+  border-radius: 999px;
+  background: var(--st-border);
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  transition: background 0.15s ease;
+}
+.st-ra-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease;
+}
+.st-ra-switch input:checked + .st-ra-track {
+  background: var(--st-primary);
+}
+.st-ra-switch input:checked + .st-ra-track .st-ra-thumb {
+  transform: translateX(15px);
+}
+.st-ra-switch input:focus-visible + .st-ra-track {
+  outline: 2px solid var(--st-primary);
+  outline-offset: 2px;
+}
+.st-ra-switch input:disabled + .st-ra-track {
+  opacity: 0.55;
+}
+.st-ra-switch input:disabled {
+  cursor: not-allowed;
+}
+.st-ra-switch input:disabled ~ .st-ra-track {
+  cursor: not-allowed;
+}
+
+@media (max-width: 560px) {
+  .st-ra-table thead th,
+  .st-ra-cap-head,
+  .st-ra-cell {
+    padding: 8px 9px;
+  }
+}
+
+/* ---------- Dark mode ---------- */
+html[data-theme="dark"] .st-ra-table thead th {
+  background: #101b1f;
+}
+html[data-theme="dark"] .st-ra-cap-code {
+  background: rgba(33, 167, 174, 0.16);
+  color: #69c8c2;
+}
+html[data-theme="dark"] .st-ra-thumb {
+  background: #eef3f3;
+}
+
+/* ---------- Role Access card-head actions ---------- */
+.st-ra-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 560px) {
+  .st-ra-head-actions {
+    width: 100%;
+  }
+  .st-ra-head-actions .st-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* ============================================================
+   Add Role / Delete Role modals
+============================================================= */
+.st-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+
+  background: rgba(18, 30, 34, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+}
+
+.st-modal-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s ease, visibility 0s linear 0s;
+}
+
+.st-modal-overlay * {
+  box-sizing: border-box;
+}
+
+.st-modal {
+  width: 100%;
+  max-width: 420px;
+  background: var(--st-surface, #fff);
+  border-radius: 18px;
+  padding: 26px 26px 22px;
+  box-shadow: 0 24px 60px rgba(15, 106, 113, 0.28);
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+  color: var(--st-ink, #25343f);
+
+  transform: translateY(10px) scale(0.96);
+  opacity: 0;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+}
+
+.st-modal-overlay.is-open .st-modal {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.st-modal-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  font-size: 20px;
+}
+.st-modal-icon-primary {
+  background: var(--st-primary-soft, #e4f1f1);
+  color: var(--st-primary, #0f6a71);
+}
+.st-modal-icon-danger {
+  background: var(--st-danger-soft, #fbe8e8);
+  color: var(--st-danger, #d64545);
+}
+
+.st-modal-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.st-modal-desc {
+  font-size: 12.5px;
+  color: var(--st-muted, #7c8b8d);
+  line-height: 1.5;
+  max-width: 320px;
+  margin: 0 auto 18px;
+}
+
+.st-modal-field {
+  text-align: left;
+  margin-bottom: 14px;
+}
+.st-modal-field label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--st-muted, #7c8b8d);
+  margin-bottom: 6px;
+}
+.st-modal-field input,
+.st-modal-field select {
+  width: 100%;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--st-ink, #25343f);
+  background: var(--st-surface, #fff);
+  border: 1.5px solid var(--st-border, #e7edee);
+  border-radius: 9px;
+  padding: 9px 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.st-modal-field input:focus,
+.st-modal-field select:focus {
+  outline: none;
+  border-color: var(--st-primary, #0f6a71);
+  box-shadow: 0 0 0 3px var(--st-primary-soft, #e4f1f1);
+}
+
+.st-modal-error {
+  display: none;
+  margin-top: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--st-danger, #d64545);
+}
+.st-color-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.st-color-picker input[type="color"] {
+  width: 40px;
+  height: 36px;
+  padding: 3px;
+  cursor: pointer;
+}
+.st-color-picker-value {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 12px;
+  color: var(--st-muted, #7c8b8d);
+  text-transform: uppercase;
+}
+
+.st-modal-field.is-invalid input {
+  border-color: var(--st-danger, #d64545);
+  background: var(--st-danger-soft, #fbe8e8);
+}
+.st-modal-field.is-invalid .st-modal-error {
+  display: block;
+}
+
+.st-modal-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  text-align: left;
+  font-size: 11.5px;
+  color: var(--st-danger-dark, #b93a3a);
+  background: var(--st-danger-soft, #fbe8e8);
+  border-radius: 10px;
+  padding: 10px 12px;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+.st-modal-warning i {
+  margin-top: 1px;
+  color: var(--st-danger, #d64545);
+}
+
+.st-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.st-modal-actions .st-btn {
+  flex: 1;
+  justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .st-modal {
+    padding: 22px 18px 18px;
+  }
+  .st-modal-actions {
+    flex-direction: column-reverse;
+  }
+}
+
+/* ---------- Dark mode ---------- */
+html[data-theme="dark"] .st-modal {
+  background: #18272c;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+}

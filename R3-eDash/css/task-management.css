@@ -1,0 +1,315 @@
+/* ============================================================
+   Page: Task Management — 360eDash
+   Reuse token & komponen dari css/system-information.css
+   (--si-*, .si-btn, .si-section, .si-maint-list, .si-timeline,
+   .si-modal-*, dst.) supaya konsisten dengan System Information.
+   File ini hanya menambahkan elemen yang belum ada: sub-tabs
+   dan badge unit pada tiap item.
+============================================================= */
+
+/* ---------- Toolbar spacing fix (Future/History filter groups nempel) ---------- */
+#tmFuturePanel .si-list-toolbar,
+#tmHistoryPanel .si-list-toolbar {
+  gap: 16px;
+  row-gap: 10px;
+  flex-wrap: wrap;
+}
+#tmFuturePanel .si-filter-group,
+#tmHistoryPanel .si-filter-group {
+  margin-right: 0;
+}
+
+.tm-subtabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--si-surface, #fff);
+  border: 1px solid var(--si-border, #E7EDEE);
+  border-radius: 12px;
+  padding: 6px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.tm-subtab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  flex: 1 1 0;
+  min-width: max-content;
+  padding: 10px 18px;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--si-muted, #7C8B8D);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tm-subtab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: var(--si-page-bg, #F4F7F7);
+  color: var(--si-muted, #7C8B8D);
+  font-size: 11px;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.tm-subtab:hover {
+  background: var(--si-primary-soft, #e4f1f1);
+  color: var(--si-primary-dark, #0b4f54);
+}
+
+.tm-subtab.is-active {
+  background: var(--si-primary-soft, #e4f1f1);
+  color: var(--si-primary-dark, #0b4f54);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(15, 106, 113, 0.12);
+}
+.tm-subtab.is-active .tm-subtab-icon {
+  background: var(--si-primary, #0f6a71);
+  color: #fff;
+}
+
+.tm-subpanel {
+  display: none;
+}
+.tm-subpanel.is-active {
+  display: block;
+  animation: pmFadeIn 0.18s ease;
+}
+
+@keyframes pmFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Unit badge (menandai unit pemilik task) ---------- */
+.tm-unit-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--si-primary-soft);
+  color: var(--si-primary-dark);
+  white-space: nowrap;
+}
+.tm-unit-tag i {
+  font-size: 9px;
+}
+
+/* ---------- Rp currency input ---------- */
+.si-input-rp {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--si-border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--si-surface);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.si-input-rp span {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--si-muted);
+  background: var(--si-page-bg);
+  border-right: 1px solid var(--si-border);
+  flex-shrink: 0;
+}
+.si-input-rp input {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  flex: 1;
+  min-width: 0;
+}
+.si-input-rp:focus-within {
+  border-color: var(--si-primary);
+  box-shadow: 0 0 0 3px var(--si-primary-soft);
+}
+
+/* ---------- Photo upload (Add/Edit Future Maintenance form) ---------- */
+.tm-photo-upload {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.tm-photo-add-btn {
+  width: 84px;
+  height: 84px;
+  border-radius: 12px;
+  border: 1.5px dashed var(--si-border);
+  background: var(--si-page-bg);
+  color: var(--si-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 500;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.tm-photo-add-btn i { font-size: 16px; }
+.tm-photo-add-btn:hover {
+  border-color: var(--si-primary);
+  color: var(--si-primary);
+  background: var(--si-primary-soft);
+}
+
+.tm-photo-thumb {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid var(--si-border);
+}
+.tm-photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.tm-photo-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  cursor: pointer;
+}
+.tm-photo-remove:hover { background: var(--si-danger); }
+
+/* ---------- Photo gallery + cost summary (Detail modal) ---------- */
+.tm-detail-photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tm-detail-photo-grid img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--si-border);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.tm-detail-photo-grid img:hover { transform: scale(1.04); }
+
+.tm-cost-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tm-cost-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+}
+.tm-cost-row span:first-child { color: var(--si-muted); }
+.tm-cost-row span:last-child { font-weight: 500; }
+.tm-cost-row.tm-cost-total {
+  padding-top: 8px;
+  margin-top: 2px;
+  border-top: 1px solid var(--si-border);
+  font-weight: 700;
+  color: var(--si-ink);
+}
+.tm-cost-row.tm-cost-total span:last-child { color: var(--si-primary-dark); }
+
+/* Lightbox for viewing a photo full-size */
+.tm-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 25, 30, 0.82);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  /* Lightbox dibuka dari dalam modal (z-index 1000), jadi harus lebih
+     tinggi lagi supaya tetap di atas modal & header. */
+  z-index: 1100;
+  padding: 30px;
+}
+.tm-lightbox-overlay.is-open { display: flex; }
+.tm-lightbox-overlay img {
+  max-width: 100%;
+  max-height: 90vh;
+  border-radius: 10px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+.tm-lightbox-close {
+  position: absolute;
+  top: 22px;
+  right: 26px;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tm-lightbox-close:hover { background: rgba(255, 255, 255, 0.22); }
+
+/* ---------- Pagination spacing ---------- */
+#tmFuturePagination,
+#tmHistoryPagination {
+  margin-top: 18px;
+}
+.si-stat-icon-danger { background: var(--si-danger-soft); color: var(--si-danger); }
+.si-stat-value.si-stat-danger { color: var(--si-danger); }
+
+@media (max-width: 720px) {
+  .tm-add-btn span { display: none; }
+  .tm-add-btn { padding: 10px 12px; }
+  .tm-subtab span:not(.tm-subtab-icon) { display: none; }
+  .tm-subtab { padding: 10px 11px; }
+}
+
+/* ---------- Notification-focus highlight ----------
+   Applied briefly to a Future/Historical item when the user arrives
+   here from the header notification bell, so the exact task it was
+   about is easy to spot among everything else in the list. */
+.si-maint-item.tm-flash-highlight,
+.si-timeline-card.tm-flash-highlight {
+  animation: tmEntryFlash 2.4s ease;
+}
+@keyframes tmEntryFlash {
+  0%   { background: var(--si-primary-soft, #e4f1f1); box-shadow: inset 3px 0 0 var(--si-primary, #0f6a71); }
+  70%  { background: var(--si-primary-soft, #e4f1f1); box-shadow: inset 3px 0 0 var(--si-primary, #0f6a71); }
+  100% { background: transparent; box-shadow: inset 3px 0 0 transparent; }
+}

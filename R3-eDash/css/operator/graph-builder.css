@@ -1,0 +1,406 @@
+/* ============================================================
+   Feature: Graph Builder popup — 360eDash Operator Dashboard
+   css/operator/graph-builder.css
+
+   Ported from the standalone "buat-grafik-real-data" popup and
+   namespaced under "gb-" so nothing collides with the app's
+   existing classes (e.g. .modal-header already used in
+   css/alert.css). Colors use the SAME CSS variables as the rest
+   of the app (--primary, --surface, --ink, --border, --muted,
+   defined in css/global.css and swapped for dark mode by
+   css/dark-mode-v8.css) instead of hardcoded hex, so this modal
+   automatically matches light/dark theme.
+
+   Triggered from pages/operator/operator-dashboard.html's "Add
+   Graph" button / dashed "+" tile — see js/operator/graph-builder.js
+   and js/operator/operator-dashboard.js.
+============================================================= */
+
+.gb-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(16, 27, 31, 0.55);
+  font-family: 'Poppins', sans-serif;
+}
+.gb-backdrop.is-open {
+  display: flex;
+}
+body.gb-no-scroll {
+  overflow: hidden;
+}
+
+.gb-modal {
+  background: var(--surface, #fff);
+  color: var(--ink, #25343F);
+  width: 100%;
+  max-width: 960px;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(37, 52, 63, 0.35);
+  padding: 22px 26px 18px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.gb-modal * { box-sizing: border-box; }
+
+.gb-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.gb-modal-header h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink, #25343F);
+}
+.gb-close-btn {
+  border: none;
+  background: none;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--muted, #7C8B8D);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 8px;
+  font-family: inherit;
+}
+.gb-close-btn:hover { background: var(--primary-soft, #E4F1F1); color: var(--primary-dark, #0B4F54); }
+
+.gb-modal-subtitle {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--muted, #7C8B8D);
+}
+.gb-header-divider {
+  height: 1px;
+  background: var(--border, #E7EDEE);
+  margin: 14px 0 16px;
+}
+
+.gb-device-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.gb-device-switch-label {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--muted, #7C8B8D);
+}
+.gb-device-sn {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--muted, #7C8B8D);
+}
+
+.gb-modal-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 22px;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+
+/* ---------- LEFT: variable picker ---------- */
+.gb-var-panel {
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
+  padding-right: 8px;
+}
+.gb-var-category { margin-bottom: 16px; }
+.gb-cat-title {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted, #7C8B8D);
+  margin: 0 0 8px 2px;
+}
+.gb-var-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border, #E7EDEE);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  user-select: none;
+}
+.gb-var-row:hover { border-color: var(--primary-header, #6DC3BB); }
+.gb-var-row.is-checked {
+  border-color: var(--primary, #0F6A71);
+  background: var(--primary-soft, #E4F1F1);
+}
+.gb-var-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary, #0F6A71);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.gb-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.gb-var-label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink, #25343F);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gb-var-unit {
+  font-size: 11.5px;
+  color: var(--muted, #7C8B8D);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+/* ---------- RIGHT: chart builder ---------- */
+.gb-chart-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+}
+
+.gb-field-row { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; }
+.gb-field { display: flex; flex-direction: column; gap: 6px; }
+.gb-field-title { flex: 1; min-width: 0; }
+.gb-field label {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink, #25343F);
+  font-family: inherit;
+}
+.gb-field input[type="text"] {
+  border: 1px solid var(--border, #E7EDEE);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 13.5px;
+  font-weight: 400;
+  font-family: inherit;
+  color: var(--ink, #25343F);
+  outline: none;
+  width: 100%;
+  background: var(--surface, #fff);
+}
+.gb-field input[type="text"]:focus { border-color: var(--primary, #0F6A71); }
+.gb-field input[type="text"]::placeholder { color: var(--muted, #7C8B8D); }
+
+.gb-segmented {
+  display: inline-flex;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border, #E7EDEE);
+}
+.gb-seg-btn {
+  border: none;
+  background: var(--surface, #fff);
+  padding: 8px 16px;
+  font-size: 13.5px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--muted, #7C8B8D);
+  cursor: pointer;
+}
+.gb-seg-btn.is-active {
+  background: var(--primary, #0F6A71);
+  color: #fff;
+  font-weight: 600;
+}
+
+.gb-preview-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink, #25343F);
+  margin: 18px 0 8px;
+}
+
+.gb-stats-row { display: flex; flex-wrap: wrap; gap: 8px; min-height: 0; }
+.gb-stat-chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--border, #E7EDEE);
+  background: var(--surface, #fff);
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+.gb-stat-chip .gb-stat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.gb-stat-chip .gb-stat-label { font-size: 11px; font-weight: 500; color: var(--muted, #7C8B8D); white-space: nowrap; }
+.gb-stat-chip .gb-stat-now {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink, #25343F);
+  white-space: nowrap;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+.gb-stat-chip .gb-stat-minmax {
+  font-size: 10.5px;
+  font-weight: 400;
+  color: var(--muted, #7C8B8D);
+  white-space: nowrap;
+  border-left: 1px solid var(--border, #E7EDEE);
+  padding-left: 7px;
+  margin-left: 1px;
+}
+
+.gb-preview-box {
+  border: 1px solid var(--border, #E7EDEE);
+  border-radius: 14px;
+  padding: 18px 14px 10px;
+  min-height: 300px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface, #fff);
+  position: relative;
+}
+.gb-preview-box canvas { width: 100% !important; height: 290px !important; }
+
+.gb-field-chart-type { flex: 0 0 auto; }
+.gb-field-chart-type .gb-segmented { margin-top: 0; }
+
+.gb-empty-state {
+  text-align: center;
+  max-width: 340px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  color: var(--muted, #7C8B8D);
+  padding: 10px;
+}
+.gb-empty-icon { font-size: 30px; margin-bottom: 6px; opacity: .6; }
+.gb-empty-state p { margin: 4px 0; font-size: 13.5px; font-weight: 500; color: var(--ink, #25343F); }
+.gb-empty-state .gb-empty-sub { font-size: 11.5px; font-weight: 400; color: var(--muted, #7C8B8D); line-height: 1.6; }
+
+.gb-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 10px;
+  min-height: 18px;
+}
+.gb-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 500; color: var(--ink, #25343F); }
+.gb-legend-item .gb-ring {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2.5px solid;
+  background: var(--surface, #fff);
+}
+
+.gb-preview-caption {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--muted, #7C8B8D);
+  text-align: center;
+  margin: 10px 0 0;
+  line-height: 1.6;
+}
+
+.gb-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid var(--border, #E7EDEE);
+  margin-top: 16px;
+  padding-top: 14px;
+}
+.gb-btn {
+  border-radius: 10px;
+  padding: 9px 18px;
+  font-size: 13.5px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.gb-btn-ghost { background: var(--surface, #fff); border-color: var(--border, #E7EDEE); color: var(--ink, #25343F); }
+.gb-btn-ghost:hover { background: var(--primary-soft, #E4F1F1); border-color: var(--primary-header, #6DC3BB); }
+.gb-btn-primary { background: var(--primary, #0F6A71); color: #fff; font-weight: 600; }
+.gb-btn-primary:disabled { background: var(--border, #E7EDEE); color: var(--muted, #7C8B8D); cursor: not-allowed; }
+.gb-btn-primary:not(:disabled):hover { background: var(--primary-dark, #0B4F54); }
+
+.gb-var-panel::-webkit-scrollbar, .gb-chart-panel::-webkit-scrollbar { width: 7px; }
+.gb-var-panel::-webkit-scrollbar-thumb, .gb-chart-panel::-webkit-scrollbar-thumb {
+  background: var(--border, #E7EDEE); border-radius: 10px;
+}
+
+@media (max-width: 760px) {
+  .gb-modal-body { grid-template-columns: minmax(0, 1fr); overflow-y: auto; }
+  .gb-var-panel { max-height: 260px; }
+  .gb-modal { max-height: 96vh; }
+}
+
+@media (max-width: 480px) {
+  .gb-backdrop { padding: 0; }
+  .gb-modal { max-width: 100%; min-height: 100vh; max-height: 100vh; border-radius: 0; padding: 16px 16px 14px; }
+  .gb-device-switch { flex-wrap: wrap; row-gap: 6px; }
+}
+
+/* ============================================================
+   Dashboard card chart (mini preview rendered inside a
+   pages/operator/operator-dashboard.html .opd-card tile once a
+   graph has been added via this popup) — see
+   css/operator/operator-dashboard.css for the base .opd-card
+   sizing and js/operator/operator-dashboard.js for the render.
+============================================================= */
+.opd-card-chart {
+  padding: 10px 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.opd-card-chart-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+}
+.opd-card-chart .opd-card-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.opd-card-chart-meta {
+  font-size: 9.5px;
+  font-weight: 400;
+  color: var(--muted, #7C8B8D);
+  margin-top: -2px;
+}
+.opd-card-chart-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+.opd-card-chart-body canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+}

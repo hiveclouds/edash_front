@@ -1,0 +1,1197 @@
+/* ============================================================
+   Page: Project Selector — 360eDash
+   Fullscreen map + floating "Project Locations" panel
+============================================================= */
+
+.ps-page {
+  /* Break out of .edash-content's own padding (a shared, responsive
+     --edash-content-pad var — see index.html) so the map sits truly
+     edge-to-edge against the header and sidebar at every breakpoint.
+     A hardcoded -24px here would overshoot once .edash-content's
+     padding shrinks on narrow screens, pushing the floating "Project
+     Locations" panel up under the header and clipping it. */
+  position: absolute;
+  inset: calc(-1 * var(--edash-content-pad, 24px));
+  display: flex;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Scroll-lock HANYA untuk halaman fullscreen (Project Selector).
+   Class .edash-fullscreen-page di-toggle oleh main.js -> loadPage()
+   setiap kali route berganti, supaya halaman LAIN (Activity Log,
+   Settings, dst.) tetap bisa di-scroll normal dengan mouse wheel /
+   trackpad.
+
+   PENTING: jangan pernah menulis rule ini tanpa syarat langsung ke
+   `html, body` atau `.edash-content` — kedua selector itu aktif di
+   SEMUA halaman (dimuat sekali di <head> dan tidak pernah lepas),
+   jadi versi tanpa syarat akan mematikan scroll di seluruh aplikasi,
+   bukan cuma di peta. Ini adalah penyebab bug "tidak bisa discroll"
+   yang dilaporkan. */
+body.edash-fullscreen-page .edash-content {
+  overflow: hidden !important;
+}
+
+html.edash-fullscreen-page,
+body.edash-fullscreen-page {
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+.ps-page {
+  overflow: hidden;
+}
+
+/* ---------- Map (fullscreen) ---------- */
+.ps-map-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.demo-map-card {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(15,106,113,0.06), transparent 40%),
+    radial-gradient(circle at 70% 60%, rgba(15,106,113,0.05), transparent 45%),
+    #ffffff;
+}
+.demo-map-card::after {
+  content: "Project map will appear here";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b6c2c3;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.ps-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Locate-me button ---------- */
+.ps-locate-btn {
+  position: absolute;
+  right: 32px;
+  bottom: 32px;
+  z-index: 500;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: none;
+  background: #ffffff;
+  color: #25343F;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(15,106,113,0.18);
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.ps-locate-btn:hover {
+  color: #0f6a71;
+  transform: translateY(-1px);
+}
+.ps-locate-btn.is-loading {
+  color: #0f6a71;
+  animation: ps-spin 0.9s linear infinite;
+}
+@keyframes ps-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ---------- Detail mode (project zoomed into rooftop) ---------- */
+/* When active, the "Project Locations" dropdown is hidden and
+   replaced with a detail card (bottom-left, stacked directly above
+   the Today chart) and a right stack holding Power Output +
+   Upcoming Schedule (top-right). */
+.ps-page.is-detail .ps-panel {
+  display: none;
+}
+
+/* ---------- Left stack (bottom-left): detail card + Today chart ---------- */
+/* The detail card and the Today chart share one column so they sit
+   flush together with a small, consistent gap — the detail card
+   only takes up space when detail mode is active (display:none
+   otherwise), and the whole column stays anchored to the bottom
+   so the Today chart never moves. */
+.ps-left-stack {
+  position: absolute;
+  left: 32px;
+  bottom: 32px;
+  z-index: 600;
+  width: 280px;
+  max-width: calc(100% - 64px);
+  /* Cap the stack to the visible height and let it scroll internally
+     instead of being clipped by the page's overflow:hidden. This is
+     what makes the layout correct at 100% browser zoom on any screen
+     height, instead of only "fitting" when zoomed out to ~90%. */
+  max-height: calc(100% - 64px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 14px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.ps-detail-stack {
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+}
+.ps-page.is-detail .ps-detail-stack {
+  display: flex;
+}
+
+.ps-detail-panel {
+  position: relative;
+  flex-shrink: 0;
+  background: #ffffff;
+  border: 1px solid #e7edee;
+  border-radius: 18px;
+  box-shadow: 0 10px 32px rgba(15,106,113,0.18);
+  padding: 18px 20px 20px;
+}
+
+.ps-detail-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: #f4f7f7;
+  color: #7c8b8d;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.ps-detail-close:hover {
+  background: #FBE8E8;
+  color: #D64545;
+}
+
+.ps-detail-output {
+  font-size: 22px;
+  font-weight: 700;
+  color: #D64545;
+  line-height: 1.1;
+}
+.ps-detail-output span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #7c8b8d;
+  margin-left: 4px;
+}
+
+.ps-detail-target {
+  font-size: 12px;
+  font-weight: 500;
+  color: #7c8b8d;
+  margin-top: 3px;
+}
+.ps-detail-target strong {
+  color: #FA891A;
+  font-weight: 700;
+}
+
+.ps-detail-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 12px;
+}
+.ps-detail-title i {
+  margin-top: 3px;
+  color: #2F9E6E;
+  font-size: 14px;
+}
+.ps-detail-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #25343F;
+}
+.ps-detail-location {
+  font-size: 12px;
+  font-style: italic;
+  color: #7c8b8d;
+  margin-top: 2px;
+}
+
+.ps-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+.ps-detail-tech-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid #e7edee;
+  background: #f4f7f7;
+  color: #25343F;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.ps-detail-tech-btn:hover {
+  background: #e4f1f1;
+  color: #0f6a71;
+}
+.ps-detail-download-btn {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  border: none;
+  background: #7c8b8d;
+  color: #ffffff;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.ps-detail-download-btn:hover {
+  background: #25343F;
+}
+
+/* ---------- Right stack (top-right, detail mode): Power Output + Upcoming Schedule ---------- */
+/* Power Output and Upcoming Schedule are independent cards, not one
+   scrolling column: Power Output (fixed height) always stays fully
+   visible, Upcoming Schedule can be collapsed, and only its own
+   item list scrolls (see .ps-history-list below). The stack itself
+   never scrolls. */
+.ps-right-stack {
+  display: none;
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  z-index: 600;
+  width: 320px;
+  max-width: calc(100% - 64px);
+  /* Same fix as .ps-left-stack: cap to viewport height and scroll
+     internally so Power Output + Upcoming Schedule never get cut off
+     at 100% zoom on shorter screens. */
+  max-height: calc(100% - 64px);
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.ps-page.is-detail .ps-right-stack {
+  display: flex;
+}
+
+/* ---------- Power Output monitoring card ---------- */
+.ps-power-panel {
+  flex-shrink: 0;
+  background: #ffffff;
+  border: 1px solid #e7edee;
+  border-radius: 18px;
+  box-shadow: 0 10px 32px rgba(15,106,113,0.18);
+  padding: 18px 18px 16px;
+}
+.ps-power-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.ps-power-eyebrow {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7c8b8d;
+}
+.ps-power-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #25343F;
+  margin-top: 3px;
+}
+.ps-power-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.ps-power-toggle {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: #ffffff;
+  border: 1px solid #e7edee;
+  border-radius: 999px;
+}
+.ps-power-toggle-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  color: #7c8b8d;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.ps-power-toggle-btn.is-active {
+  background: #e4f1f1;
+  color: #0f6a71;
+}
+.ps-power-refresh {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  border-radius: 9px;
+  border: none;
+  background: #f4f7f7;
+  color: #7c8b8d;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.ps-power-refresh:hover {
+  background: #e4f1f1;
+  color: #0f6a71;
+}
+.ps-power-refresh.is-loading i {
+  display: inline-block;
+  animation: ps-spin 0.8s linear infinite;
+}
+.ps-power-chart-wrap svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Label sumbu X/Y (angka & jam/tanggal) pada chart Today & Power
+   Output -- dipakai lewat psAxisSvg() di js/project-selector.js. */
+.ps-today-chart-wrap svg .ps-axis-label,
+.ps-power-chart-wrap svg .ps-axis-label {
+  font-size: 8.5px;
+  font-family: inherit;
+  fill: #8a9799;
+  font-weight: 500;
+}
+/* Chart "Today" (default & detail per-proyek) sedikit diperbesar
+   fontnya dibanding Power Output -- card-nya lebih lebar jadi masih
+   muat tanpa numpuk/nabrak garis grafik. */
+.ps-today-chart-wrap svg .ps-axis-label {
+  font-size: 10px;
+}
+
+/* ---------- Upcoming Schedule (maintenance schedule, collapsible) ---------- */
+/* Collapsible header, styled the same way as .ps-panel-toggle for a
+   consistent look. The item list below is capped to a fixed height
+   with its own scrollbar, so a long schedule never pushes Power
+   Output out of view. */
+.ps-history-panel {
+  flex-shrink: 0;
+  background: #ffffff;
+  border: 1px solid #e7edee;
+  border-radius: 18px;
+  box-shadow: 0 10px 32px rgba(15,106,113,0.18);
+  overflow: hidden;
+}
+
+.ps-history-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 15px 18px;
+  border: none;
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #25343F;
+  cursor: pointer;
+}
+.ps-history-toggle i:first-child {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  background: #FDECD8;
+  color: #FA891A;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ps-history-toggle span:first-of-type {
+  flex: 1;
+  text-align: left;
+}
+.ps-history-count {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #b6c2c3;
+}
+.ps-history-toggle-chevron {
+  font-size: 11px;
+  color: #7c8b8d;
+  transition: transform 0.2s ease;
+}
+.ps-history-panel.is-open .ps-history-toggle {
+  border-bottom: 1px solid #e7edee;
+}
+.ps-history-panel.is-open .ps-history-toggle-chevron {
+  transform: rotate(180deg);
+}
+
+.ps-history-content {
+  display: none;
+}
+.ps-history-panel.is-open .ps-history-content {
+  display: block;
+}
+
+.ps-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 14px 14px 16px;
+}
+.ps-history-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background: #f4f7f7;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  transition: border-color 0.15s ease;
+}
+.ps-history-item:hover {
+  border-color: #0f6a71;
+}
+.ps-history-icon {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 9px;
+  background: #FDECD8;
+  color: #FA891A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+.ps-history-body {
+  min-width: 0;
+}
+.ps-history-item-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #25343F;
+}
+.ps-history-item-note {
+  font-size: 11.5px;
+  color: #7c8b8d;
+  margin-top: 2px;
+  line-height: 1.35;
+}
+.ps-history-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.ps-history-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  background: #ffffff;
+  color: #7c8b8d;
+  border: 1px solid #e7edee;
+  white-space: nowrap;
+}
+.ps-history-tag i {
+  font-size: 9px;
+}
+.ps-history-tag-device {
+  background: #e4f1f1;
+  color: #0f6a71;
+  border-color: #d3e7e7;
+}
+
+/* ---------- Today chart: layout changes in detail mode ---------- */
+.ps-today-float.is-detail .ps-today-value {
+  font-size: 26px;
+}
+.ps-today-float.is-detail .ps-today-target {
+  color: #25343F;
+  font-weight: 600;
+}
+.ps-today-legend-dot {
+  display: none;
+}
+.ps-today-legend-dot-swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.ps-today-legend-dot-swatch.is-projected {
+  background: #FA891A;
+}
+.ps-today-legend-dot-swatch.is-realized {
+  background: #D64545;
+}
+
+/* ---------- Floating "Project Locations" panel ---------- */
+.ps-panel {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  z-index: 600;
+  width: 296px;
+  max-width: calc(100% - 64px);
+  max-height: calc(100% - 64px);
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #e7edee;
+  border-radius: 18px;
+  box-shadow: 0 10px 32px rgba(15,106,113,0.18);
+  overflow: hidden;
+}
+
+.ps-panel-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 15px 18px;
+  border: none;
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #25343F;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.ps-panel-toggle i:first-child {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  background: #e4f1f1;
+  color: #0f6a71;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ps-panel-toggle span {
+  flex: 1;
+  text-align: left;
+}
+.ps-panel-toggle-chevron {
+  font-size: 11px;
+  color: #7c8b8d;
+  transition: transform 0.2s ease;
+}
+.ps-panel.is-open .ps-panel-toggle {
+  border-bottom: 1px solid #e7edee;
+}
+.ps-panel.is-open .ps-panel-toggle-chevron {
+  transform: rotate(180deg);
+}
+
+.ps-panel-body {
+  display: none;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px 18px 18px;
+  min-height: 0;
+  overflow-y: auto;
+}
+.ps-panel.is-open .ps-panel-body {
+  display: flex;
+}
+
+/* ---------- Project summary ---------- */
+.ps-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.ps-summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 4px 11px;
+  background: #f4f7f7;
+  border: 1px solid #e7edee;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.ps-summary-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+}
+.ps-summary-icon-all     { background: #e4f1f1; color: #0f6a71; }
+.ps-summary-icon-online  { background: #E4F5EC; color: #2F9E6E; }
+.ps-summary-icon-offline { background: #FBE8E8; color: #D64545; }
+.ps-summary-icon-alerts  { background: #FBF1DE; color: #E3A21A; }
+
+.ps-summary-value {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #25343F;
+  line-height: 1;
+}
+
+.ps-summary-label {
+  font-size: 9px;
+  font-weight: 500;
+  color: #7c8b8d;
+  line-height: 1.25;
+}
+
+/* ---------- Category (icon on top, count, then label) ---------- */
+/* TKT-000045 follow-up: kategori sekarang max 4 (bukan lagi selalu 3),
+   dan jumlah kartu yang tampil berubah-ubah tergantung berapa yang
+   count-nya > 0 / toggle "Show all". grid-template-columns disesuaikan
+   PER JUMLAH KARTU biar selalu rata penuh row -- 1 kartu = full width,
+   2 = 50/50, 3 = 1/3 rata (pas), 4 = grid 2x2 -- ga ada lagi kartu yang
+   "nyempil" kecil sendirian di baris terakhir. :has() didukung semua
+   browser modern (Chrome/Edge/Safari/Firefox 121+).
+*/
+.ps-category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.ps-category-grid:has(> :nth-child(1):last-child) {
+  grid-template-columns: 1fr;
+}
+.ps-category-grid:has(> :nth-child(2):last-child),
+.ps-category-grid:has(> :nth-child(4):last-child) {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.ps-category-empty {
+  grid-column: 1 / -1;
+  padding: 10px 6px;
+  font-size: 12px;
+  color: #7c8b8d;
+  text-align: center;
+}
+
+.ps-section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ps-section-title-row .ps-section-title {
+  margin-bottom: 0;
+}
+
+.ps-category-show-all {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #7c8b8d;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ps-category-show-all input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  accent-color: #0f6a71;
+  cursor: pointer;
+}
+
+.ps-category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 6px;
+  background: var(--cat-bg, #f7fafa);
+  border: 1px solid var(--cat-border, #e7edee);
+  border-radius: 14px;
+  text-align: center;
+}
+
+.ps-category-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  background: var(--cat-icon-bg, #e4f1f1);
+  color: var(--cat-color, #0f6a71);
+  flex-shrink: 0;
+}
+
+.ps-category-value {
+  display: block;
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #25343F;
+  line-height: 1;
+}
+
+.ps-category-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: #7c8b8d;
+  line-height: 1.25;
+}
+
+/* ---------- Generation stats (MWh / MWp / CO2) ---------- */
+.ps-gen-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.ps-gen-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 6px 11px;
+  background: #f4f7f7;
+  border: 1px solid #e7edee;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.ps-gen-value {
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #25343F;
+  line-height: 1.1;
+}
+
+.ps-gen-unit {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #0f6a71;
+}
+
+.ps-gen-label {
+  font-size: 8.5px;
+  font-weight: 500;
+  color: #7c8b8d;
+  line-height: 1.2;
+}
+
+/* ---------- "Today" generation chart (bottom-left, stacked with the detail card via .ps-left-stack) ---------- */
+.ps-today-float {
+  flex-shrink: 0;
+  background: #ffffff;
+  border: 1px solid #e7edee;
+  border-radius: 16px;
+  padding: 14px 16px 18px;
+  box-shadow: 0 8px 28px rgba(15,106,113,0.16);
+}
+
+.ps-today-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ps-today-title {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7c8b8d;
+}
+
+.ps-today-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f6a71;
+  line-height: 1.15;
+}
+.ps-today-value span {
+  font-size: 11px;
+  font-weight: 600;
+  color: #7c8b8d;
+  margin-left: 3px;
+}
+
+.ps-today-target {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #2F9E6E;
+}
+
+.ps-today-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.ps-today-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9.5px;
+  font-weight: 500;
+  color: #7c8b8d;
+  white-space: nowrap;
+}
+
+.ps-today-legend-swatch {
+  width: 12px;
+  height: 2px;
+  border-radius: 2px;
+}
+.ps-today-legend-swatch.is-projected {
+  background: repeating-linear-gradient(90deg, #FA891A 0 4px, transparent 4px 7px);
+}
+.ps-today-legend-swatch.is-realized {
+  background: #0f6a71;
+}
+
+.ps-today-chart-wrap {
+  position: relative;
+  padding-bottom: 14px;
+}
+.ps-today-chart-wrap svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ps-today-now-label {
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-weight: 600;
+  color: #25343F;
+  white-space: nowrap;
+}
+
+/* ---------- Sections (Saved / All projects) ---------- */
+.ps-section {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 8px;
+  min-height: 0;
+}
+.ps-section-grow {
+  flex-shrink: 0;
+}
+
+.ps-section-title {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7c8b8d;
+}
+
+.ps-empty {
+  font-size: 12px;
+  color: #b6c2c3;
+  padding: 10px 4px;
+  text-align: center;
+}
+
+/* ---------- Search ---------- */
+.ps-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f4f7f7;
+  border: 1px solid #e7edee;
+  border-radius: 10px;
+}
+.ps-search i {
+  font-size: 12px;
+  color: #7c8b8d;
+}
+.ps-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12.5px;
+  color: #25343F;
+  outline: none;
+}
+.ps-search input::placeholder {
+  color: #b6c2c3;
+}
+
+/* ---------- Table (Saved / All Projects lists) ---------- */
+.ps-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.ps-table-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #b6c2c3;
+}
+.ps-table-head-name     { flex: 1.5; }
+.ps-table-head-location { flex: 1; }
+.ps-table-head-actions  { width: 68px; text-align: right; }
+
+.ps-table-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ps-table-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.ps-table-row:hover,
+.ps-table-row.is-active {
+  background: #e4f1f1;
+}
+
+.ps-table-row-name {
+  flex: 1.5;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #25343F;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ps-status-dot {
+  width: 7px;
+  height: 7px;
+  min-width: 7px;
+  border-radius: 50%;
+  background: #2F9E6E;
+}
+.ps-status-dot.is-offline {
+  background: #D64545;
+}
+
+.ps-table-row-location {
+  flex: 1;
+  min-width: 0;
+  font-size: 11.5px;
+  color: #7c8b8d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ps-table-row-actions {
+  width: 68px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.ps-row-action-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #b6c2c3;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.ps-row-action-btn:hover {
+  background: #ffffff;
+  color: #0f6a71;
+}
+.ps-row-action-btn.ps-action-delete:hover {
+  color: #D64545;
+}
+.ps-row-action-btn.ps-action-save.is-saved {
+  color: #FA891A;
+}
+
+/* ---------- Map pin / popup (unchanged visual language) ---------- */
+.ps-pin-wrap {
+  position: relative;
+  width: 26px;
+  height: 34px;
+}
+
+.ps-pin {
+  position: absolute;
+  top: 0;
+  left: 5px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--pin-color, #0f6a71);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+}
+
+.ps-pin::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.maplibregl-popup-content {
+  border-radius: 10px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Hover tooltip di peta Dashboard (Project Overview) — popup tanpa
+   close button/arrow besar, dipakai lewat maplibregl.Popup className
+   "ps-pin-tooltip" di js/dashboard.js */
+.ps-pin-tooltip .maplibregl-popup-content {
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  padding: 6px 10px;
+  font-size: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.ps-popup-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: #25343F;
+  margin-bottom: 2px;
+}
+
+.ps-popup-category {
+  font-size: 11.5px;
+  color: #7c8b8d;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+  .ps-panel {
+    top: 16px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+    max-width: none;
+    max-height: calc(100% - 32px);
+  }
+  .ps-locate-btn {
+    right: 16px;
+    bottom: 16px;
+  }
+  .ps-left-stack {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    width: auto;
+    max-width: none;
+  }
+  .ps-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  /* Narrow screens: keep focus on the output card + Today chart so
+     the view doesn't feel too crowded — Power Output & Upcoming
+     Schedule are hidden. */
+  .ps-page.is-detail .ps-right-stack {
+    display: none;
+  }
+}

@@ -1,0 +1,520 @@
+[
+  {
+    "id": "25b2b9c0-6673-43d8-b6cf-5030caa96f80",
+    "eventName": "PageView",
+    "timestamp": "2026-08-21T06:26:34.847Z",
+    "sessionId": "e03ad41b-c2d0-488a-9e1b-50be519cb452",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "Indonesia",
+    "countryCode": "ID",
+    "data": {}
+  },
+  {
+    "id": "dfaeee29-93df-4887-894e-b5098cb07fc7",
+    "eventName": "ViewContent",
+    "timestamp": "2026-08-21T01:29:42.323Z",
+    "sessionId": "f000f49c-7caf-4d2c-9e33-6554af3982fb",
+    "detail": "Clicked \"Calculate Estimate\"",
+    "country": "Indonesia",
+    "countryCode": "ID",
+    "data": {
+      "content_category": "Restaurant",
+      "country_code": "ID"
+    }
+  },
+  {
+    "id": "7b924224-c984-464d-9c85-4c6874a31597",
+    "eventName": "SolarCalculatorInputChange",
+    "timestamp": "2026-08-21T01:29:32.042Z",
+    "sessionId": "f000f49c-7caf-4d2c-9e33-6554af3982fb",
+    "detail": "Changed field \"kvaInput\"",
+    "country": "Indonesia",
+    "countryCode": "ID",
+    "data": {
+      "field": "kvaInput"
+    }
+  },
+  {
+    "id": "4933200c-38c2-4804-acc9-fbe77c907378",
+    "eventName": "PageView",
+    "timestamp": "2026-08-21T01:29:25.214Z",
+    "sessionId": "f000f49c-7caf-4d2c-9e33-6554af3982fb",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "Indonesia",
+    "countryCode": "ID",
+    "data": {}
+  },
+  {
+    "id": "6c1d8a9b-4c98-49f2-8243-dd1653290c2c",
+    "eventName": "PageView",
+    "timestamp": "2026-08-20T16:08:59.990Z",
+    "sessionId": "c839b6e3-72e1-4bc8-91f8-9d238a935da3",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "Indonesia",
+    "countryCode": "ID",
+    "data": {}
+  },
+  {
+    "id": "cc2b8fc8-3054-4379-a642-5324440059f7",
+    "eventName": "SolarCalculatorInputChange",
+    "timestamp": "2026-08-20T15:48:10.645Z",
+    "sessionId": "b0520076-6e73-4d7d-a742-ac395185e840",
+    "detail": "Changed field \"facilitySelect\"",
+    "country": "Indonesia",
+    "countryCode": "ID",
+    "data": {
+      "field": "facilitySelect"
+    }
+  },
+  {
+    "id": "a2396225-5773-4aa8-9418-e79bb268f8ca",
+    "eventName": "SolarCalculatorInputChange",
+    "timestamp": "2026-08-20T15:48:07.936Z",
+    "sessionId": "b0520076-6e73-4d7d-a742-ac395185e840",
+    "detail": "Changed field \"provinceSelect\"",
+    "country": "Indonesia",
+    "countryCode": "ID",
+    "data": {
+      "field": "provinceSelect"
+    }
+  },
+  {
+    "id": "113efb09-b3d8-4c8f-a82b-5d9223e00b6b",
+    "eventName": "PageView",
+    "timestamp": "2026-08-20T15:48:03.159Z",
+    "sessionId": "b0520076-6e73-4d7d-a742-ac395185e840",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "Indonesia",
+    "countryCode": "ID",
+    "data": {}
+  },
+  {
+    "id": "cff66acd-1d8c-4b6b-bf5b-6a1f9efd4734",
+    "eventName": "PageView",
+    "timestamp": "2026-08-20T15:47:26.532Z",
+    "sessionId": "eb62a052-e3b0-4907-ab36-860d6f38f56f",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "United States",
+    "countryCode": "US",
+    "data": {}
+  },
+  {
+    "id": "ce752d84-239b-47f3-a481-395e4acef98c",
+    "eventName": "PageView",
+    "timestamp": "2026-08-20T14:36:16.949Z",
+    "sessionId": "fe3631ef-9b18-4d59-aa20-88666b016e10",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "Indonesia",
+    "countryCode": "ID",
+    "data": {}
+  },
+  {
+    "id": "926c1780-d0f7-429e-9ad9-218f2c4e39d7",
+    "eventName": "PageView",
+    "timestamp": "2026-08-20T14:36:02.317Z",
+    "sessionId": "fe3631ef-9b18-4d59-aa20-88666b016e10",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "Indonesia",
+    "countryCode": "ID",
+    "data": {}
+  },
+  {
+    "id": "dc7ee9c1-cb36-41e4-af57-8ca0fc2adbef",
+    "eventName": "SolarCalculatorInputChange",
+    "timestamp": "2026-08-20T14:33:08.433Z",
+    "sessionId": "d02bbb5e-cbb2-4a1b-a150-aebb76819ed1",
+    "detail": "Changed field \"countrySelect\"",
+    "country": "Indonesia",
+    "countryCode": "ID",
+    "data": {
+      "field": "countrySelect"
+    }
+  },
+  {
+    "id": "6e3f2f21-dc8e-4d34-8ba8-2d4e48f559d5",
+    "eventName": "PageView",
+    "timestamp": "2026-08-20T14:33:04.192Z",
+    "sessionId": "d02bbb5e-cbb2-4a1b-a150-aebb76819ed1",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "Indonesia",
+    "countryCode": "ID",
+    "data": {}
+  },
+  {
+    "id": "932045b0-3431-40d5-bdcb-b57fc1e14352",
+    "eventName": "ViewContent",
+    "timestamp": "2026-08-18T09:45:19.669Z",
+    "sessionId": "aebdde88-7149-46a5-ac6a-9101b0acb923",
+    "detail": "Clicked \"Calculate Estimate\"",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "content_category": "Restaurant",
+      "country_code": "ID"
+    }
+  },
+  {
+    "id": "a2008699-3b08-44df-bcc1-f17a576e0d80",
+    "eventName": "SolarCalculatorInputChange",
+    "timestamp": "2026-08-18T09:45:18.146Z",
+    "sessionId": "aebdde88-7149-46a5-ac6a-9101b0acb923",
+    "detail": "Changed field \"kvaInput\"",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "field": "kvaInput"
+    }
+  },
+  {
+    "id": "8d64931a-0506-4252-8bb1-facbc5511d21",
+    "eventName": "SolarCalculatorInputChange",
+    "timestamp": "2026-08-18T09:45:13.186Z",
+    "sessionId": "aebdde88-7149-46a5-ac6a-9101b0acb923",
+    "detail": "Changed field \"billInput\"",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "field": "billInput"
+    }
+  },
+  {
+    "id": "5f0301b6-288d-4db0-a9ee-e618f82c8e46",
+    "eventName": "PageView",
+    "timestamp": "2026-08-18T09:45:06.850Z",
+    "sessionId": "aebdde88-7149-46a5-ac6a-9101b0acb923",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "-",
+    "countryCode": "-",
+    "data": {}
+  },
+  {
+    "id": "7b952ca6-2c6d-4f24-ba7a-97e76efbedbb",
+    "eventName": "PageView",
+    "timestamp": "2026-08-15T16:39:43.148Z",
+    "sessionId": "4f4e2e78-1531-4083-b350-738fc3b2f678",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "-",
+    "countryCode": "-",
+    "data": {}
+  },
+  {
+    "id": "b9fe9e3a-dfe3-44da-a5be-e8a484b95ae1",
+    "eventName": "ViewContent",
+    "timestamp": "2026-08-12T07:19:23.043Z",
+    "sessionId": "65be33fd-36df-48c8-8e74-fc7ab38410d6",
+    "detail": "Clicked \"Calculate Estimate\"",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "content_category": "Office",
+      "country_code": "ID"
+    }
+  },
+  {
+    "id": "76a101a2-2f7d-4ed5-8065-144989ed9190",
+    "eventName": "SolarCalculatorInputChange",
+    "timestamp": "2026-08-12T07:19:21.042Z",
+    "sessionId": "65be33fd-36df-48c8-8e74-fc7ab38410d6",
+    "detail": "Changed field \"usableRoofPercent\"",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "field": "usableRoofPercent"
+    }
+  },
+  {
+    "id": "392b5a75-1afd-4f4f-a762-d41cf12823c2",
+    "eventName": "SolarCalculatorInputChange",
+    "timestamp": "2026-08-12T07:19:20.669Z",
+    "sessionId": "65be33fd-36df-48c8-8e74-fc7ab38410d6",
+    "detail": "Changed field \"kvaInput\"",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "field": "kvaInput"
+    }
+  },
+  {
+    "id": "3de55f54-5323-480a-ace6-a021854d2f17",
+    "eventName": "SolarCalculatorInputChange",
+    "timestamp": "2026-08-12T07:19:14.597Z",
+    "sessionId": "65be33fd-36df-48c8-8e74-fc7ab38410d6",
+    "detail": "Changed field \"tariffSelect\"",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "field": "tariffSelect"
+    }
+  },
+  {
+    "id": "3377a89d-5029-4f45-a27d-5bc0c959d86e",
+    "eventName": "Lead",
+    "timestamp": "2026-08-12T07:19:00.215Z",
+    "sessionId": "65be33fd-36df-48c8-8e74-fc7ab38410d6",
+    "detail": "Submitted email to unlock the estimate",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "country_code": "ID",
+      "province": "DKI Jakarta",
+      "city": "Jakarta Barat"
+    }
+  },
+  {
+    "id": "4eef7e7d-cb55-4c53-8a2c-76767061e614",
+    "eventName": "ViewContent",
+    "timestamp": "2026-08-12T07:18:24.592Z",
+    "sessionId": "65be33fd-36df-48c8-8e74-fc7ab38410d6",
+    "detail": "Clicked \"Calculate Estimate\"",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "content_category": "Office",
+      "country_code": "ID"
+    }
+  },
+  {
+    "id": "52529608-5934-4322-a701-42d4005f5ed4",
+    "eventName": "SolarCalculatorInputChange",
+    "timestamp": "2026-08-12T07:18:24.370Z",
+    "sessionId": "65be33fd-36df-48c8-8e74-fc7ab38410d6",
+    "detail": "Changed field \"usableRoofPercentValue\"",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "field": "usableRoofPercentValue"
+    }
+  },
+  {
+    "id": "657f9c34-4bd7-4db3-a00e-6b6c7ca91e67",
+    "eventName": "SolarCalculatorInputChange",
+    "timestamp": "2026-08-12T07:18:17.052Z",
+    "sessionId": "65be33fd-36df-48c8-8e74-fc7ab38410d6",
+    "detail": "Changed field \"limitByArea\"",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "field": "limitByArea"
+    }
+  },
+  {
+    "id": "f7c8bb7d-cf42-451c-934a-7fff549fe863",
+    "eventName": "PageView",
+    "timestamp": "2026-08-12T07:18:11.926Z",
+    "sessionId": "65be33fd-36df-48c8-8e74-fc7ab38410d6",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "-",
+    "countryCode": "-",
+    "data": {}
+  },
+  {
+    "id": "a05d687d-b0de-4313-9968-71745c12f6f0",
+    "eventName": "PageView",
+    "timestamp": "2026-08-12T07:16:27.302Z",
+    "sessionId": "65be33fd-36df-48c8-8e74-fc7ab38410d6",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "-",
+    "countryCode": "-",
+    "data": {}
+  },
+  {
+    "id": "064fd314-89f7-46c0-b5f0-5b7550e4ea5c",
+    "eventName": "PageView",
+    "timestamp": "2026-08-12T07:15:42.830Z",
+    "sessionId": "505656eb-fb14-439c-9cfd-823adf668f9b",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "-",
+    "countryCode": "-",
+    "data": {}
+  },
+  {
+    "id": "4434362e-dfe8-4405-8a41-3e857112bbfd",
+    "eventName": "PageView",
+    "timestamp": "2026-08-12T07:12:33.113Z",
+    "sessionId": "c4a44a46-d8fa-4023-a825-832ed493bcf5",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "-",
+    "countryCode": "-",
+    "data": {}
+  },
+  {
+    "id": "3e9933f2-2c31-44df-a2aa-073c43664827",
+    "eventName": "PageView",
+    "timestamp": "2026-08-12T07:09:34.557Z",
+    "sessionId": "01e1da3b-9f19-4808-9936-f45933e5b2c6",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "-",
+    "countryCode": "-",
+    "data": {}
+  },
+  {
+    "id": "b7351fb0-f4b8-4f5f-8a32-6a1de8633b2a",
+    "eventName": "PageView",
+    "timestamp": "2026-08-12T07:08:45.351Z",
+    "sessionId": "afa74db0-c3b7-40ed-a6b1-73aad3006b5b",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "-",
+    "countryCode": "-",
+    "data": {}
+  },
+  {
+    "id": "fd26bfab-6299-42e1-994c-92148fc7a3ea",
+    "eventName": "PageView",
+    "timestamp": "2026-08-12T06:56:58.500Z",
+    "sessionId": "edc4eb61-fde7-4449-b15f-9067994fbb24",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "-",
+    "countryCode": "-",
+    "data": {}
+  },
+  {
+    "id": "71ef0b4a-341f-4d97-b1c0-e69d8e74aa55",
+    "eventName": "PageView",
+    "timestamp": "2026-08-12T03:34:49.819Z",
+    "sessionId": "265b0d70-00e8-4db9-b298-86aea88b2f95",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "-",
+    "countryCode": "-",
+    "data": {}
+  },
+  {
+    "id": "d6327ccf-5b0a-49ed-bde5-8f152074f03b",
+    "eventName": "ViewContent",
+    "timestamp": "2026-08-12T03:27:34.821Z",
+    "sessionId": "2f786fab-eb2d-480c-a2ef-3c47c801b4b9",
+    "detail": "Clicked \"Calculate Estimate\"",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "content_category": "Office",
+      "country_code": "ID"
+    }
+  },
+  {
+    "id": "54fb5066-0990-4da3-8f56-8e83fc093ee1",
+    "eventName": "PageView",
+    "timestamp": "2026-08-12T03:27:32.351Z",
+    "sessionId": "2f786fab-eb2d-480c-a2ef-3c47c801b4b9",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "-",
+    "countryCode": "-",
+    "data": {}
+  },
+  {
+    "id": "81076daa-7200-4972-a11f-99c1de2bd2d8",
+    "eventName": "ViewContent",
+    "timestamp": "2026-08-09T11:40:17.849Z",
+    "sessionId": "09258bbb-24da-4f2e-aeac-c4d77f1dbcb1",
+    "detail": "Clicked \"Calculate Estimate\"",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "content_category": "Street Lighting",
+      "country_code": "ID"
+    }
+  },
+  {
+    "id": "e215e97e-66b3-4b82-b42e-80313d5cd6fe",
+    "eventName": "SolarCalculatorInputChange",
+    "timestamp": "2026-08-09T11:40:14.615Z",
+    "sessionId": "09258bbb-24da-4f2e-aeac-c4d77f1dbcb1",
+    "detail": "Changed field \"facilitySelect\"",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "field": "facilitySelect"
+    }
+  },
+  {
+    "id": "5839e314-ce22-4084-bb81-32450ebe8388",
+    "eventName": "ViewContent",
+    "timestamp": "2026-08-09T11:39:57.536Z",
+    "sessionId": "09258bbb-24da-4f2e-aeac-c4d77f1dbcb1",
+    "detail": "Clicked \"Calculate Estimate\"",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "content_category": "Office",
+      "country_code": "ID"
+    }
+  },
+  {
+    "id": "a83218f1-f985-4861-a2b5-92dcebef2451",
+    "eventName": "PageView",
+    "timestamp": "2026-08-09T11:39:54.674Z",
+    "sessionId": "09258bbb-24da-4f2e-aeac-c4d77f1dbcb1",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "-",
+    "countryCode": "-",
+    "data": {}
+  },
+  {
+    "id": "62ed8521-86b0-4715-b89d-8821b6760756",
+    "eventName": "Lead",
+    "timestamp": "2026-08-09T11:38:05.613Z",
+    "sessionId": "09258bbb-24da-4f2e-aeac-c4d77f1dbcb1",
+    "detail": "Submitted email to unlock the estimate",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "country_code": "ID",
+      "province": "DKI Jakarta",
+      "city": "Jakarta Timur"
+    }
+  },
+  {
+    "id": "67e7a6e2-f5b4-435b-b1ef-391b9df95097",
+    "eventName": "ViewContent",
+    "timestamp": "2026-08-09T11:37:58.546Z",
+    "sessionId": "09258bbb-24da-4f2e-aeac-c4d77f1dbcb1",
+    "detail": "Clicked \"Calculate Estimate\"",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "content_category": "Office",
+      "country_code": "ID"
+    }
+  },
+  {
+    "id": "fc311ca2-db00-4a4f-8c24-7d5ef3dbee7c",
+    "eventName": "SolarCalculatorInputChange",
+    "timestamp": "2026-08-09T11:37:56.511Z",
+    "sessionId": "09258bbb-24da-4f2e-aeac-c4d77f1dbcb1",
+    "detail": "Changed field \"cityInput\"",
+    "country": "-",
+    "countryCode": "-",
+    "data": {
+      "field": "cityInput"
+    }
+  },
+  {
+    "id": "4cccd494-887c-4ce7-9d82-a52cd85a1f9c",
+    "eventName": "PageView",
+    "timestamp": "2026-08-09T11:37:53.438Z",
+    "sessionId": "09258bbb-24da-4f2e-aeac-c4d77f1dbcb1",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "-",
+    "countryCode": "-",
+    "data": {}
+  },
+  {
+    "id": "9a5c4bc0-bba4-48d8-ada7-b2a012d7f679",
+    "eventName": "PageView",
+    "timestamp": "2026-08-09T11:33:44.856Z",
+    "sessionId": "09258bbb-24da-4f2e-aeac-c4d77f1dbcb1",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "-",
+    "countryCode": "-",
+    "data": {}
+  },
+  {
+    "id": "f4461da9-4a00-4774-af2c-ba797688014b",
+    "eventName": "PageView",
+    "timestamp": "2026-08-09T11:33:37.445Z",
+    "sessionId": "09258bbb-24da-4f2e-aeac-c4d77f1dbcb1",
+    "detail": "Solar Calculator landing page loaded",
+    "country": "-",
+    "countryCode": "-",
+    "data": {}
+  }
+]
